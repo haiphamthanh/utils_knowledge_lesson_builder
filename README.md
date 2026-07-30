@@ -115,6 +115,11 @@ resource/raw → resource/pool → resource/done
 `resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
 `guidelines/resources.md` để biết quy tắc transition.
 
+Skill `$promote-pool-lesson` đã được tạo tại
+`~/.codex/skills/promote-pool-lesson`. Khi gọi skill, agent sẽ liệt kê pool,
+đề xuất lesson/graph/path và yêu cầu xác nhận trước khi tạo nội dung hoặc move
+resource.
+
 ## Kiểm thử
 
 ```bash
