@@ -5,7 +5,8 @@ import sys
 from pathlib import Path
 
 from knowledge_builder.builder import build
-from knowledge_builder.core import BuilderError, create_plan
+from knowledge_builder.core import create_plan
+from knowledge_builder.models import BuilderError
 
 
 def project_root() -> Path:
@@ -65,4 +66,3 @@ def main(argv: list[str] | None = None) -> None:
     except BuilderError as error:
         print(f"[knowledge-builder] Error: {error}", file=sys.stderr)
         raise SystemExit(1) from error
-

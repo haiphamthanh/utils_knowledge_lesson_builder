@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from knowledge_builder.core import BuildPlan, BuilderError
+from knowledge_builder.models import BuildPlan, BuilderError
 
 
 def _format_config(plan: BuildPlan) -> dict[str, Any]:
@@ -140,4 +140,3 @@ def build(plan: BuildPlan) -> Path:
             f"Pandoc build thất bại với exit code {error.returncode}"
         ) from error
     return output_path
-
