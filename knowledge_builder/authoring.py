@@ -1,31 +1,12 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
-import tempfile
 
 import yaml
 
+from knowledge_builder.io_utils import atomic_write
 from knowledge_builder.loading import load_yaml, require_slug
 from knowledge_builder.models import ALLOWED_DEPTHS, BuilderError
-
-
-def _atomic_write(path: Path, content: str) -> None:
-    temporary_path: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            mode="w",
-            encoding="utf-8",
-            dir=path.parent,
-            prefix=f".{path.name}.",
-            delete=False,
-        ) as file:
-            file.write(content)
-            temporary_path = Path(file.name)
-        os.replace(temporary_path, path)
-    finally:
-        if temporary_path is not None and temporary_path.exists():
-            temporary_path.unlink()
 
 
 def create_lesson(
@@ -94,7 +75,7 @@ def create_lesson(
     try:
         with target.open("x", encoding="utf-8") as file:
             file.write(lesson_text)
-        _atomic_write(graph_path, graph_text)
+        atomic_write(graph_path, graph_text)
     except Exception:
         if target.exists():
             target.unlink()

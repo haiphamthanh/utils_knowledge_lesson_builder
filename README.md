@@ -95,6 +95,26 @@ viết nội dung, hãy chọn một trong ba vai trò: `core`, `optional` hoặ
 
 Guideline đầy đủ nằm trong `guidelines/`.
 
+## Resource lifecycle
+
+Nội dung đầu vào đi qua ba trạng thái:
+
+```text
+resource/raw → resource/pool → resource/done
+```
+
+```bash
+./build.sh resource sync
+./build.sh resource list --status pool
+./build.sh resource review <resource-id>
+./build.sh resource complete <resource-id> \
+  --cookbook web-system-foundations \
+  --lesson request-response
+```
+
+`resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
+`guidelines/resources.md` để biết quy tắc transition.
+
 ## Kiểm thử
 
 ```bash
