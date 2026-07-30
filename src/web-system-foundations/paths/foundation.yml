@@ -1,0 +1,35 @@
+id: foundation
+title: "Foundation"
+description: "Lộ trình ngắn cho người mới bắt đầu."
+audience: beginner
+
+chapters:
+  - id: web-runtime
+    title: "Hệ thống đang chạy"
+    context: >-
+      Trước khi chọn framework hay database, người học cần thấy một request đi
+      qua hệ thống và phân biệt dữ liệu tạm thời với dữ liệu cần được giữ lại.
+    objective:
+      - Vẽ được đường đi tối thiểu của một HTTP request.
+      - Nhận ra state nào sẽ mất khi process dừng.
+    out_of_scope:
+      - Chi tiết giao thức TCP.
+      - Kiến trúc microservice.
+    lessons:
+      - request-response
+      - persistent-state
+
+  - id: durable-data
+    title: "Lưu dữ liệu có cấu trúc"
+    context: >-
+      Khi state phải tồn tại qua restart và được nhiều request cùng sử dụng,
+      hệ thống cần một cơ chế lưu trữ có hợp đồng rõ ràng.
+    objective:
+      - Hiểu database giải quyết nhu cầu gì.
+      - Nhận diện lợi ích và chi phí của mô hình quan hệ.
+    out_of_scope:
+      - Tối ưu query nâng cao.
+      - Replication và sharding.
+    lessons:
+      - relational-database
+

@@ -1,0 +1,16 @@
+id: default
+filters:
+  - admonitions.lua
+formats:
+  html:
+    to: html5
+    extension: html
+    template: html-template.html
+    stylesheet: book.css
+    embed_resources: true
+  pdf:
+    to: latex
+    extension: pdf
+    template: pdf-template.tex
+    pdf_engine: xelatex
+

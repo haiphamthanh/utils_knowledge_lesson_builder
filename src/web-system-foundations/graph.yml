@@ -1,0 +1,19 @@
+nodes:
+  request-response:
+    title: "Request và response"
+  persistent-state:
+    title: "Trạng thái bền vững"
+  relational-database:
+    title: "Cơ sở dữ liệu quan hệ"
+
+relations:
+  - from: persistent-state
+    to: request-response
+    type: builds_on
+  - from: relational-database
+    to: persistent-state
+    type: requires
+  - from: persistent-state
+    to: relational-database
+    type: leads_to
+

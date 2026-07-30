@@ -1,0 +1,13 @@
+id: web-system-foundations
+title: "Nền tảng tư duy hệ thống Web"
+subtitle: "Từ request–response đến nhu cầu lưu trữ bền vững"
+author: "Knowledge Cookbook"
+language: vi-VN
+edition: "MVP 0.1"
+default_path: foundation
+template: default
+format: html
+description: >-
+  Một ví dụ nhỏ cho cách tách lesson, knowledge graph và learning path trong
+  hệ thống Knowledge Lesson Builder.
+
