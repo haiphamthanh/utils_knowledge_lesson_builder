@@ -1,0 +1,38 @@
+from: markdown+fenced_divs+fenced_code_attributes+pipe_tables+link_attributes
+standalone: true
+table-of-contents: true
+toc-depth: 2
+number-sections: true
+top-level-division: chapter
+highlight-style: tango
+resource-path:
+  - .
+  - chapters
+  - assets
+filters:
+  - theme/admonitions.lua
+metadata:
+  lang: vi-VN
+  title: Cookbook Xây dựng và Vận hành Hệ thống Web Multi-user
+  subtitle: Auth, PostgreSQL, kiến trúc, deploy và vận hành — case study AI Learn JLPT
+  author: AI Learn JLPT Engineering
+  date: 2026
+  description: >-
+    Sổ tay thực chiến để hiểu, xây dựng, triển khai và vận hành một hệ thống web
+    nhiều người dùng với Node.js, PostgreSQL và một VPS Linux.
+input-files:
+  - chapters/00-preface.md
+  - chapters/01-system-mental-model.md
+  - chapters/02-multi-user-design.md
+  - chapters/03-session-auth.md
+  - chapters/04-auth-hardening.md
+  - chapters/05-postgresql-setup.md
+  - chapters/06-practical-sql.md
+  - chapters/07-postgresql-in-application.md
+  - chapters/08-system-components.md
+  - chapters/09-tool-selection.md
+  - chapters/10-deployment-cicd.md
+  - chapters/11-operations.md
+  - chapters/12-command-cookbook.md
+  - chapters/13-capstone-checklists.md
+

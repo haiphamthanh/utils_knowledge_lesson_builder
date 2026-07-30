@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="$lang$">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="$description$">
+  <title>$title$</title>
+$for(css)$
+  <link rel="stylesheet" href="$css$">
+$endfor$
+$if(highlighting-css)$
+  <style>$highlighting-css$</style>
+$endif$
+</head>
+<body>
+  <header class="book-cover">
+    <p class="eyebrow">SYSTEM ENGINEERING COOKBOOK</p>
+    <h1>$title$</h1>
+    <p class="subtitle">$subtitle$</p>
+    <p class="edition">Case study: AI Learn JLPT · $date$</p>
+  </header>
+  <div class="book-layout">
+$if(toc)$
+    <nav id="$idprefix$TOC" class="toc" aria-label="Mục lục">
+      <h2>Mục lục</h2>
+      $table-of-contents$
+    </nav>
+$endif$
+    <main class="book-content">
+$body$
+    </main>
+  </div>
+  <footer class="book-footer">Cookbook Xây dựng và Vận hành Hệ thống Web Multi-user</footer>
+</body>
+</html>
+

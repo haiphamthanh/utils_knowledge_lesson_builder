@@ -1,0 +1,112 @@
+\documentclass[10pt,b5paper,open=any]{scrbook}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{vietnamese}
+\setmainfont{texgyrepagella}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setsansfont{texgyreheros}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setmonofont{texgyrecursor}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic,
+  Scale=0.86
+]
+\usepackage[b5paper,inner=18mm,outer=15mm,top=19mm,bottom=20mm,headheight=14pt]{geometry}
+\usepackage{xcolor,graphicx,longtable,booktabs,array,calc}
+\usepackage{amssymb}
+\usepackage{hyperref,bookmark}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{fvextra}
+\usepackage{upquote}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\definecolor{BookNavy}{HTML}{17324D}
+\definecolor{BookTeal}{HTML}{0D7C78}
+\definecolor{BookGold}{HTML}{D89524}
+\definecolor{BookCode}{HTML}{F2F4F7}
+\definecolor{BookLine}{HTML}{DCE1E6}
+\hypersetup{colorlinks=true,linkcolor=BookTeal,urlcolor=BookNavy,citecolor=BookTeal,pdfauthor={$author$},pdftitle={$title$}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlist{nosep,leftmargin=*}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\small\sffamily\color{BookNavy}\leftmark}
+\fancyhead[RO]{\small\sffamily\color{BookNavy}\rightmark}
+\fancyfoot[C]{\small\sffamily\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\addtokomafont{chapter}{\color{BookNavy}\sffamily}
+\addtokomafont{section}{\color{BookNavy}\sffamily}
+\addtokomafont{subsection}{\color{BookNavy}\sffamily}
+\RedeclareSectionCommand[beforeskip=0pt,afterskip=1.4\baselineskip]{chapter}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter\enspace #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace #1}}
+\newcommand{\passthrough}[1]{#1}
+\newcommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcommand{\pandocbounded}[1]{\begin{center}\includegraphics[width=\linewidth,height=.8\textheight,keepaspectratio]{#1}\end{center}}
+\newenvironment{CSLReferences}[2]{}{}
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\entryspacing}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\cslhangindent}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth-\cslhangindent}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\small}
+\BeforeBeginEnvironment{Shaded}{\begin{tcolorbox}[colback=BookCode,colframe=BookLine,boxrule=.4pt,arc=2pt,left=2mm,right=2mm,top=1mm,bottom=1mm]}
+\AfterEndEnvironment{Shaded}{\end{tcolorbox}}
+\newtcolorbox{hintbox}{breakable,title=Hint đúc kết,colback=green!4,colframe=BookTeal,fonttitle=\bfseries\sffamily}
+\newtcolorbox{warningbox}{breakable,title=Cảnh báo,colback=orange!6,colframe=orange!70!black,fonttitle=\bfseries\sffamily}
+\newtcolorbox{currentbox}{breakable,title=Hệ thống hiện có,colback=cyan!4,colframe=BookTeal,fonttitle=\bfseries\sffamily}
+\newtcolorbox{recommendationbox}{breakable,title=Khuyến nghị,colback=blue!4,colframe=blue!60!black,fonttitle=\bfseries\sffamily}
+\newtcolorbox{labbox}{breakable,title=Lab thực hành,colback=violet!4,colframe=violet!65!black,fonttitle=\bfseries\sffamily}
+\newtcolorbox{checkpointbox}{breakable,title=Checkpoint,colback=green!5,colframe=green!55!black,fonttitle=\bfseries\sffamily}
+\begin{document}
+\frontmatter
+\begin{titlepage}
+  \pagecolor{BookNavy}\color{white}
+  \vspace*{18mm}
+  {\sffamily\bfseries\fontsize{11}{13}\selectfont\color{cyan!45} SYSTEM ENGINEERING COOKBOOK\par}
+  \vspace{14mm}
+  {\sffamily\bfseries\fontsize{30}{35}\selectfont $title$\par}
+  \vspace{9mm}
+  {\sffamily\fontsize{15}{20}\selectfont\color{white!82} $subtitle$\par}
+  \vfill
+  {\sffamily\color{white!75} Case study: AI Learn JLPT\par}
+  {\sffamily\color{white!75} Phiên bản $date$\par}
+\end{titlepage}
+\nopagecolor\color{black}
+$if(toc)$
+\tableofcontents
+\clearpage
+$endif$
+\let\cleardoublepage\clearpage
+\mainmatter
+$body$
+\backmatter
+\chapter*{Lời kết}
+Một hệ thống đáng tin cậy không được tạo nên bởi số lượng framework, mà bởi các
+boundary rõ ràng, dữ liệu có chủ sở hữu, thay đổi có thể kiểm chứng và quy trình
+phục hồi đã được diễn tập.
+\end{document}

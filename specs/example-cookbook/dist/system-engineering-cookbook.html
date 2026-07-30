@@ -1,0 +1,2482 @@
+<!doctype html>
+<html lang="vi-VN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sổ tay thực chiến để hiểu, xây dựng,
+triển khai và vận hành một hệ thống web nhiều người dùng với Node.js,
+PostgreSQL và một VPS Linux.">
+  <title>Cookbook Xây dựng và Vận hành Hệ thống Web Multi-user</title>
+  <style type="text/css">:root {
+--ink: #172033;
+--muted: #5d6678;
+--paper: #fbfaf7;
+--navy: #17324d;
+--teal: #0d7c78;
+--gold: #d89524;
+--line: #dce1e6;
+--code: #f2f4f7;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+margin: 0;
+color: var(--ink);
+background: var(--paper);
+font: 17px/1.7 Georgia, "Times New Roman", serif;
+}
+a { color: #0969a8; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.book-cover {
+min-height: 68vh;
+padding: clamp(3rem, 9vw, 8rem) max(7vw, 2rem);
+color: white;
+background: linear-gradient(135deg, #10283d 0%, #174c5f 62%, #0d7c78 100%);
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+.book-cover h1 { max-width: 950px; margin: .25rem 0 1rem; padding: 0; color: white; border: 0; font-size: clamp(2.7rem, 6vw, 5.4rem); line-height: 1.05; }
+.eyebrow { color: #8fe0d7; font: 700 .85rem/1.2 Arial, sans-serif; letter-spacing: .18em; }
+.subtitle { max-width: 800px; font: 1.25rem/1.5 Arial, sans-serif; }
+.edition { margin-top: 3rem; color: #d8eef0; font: .95rem/1.4 Arial, sans-serif; }
+.book-layout { display: grid; grid-template-columns: minmax(230px, 310px) minmax(0, 820px); gap: 4rem; max-width: 1240px; margin: auto; padding: 4rem 2rem; }
+.toc { position: sticky; top: 1rem; align-self: start; max-height: calc(100vh - 2rem); overflow: auto; padding-right: 1rem; font: .88rem/1.45 Arial, sans-serif; }
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ul { padding-left: 1.15rem; }
+.toc a { color: #3d4b5e; text-decoration: none; }
+.book-content { min-width: 0; }
+h1, h2, h3, h4 { color: var(--navy); font-family: Arial, sans-serif; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { margin: 5rem 0 1.5rem; padding-top: 1.5rem; border-top: 5px solid var(--teal); font-size: 2.4rem; }
+h1:first-child { margin-top: 0; }
+h2 { margin-top: 2.7rem; font-size: 1.65rem; }
+h3 { margin-top: 2rem; font-size: 1.25rem; }
+p, li { max-width: 75ch; }
+blockquote { margin: 1.5rem 0; padding: .3rem 1.2rem; color: var(--muted); border-left: 4px solid var(--gold); }
+code { padding: .1em .3em; border-radius: 4px; background: var(--code); font: .88em/1.5 Menlo, Consolas, monospace; }
+pre { overflow-x: auto; padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: 8px; background: var(--code); font-size: .84rem; line-height: 1.55; }
+pre code { padding: 0; background: transparent; }
+table { display: block; width: max-content; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin: 1.5rem 0; font-size: .94rem; }
+th, td { padding: .55rem .7rem; border: 1px solid var(--line); vertical-align: top; }
+th { color: var(--navy); background: #edf3f4; font-family: Arial, sans-serif; }
+.admonition { margin: 1.5rem 0; padding: 1rem 1.15rem; border: 1px solid #b8ced0; border-left: 6px solid var(--teal); border-radius: 7px; background: #eff8f7; }
+.admonition > p:first-child { margin-top: 0; color: var(--navy); font-family: Arial, sans-serif; }
+.admonition.warning { border-color: #e8c98e; border-left-color: #c87718; background: #fff8e9; }
+.admonition.recommendation { border-color: #b8c9e5; border-left-color: #426aa8; background: #f1f5fb; }
+.admonition.lab { border-color: #c9bfe3; border-left-color: #7252aa; background: #f7f3fc; }
+.admonition.checkpoint { border-color: #a9d7b0; border-left-color: #32814a; background: #f0f9f1; }
+.book-footer { padding: 2rem; color: #d8e3e8; background: var(--navy); text-align: center; font: .85rem Arial, sans-serif; }
+@media (max-width: 850px) {
+.book-layout { display: block; padding: 2rem 1.25rem; }
+.toc { position: static; max-height: none; margin-bottom: 3rem; padding: 1rem; border: 1px solid var(--line); }
+h1 { font-size: 2rem; }
+}
+@media print {
+.book-cover { min-height: 100vh; }
+.book-layout { display: block; max-width: none; padding: 0; }
+.toc { position: static; max-height: none; }
+a { color: inherit; }
+}
+</style>
+  <style>html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } </style>
+</head>
+<body>
+  <header class="book-cover">
+    <p class="eyebrow">SYSTEM ENGINEERING COOKBOOK</p>
+    <h1>Cookbook Xây dựng và Vận hành Hệ thống Web Multi-user</h1>
+    <p class="subtitle">Auth, PostgreSQL, kiến trúc, deploy và vận hành
+— case study AI Learn JLPT</p>
+    <p class="edition">Case study: AI Learn JLPT · 2026</p>
+  </header>
+  <div class="book-layout">
+    <nav id="TOC" class="toc" aria-label="Mục lục">
+      <h2>Mục lục</h2>
+      <ul>
+      <li><a href="#preface" id="toc-preface">Lời mở đầu</a>
+      <ul>
+      <li><a href="#cách-đọc" id="toc-cách-đọc">Cách đọc</a></li>
+      <li><a href="#luật-an-toàn-cho-lab" id="toc-luật-an-toàn-cho-lab">Luật an toàn cho lab</a></li>
+      </ul></li>
+      <li><a href="#chapter-mental-model" id="toc-chapter-mental-model"><span class="toc-section-number">1</span> Mental model của một hệ thống
+      web</a>
+      <ul>
+      <li><a href="#mục-tiêu" id="toc-mục-tiêu"><span class="toc-section-number">1.1</span> Mục tiêu</a></li>
+      <li><a href="#bảy-khái-niệm-đủ-để-bắt-đầu" id="toc-bảy-khái-niệm-đủ-để-bắt-đầu"><span class="toc-section-number">1.2</span> Bảy khái niệm đủ để bắt
+      đầu</a></li>
+      <li><a href="#source-build-artifact-và-runtime" id="toc-source-build-artifact-và-runtime"><span class="toc-section-number">1.3</span> Source, build artifact và
+      runtime</a></li>
+      <li><a href="#theo-dấu-một-request-thật" id="toc-theo-dấu-một-request-thật"><span class="toc-section-number">1.4</span> Theo dấu một request
+      thật</a></li>
+      <li><a href="#liveness-readiness-và-shutdown" id="toc-liveness-readiness-và-shutdown"><span class="toc-section-number">1.5</span> Liveness, readiness và
+      shutdown</a></li>
+      <li><a href="#lab-truy-dấu-endpoint" id="toc-lab-truy-dấu-endpoint"><span class="toc-section-number">1.6</span> Lab: truy dấu
+      endpoint</a></li>
+      <li><a href="#failure-modes" id="toc-failure-modes"><span class="toc-section-number">1.7</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra" id="toc-tự-kiểm-tra"><span class="toc-section-number">1.8</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-multi-user" id="toc-chapter-multi-user"><span class="toc-section-number">2</span> Thiết kế hệ thống nhiều người
+      dùng</a>
+      <ul>
+      <li><a href="#mục-tiêu-1" id="toc-mục-tiêu-1"><span class="toc-section-number">2.1</span> Mục tiêu</a></li>
+      <li><a href="#bốn-câu-hỏi-khác-nhau" id="toc-bốn-câu-hỏi-khác-nhau"><span class="toc-section-number">2.2</span> Bốn câu hỏi khác
+      nhau</a></li>
+      <li><a href="#phân-loại-dữ-liệu-trước-khi-viết-api" id="toc-phân-loại-dữ-liệu-trước-khi-viết-api"><span class="toc-section-number">2.3</span> Phân loại dữ liệu trước khi
+      viết API</a></li>
+      <li><a href="#idor-và-horizontal-privilege-escalation" id="toc-idor-và-horizontal-privilege-escalation"><span class="toc-section-number">2.4</span> IDOR và horizontal privilege
+      escalation</a></li>
+      <li><a href="#role-hay-permission" id="toc-role-hay-permission"><span class="toc-section-number">2.5</span> Role hay
+      permission?</a></li>
+      <li><a href="#lab-ma-trận-hai-user" id="toc-lab-ma-trận-hai-user"><span class="toc-section-number">2.6</span> Lab: ma trận hai
+      user</a></li>
+      <li><a href="#failure-modes-1" id="toc-failure-modes-1"><span class="toc-section-number">2.7</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-1" id="toc-tự-kiểm-tra-1"><span class="toc-section-number">2.8</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-session-auth" id="toc-chapter-session-auth"><span class="toc-section-number">3</span> Xây dựng session
+      authentication</a>
+      <ul>
+      <li><a href="#mục-tiêu-2" id="toc-mục-tiêu-2"><span class="toc-section-number">3.1</span> Mục tiêu</a></li>
+      <li><a href="#authentication-flow" id="toc-authentication-flow"><span class="toc-section-number">3.2</span> Authentication flow</a></li>
+      <li><a href="#password-hash-không-phải-encryption" id="toc-password-hash-không-phải-encryption"><span class="toc-section-number">3.3</span> Password hash không phải
+      encryption</a></li>
+      <li><a href="#session-và-cookie" id="toc-session-và-cookie"><span class="toc-section-number">3.4</span> Session và cookie</a></li>
+      <li><a href="#request-context-và-access" id="toc-request-context-và-access"><span class="toc-section-number">3.5</span> Request context và
+      access</a></li>
+      <li><a href="#session-hay-jwt" id="toc-session-hay-jwt"><span class="toc-section-number">3.6</span> Session hay JWT?</a></li>
+      <li><a href="#lab-auth-bằng-curl" id="toc-lab-auth-bằng-curl"><span class="toc-section-number">3.7</span> Lab: auth bằng
+      <code>curl</code></a></li>
+      <li><a href="#failure-modes-2" id="toc-failure-modes-2"><span class="toc-section-number">3.8</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-2" id="toc-tự-kiểm-tra-2"><span class="toc-section-number">3.9</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-auth-hardening" id="toc-chapter-auth-hardening"><span class="toc-section-number">4</span> Làm auth đủ an toàn cho
+      production</a>
+      <ul>
+      <li><a href="#mục-tiêu-3" id="toc-mục-tiêu-3"><span class="toc-section-number">4.1</span> Mục tiêu</a></li>
+      <li><a href="#threat-model-tối-thiểu" id="toc-threat-model-tối-thiểu"><span class="toc-section-number">4.2</span> Threat model tối
+      thiểu</a></li>
+      <li><a href="#ưu-tiên-1-giới-hạn-thử-credential" id="toc-ưu-tiên-1-giới-hạn-thử-credential"><span class="toc-section-number">4.3</span> Ưu tiên 1: giới hạn thử
+      credential</a></li>
+      <li><a href="#ưu-tiên-2-session-lifecycle" id="toc-ưu-tiên-2-session-lifecycle"><span class="toc-section-number">4.4</span> Ưu tiên 2: session
+      lifecycle</a></li>
+      <li><a href="#csrf-và-samesite" id="toc-csrf-và-samesite"><span class="toc-section-number">4.5</span> CSRF và SameSite</a></li>
+      <li><a href="#email-verification-và-reset-password" id="toc-email-verification-và-reset-password"><span class="toc-section-number">4.6</span> Email verification và reset
+      password</a></li>
+      <li><a href="#audit-mfa-và-oauth" id="toc-audit-mfa-và-oauth"><span class="toc-section-number">4.7</span> Audit, MFA và OAuth</a></li>
+      <li><a href="#recipe-triển-khai-theo-lát-dọc" id="toc-recipe-triển-khai-theo-lát-dọc"><span class="toc-section-number">4.8</span> Recipe triển khai theo lát
+      dọc</a></li>
+      <li><a href="#lab-review-auth-hiện-tại" id="toc-lab-review-auth-hiện-tại"><span class="toc-section-number">4.9</span> Lab: review auth hiện
+      tại</a></li>
+      <li><a href="#failure-modes-3" id="toc-failure-modes-3"><span class="toc-section-number">4.10</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-3" id="toc-tự-kiểm-tra-3"><span class="toc-section-number">4.11</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-postgresql-setup" id="toc-chapter-postgresql-setup"><span class="toc-section-number">5</span> Cài đặt và kết nối
+      PostgreSQL</a>
+      <ul>
+      <li><a href="#mục-tiêu-4" id="toc-mục-tiêu-4"><span class="toc-section-number">5.1</span> Mục tiêu</a></li>
+      <li><a href="#mental-model" id="toc-mental-model"><span class="toc-section-number">5.2</span> Mental model</a></li>
+      <li><a href="#cài-cho-development" id="toc-cài-cho-development"><span class="toc-section-number">5.3</span> Cài cho development</a></li>
+      <li><a href="#tạo-role-và-database" id="toc-tạo-role-và-database"><span class="toc-section-number">5.4</span> Tạo role và
+      database</a></li>
+      <li><a href="#làm-việc-với-psql" id="toc-làm-việc-với-psql"><span class="toc-section-number">5.5</span> Làm việc với
+      <code>psql</code></a></li>
+      <li><a href="#lab-database-cô-lập" id="toc-lab-database-cô-lập"><span class="toc-section-number">5.6</span> Lab: database cô
+      lập</a></li>
+      <li><a href="#chẩn-đoán-theo-lớp" id="toc-chẩn-đoán-theo-lớp"><span class="toc-section-number">5.7</span> Chẩn đoán theo lớp</a></li>
+      <li><a href="#tự-kiểm-tra-4" id="toc-tự-kiểm-tra-4"><span class="toc-section-number">5.8</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-practical-sql" id="toc-chapter-practical-sql"><span class="toc-section-number">6</span> SQL thực chiến trên schema dự
+      án</a>
+      <ul>
+      <li><a href="#mục-tiêu-5" id="toc-mục-tiêu-5"><span class="toc-section-number">6.1</span> Mục tiêu</a></li>
+      <li><a href="#data-type-là-một-phần-của-thiết-kế" id="toc-data-type-là-một-phần-của-thiết-kế"><span class="toc-section-number">6.2</span> Data type là một phần của
+      thiết kế</a></li>
+      <li><a href="#crud-có-scope" id="toc-crud-có-scope"><span class="toc-section-number">6.3</span> CRUD có scope</a></li>
+      <li><a href="#join-và-quan-hệ" id="toc-join-và-quan-hệ"><span class="toc-section-number">6.4</span> JOIN và quan hệ</a></li>
+      <li><a href="#aggregate-cte-và-pagination" id="toc-aggregate-cte-và-pagination"><span class="toc-section-number">6.5</span> Aggregate, CTE và
+      pagination</a></li>
+      <li><a href="#transaction" id="toc-transaction"><span class="toc-section-number">6.6</span> Transaction</a></li>
+      <li><a href="#index-và-query-plan" id="toc-index-và-query-plan"><span class="toc-section-number">6.7</span> Index và query plan</a></li>
+      <li><a href="#jsonb-dùng-có-chủ-đích" id="toc-jsonb-dùng-có-chủ-đích"><span class="toc-section-number">6.8</span> JSONB: dùng có chủ
+      đích</a></li>
+      <li><a href="#lab-query-an-toàn" id="toc-lab-query-an-toàn"><span class="toc-section-number">6.9</span> Lab: query an toàn</a></li>
+      <li><a href="#failure-modes-4" id="toc-failure-modes-4"><span class="toc-section-number">6.10</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-5" id="toc-tự-kiểm-tra-5"><span class="toc-section-number">6.11</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-postgresql-app" id="toc-chapter-postgresql-app"><span class="toc-section-number">7</span> PostgreSQL bên trong ứng
+      dụng</a>
+      <ul>
+      <li><a href="#mục-tiêu-6" id="toc-mục-tiêu-6"><span class="toc-section-number">7.1</span> Mục tiêu</a></li>
+      <li><a href="#connection-pool" id="toc-connection-pool"><span class="toc-section-number">7.2</span> Connection pool</a></li>
+      <li><a href="#query-và-transaction" id="toc-query-và-transaction"><span class="toc-section-number">7.3</span> Query và
+      transaction</a></li>
+      <li><a href="#migration-như-release-contract" id="toc-migration-như-release-contract"><span class="toc-section-number">7.4</span> Migration như release
+      contract</a></li>
+      <li><a href="#lock-deadlock-và-timeout" id="toc-lock-deadlock-và-timeout"><span class="toc-section-number">7.5</span> Lock, deadlock và
+      timeout</a></li>
+      <li><a href="#backup-và-restore" id="toc-backup-và-restore"><span class="toc-section-number">7.6</span> Backup và restore</a></li>
+      <li><a href="#lab-recovery-drill" id="toc-lab-recovery-drill"><span class="toc-section-number">7.7</span> Lab: recovery drill</a></li>
+      <li><a href="#failure-modes-5" id="toc-failure-modes-5"><span class="toc-section-number">7.8</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-6" id="toc-tự-kiểm-tra-6"><span class="toc-section-number">7.9</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-components" id="toc-chapter-components"><span class="toc-section-number">8</span> Ghép các thành phần thành hệ
+      thống</a>
+      <ul>
+      <li><a href="#mục-tiêu-7" id="toc-mục-tiêu-7"><span class="toc-section-number">8.1</span> Mục tiêu</a></li>
+      <li><a href="#dependency-map" id="toc-dependency-map"><span class="toc-section-number">8.2</span> Dependency map</a></li>
+      <li><a href="#request-flow-và-failure-boundary" id="toc-request-flow-và-failure-boundary"><span class="toc-section-number">8.3</span> Request flow và failure
+      boundary</a></li>
+      <li><a href="#config" id="toc-config"><span class="toc-section-number">8.4</span> Config</a></li>
+      <li><a href="#error-và-log" id="toc-error-và-log"><span class="toc-section-number">8.5</span> Error và log</a></li>
+      <li><a href="#build-và-static-assets" id="toc-build-và-static-assets"><span class="toc-section-number">8.6</span> Build và static
+      assets</a></li>
+      <li><a href="#security-và-resilience-là-thành-phần" id="toc-security-và-resilience-là-thành-phần"><span class="toc-section-number">8.7</span> Security và resilience là
+      thành phần</a></li>
+      <li><a href="#lab-thiết-kế-endpoint-trước-khi-code" id="toc-lab-thiết-kế-endpoint-trước-khi-code"><span class="toc-section-number">8.8</span> Lab: thiết kế endpoint trước
+      khi code</a></li>
+      <li><a href="#failure-modes-6" id="toc-failure-modes-6"><span class="toc-section-number">8.9</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-7" id="toc-tự-kiểm-tra-7"><span class="toc-section-number">8.10</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-tool-selection" id="toc-chapter-tool-selection"><span class="toc-section-number">9</span> Chọn framework, OS và
+      plugin</a>
+      <ul>
+      <li><a href="#mục-tiêu-8" id="toc-mục-tiêu-8"><span class="toc-section-number">9.1</span> Mục tiêu</a></li>
+      <li><a href="#framework-http" id="toc-framework-http"><span class="toc-section-number">9.2</span> Framework HTTP</a></li>
+      <li><a href="#database-access" id="toc-database-access"><span class="toc-section-number">9.3</span> Database access</a></li>
+      <li><a href="#process-và-packaging" id="toc-process-và-packaging"><span class="toc-section-number">9.4</span> Process và
+      packaging</a></li>
+      <li><a href="#reverse-proxy-và-os" id="toc-reverse-proxy-và-os"><span class="toc-section-number">9.5</span> Reverse proxy và OS</a></li>
+      <li><a href="#khi-nào-thêm-thành-phần" id="toc-khi-nào-thêm-thành-phần"><span class="toc-section-number">9.6</span> Khi nào thêm thành
+      phần</a></li>
+      <li><a href="#dependency-gate" id="toc-dependency-gate"><span class="toc-section-number">9.7</span> Dependency gate</a></li>
+      <li><a href="#bộ-cài-tối-thiểu" id="toc-bộ-cài-tối-thiểu"><span class="toc-section-number">9.8</span> Bộ cài tối thiểu</a></li>
+      <li><a href="#lab-architecture-decision-record" id="toc-lab-architecture-decision-record"><span class="toc-section-number">9.9</span> Lab: architecture decision
+      record</a></li>
+      <li><a href="#tự-kiểm-tra-8" id="toc-tự-kiểm-tra-8"><span class="toc-section-number">9.10</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-deployment" id="toc-chapter-deployment"><span class="toc-section-number">10</span> Deploy và CI/CD</a>
+      <ul>
+      <li><a href="#mục-tiêu-9" id="toc-mục-tiêu-9"><span class="toc-section-number">10.1</span> Mục tiêu</a></li>
+      <li><a href="#topology-vps-đơn" id="toc-topology-vps-đơn"><span class="toc-section-number">10.2</span> Topology VPS đơn</a></li>
+      <li><a href="#artifact-và-release-directory" id="toc-artifact-và-release-directory"><span class="toc-section-number">10.3</span> Artifact và release
+      directory</a></li>
+      <li><a href="#thứ-tự-release" id="toc-thứ-tự-release"><span class="toc-section-number">10.4</span> Thứ tự release</a></li>
+      <li><a href="#secret-và-least-privilege" id="toc-secret-và-least-privilege"><span class="toc-section-number">10.5</span> Secret và least
+      privilege</a></li>
+      <li><a href="#systemd-và-nginx" id="toc-systemd-và-nginx"><span class="toc-section-number">10.6</span> systemd và Nginx</a></li>
+      <li><a href="#rollback-nào" id="toc-rollback-nào"><span class="toc-section-number">10.7</span> Rollback nào?</a></li>
+      <li><a href="#lab-đọc-release-như-state-machine" id="toc-lab-đọc-release-như-state-machine"><span class="toc-section-number">10.8</span> Lab: đọc release như state
+      machine</a></li>
+      <li><a href="#failure-modes-7" id="toc-failure-modes-7"><span class="toc-section-number">10.9</span> Failure modes</a></li>
+      <li><a href="#tự-kiểm-tra-9" id="toc-tự-kiểm-tra-9"><span class="toc-section-number">10.10</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-operations" id="toc-chapter-operations"><span class="toc-section-number">11</span> Vận hành và xử lý sự cố</a>
+      <ul>
+      <li><a href="#mục-tiêu-10" id="toc-mục-tiêu-10"><span class="toc-section-number">11.1</span> Mục tiêu</a></li>
+      <li><a href="#bốn-tín-hiệu-đầu-tiên" id="toc-bốn-tín-hiệu-đầu-tiên"><span class="toc-section-number">11.2</span> Bốn tín hiệu đầu
+      tiên</a></li>
+      <li><a href="#evidence-trước-action" id="toc-evidence-trước-action"><span class="toc-section-number">11.3</span> Evidence trước
+      action</a></li>
+      <li><a href="#playbook-app-crash" id="toc-playbook-app-crash"><span class="toc-section-number">11.4</span> Playbook: app
+      crash</a></li>
+      <li><a href="#playbook-postgresql-không-ready" id="toc-playbook-postgresql-không-ready"><span class="toc-section-number">11.5</span> Playbook: PostgreSQL không
+      ready</a></li>
+      <li><a href="#playbook-disk-đầy" id="toc-playbook-disk-đầy"><span class="toc-section-number">11.6</span> Playbook: disk đầy</a></li>
+      <li><a href="#playbook-migrationrelease-lỗi" id="toc-playbook-migrationrelease-lỗi"><span class="toc-section-number">11.7</span> Playbook: migration/release
+      lỗi</a></li>
+      <li><a href="#tls-và-certificate" id="toc-tls-và-certificate"><span class="toc-section-number">11.8</span> TLS và certificate</a></li>
+      <li><a href="#backup-operations" id="toc-backup-operations"><span class="toc-section-number">11.9</span> Backup operations</a></li>
+      <li><a href="#khi-nào-scale" id="toc-khi-nào-scale"><span class="toc-section-number">11.10</span> Khi nào scale</a></li>
+      <li><a href="#lab-game-day-không-phá-dữ-liệu" id="toc-lab-game-day-không-phá-dữ-liệu"><span class="toc-section-number">11.11</span> Lab: game day không phá dữ
+      liệu</a></li>
+      <li><a href="#tự-kiểm-tra-10" id="toc-tự-kiểm-tra-10"><span class="toc-section-number">11.12</span> Tự kiểm tra</a></li>
+      </ul></li>
+      <li><a href="#chapter-commands" id="toc-chapter-commands"><span class="toc-section-number">12</span> Command cookbook</a>
+      <ul>
+      <li><a href="#git-dependency-và-build" id="toc-git-dependency-và-build"><span class="toc-section-number">12.1</span> Git, dependency và
+      build</a></li>
+      <li><a href="#postgresql-status-và-khám-phá" id="toc-postgresql-status-và-khám-phá"><span class="toc-section-number">12.2</span> PostgreSQL status và khám
+      phá</a></li>
+      <li><a href="#database-lifecycle" id="toc-database-lifecycle"><span class="toc-section-number">12.3</span> Database lifecycle</a></li>
+      <li><a href="#backup-và-restore-1" id="toc-backup-và-restore-1"><span class="toc-section-number">12.4</span> Backup và restore</a></li>
+      <li><a href="#http-và-health" id="toc-http-và-health"><span class="toc-section-number">12.5</span> HTTP và health</a></li>
+      <li><a href="#systemd-và-journal" id="toc-systemd-và-journal"><span class="toc-section-number">12.6</span> systemd và journal</a></li>
+      <li><a href="#port-process-và-resource" id="toc-port-process-và-resource"><span class="toc-section-number">12.7</span> Port, process và
+      resource</a></li>
+      <li><a href="#nginx-dns-và-tls" id="toc-nginx-dns-và-tls"><span class="toc-section-number">12.8</span> Nginx, DNS và TLS</a></li>
+      <li><a href="#ssh-và-deploy" id="toc-ssh-và-deploy"><span class="toc-section-number">12.9</span> SSH và deploy</a></li>
+      <li><a href="#cách-dùng-cookbook-khi-incident" id="toc-cách-dùng-cookbook-khi-incident"><span class="toc-section-number">12.10</span> Cách dùng cookbook khi
+      incident</a></li>
+      </ul></li>
+      <li><a href="#chapter-capstone" id="toc-chapter-capstone"><span class="toc-section-number">13</span> Capstone và checklist</a>
+      <ul>
+      <li><a href="#mục-tiêu-11" id="toc-mục-tiêu-11"><span class="toc-section-number">13.1</span> Mục tiêu</a></li>
+      <li><a href="#capstone-từ-login-tới-recovery" id="toc-capstone-từ-login-tới-recovery"><span class="toc-section-number">13.2</span> Capstone: từ login tới
+      recovery</a></li>
+      <li><a href="#maturity-matrix" id="toc-maturity-matrix"><span class="toc-section-number">13.3</span> Maturity matrix</a></li>
+      <li><a href="#checklist-kiến-thức" id="toc-checklist-kiến-thức"><span class="toc-section-number">13.4</span> Checklist kiến
+      thức</a></li>
+      <li><a href="#security-review" id="toc-security-review"><span class="toc-section-number">13.5</span> Security review</a></li>
+      <li><a href="#database-và-go-live-review" id="toc-database-và-go-live-review"><span class="toc-section-number">13.6</span> Database và go-live
+      review</a></li>
+      <li><a href="#câu-hỏi-tình-huống" id="toc-câu-hỏi-tình-huống"><span class="toc-section-number">13.7</span> Câu hỏi tình huống</a></li>
+      <li><a href="#những-thứ-chưa-cần-vội-dùng" id="toc-những-thứ-chưa-cần-vội-dùng"><span class="toc-section-number">13.8</span> Những thứ chưa cần vội
+      dùng</a></li>
+      </ul></li>
+      </ul>
+    </nav>
+    <main class="book-content">
+<h1 class="unnumbered" id="preface">Lời mở đầu</h1>
+<p>Quyển sách này trả lời một câu hỏi thực tế: từ một codebase đang chạy
+trên máy cá nhân, làm thế nào để hiểu, xây dựng và vận hành nó như một
+hệ thống web nhiều người dùng?</p>
+<p>Đây không phải tài liệu “copy lệnh rồi hy vọng”. Mỗi quyết định đều
+đi theo bốn bước: vấn đề là gì, thành phần nào chịu trách nhiệm, cách
+kiểm chứng ra sao, và khi hỏng thì quan sát ở đâu. Dự án AI Learn JLPT
+được dùng làm case study vì nó có đủ một vòng đời nhỏ nhưng thực:
+browser client, native Node.js HTTP server, session authentication,
+PostgreSQL, migration, build artifact, Nginx, systemd và GitHub
+Actions.</p>
+<h2 class="unnumbered" id="cách-đọc">Cách đọc</h2>
+<p>Nếu muốn hiểu toàn hệ thống, đọc tuần tự. Nếu đang giải quyết một
+việc cụ thể:</p>
+<table>
+<thead>
+<tr>
+<th>Nhu cầu</th>
+<th>Chương nên đọc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bổ sung auth hoặc sửa lỗi phân quyền</td>
+<td>2, 3, 4</td>
+</tr>
+<tr>
+<td>Học PostgreSQL và SQL</td>
+<td>5, 6, 7</td>
+</tr>
+<tr>
+<td>Hiểu kiến trúc codebase</td>
+<td>1, 8</td>
+</tr>
+<tr>
+<td>Chọn framework hoặc giảm dependency</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Đưa hệ thống lên VPS</td>
+<td>10, 11, 12</td>
+</tr>
+<tr>
+<td>Tự đánh giá kiến thức</td>
+<td>13</td>
+</tr>
+</tbody>
+</table>
+<p>Các nhãn trong sách có ý nghĩa cố định:</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Nội dung trong hộp này đã được đối chiếu với source hiện tại. Đường
+dẫn code là source of truth; sách giải thích ý nghĩa chứ không thay thế
+code.</p>
+</div>
+<div class="recommendation admonition">
+<p><strong>Khuyến nghị</strong></p>
+<p>Đây là thiết kế nên bổ sung khi yêu cầu production đòi hỏi. Nó không
+được mô tả như một tính năng đã tồn tại.</p>
+</div>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p>Lệnh có thể làm thay đổi dữ liệu hoặc availability. Đọc preflight và
+xác nhận đúng database, host, user trước khi chạy.</p>
+</div>
+<h2 class="unnumbered" id="luật-an-toàn-cho-lab">Luật an toàn cho
+lab</h2>
+<ol type="1">
+<li>Lab database chỉ dùng database có tên chứa <code>lab</code> hoặc
+<code>test</code>.</li>
+<li>Không dùng <code>DATABASE_URL</code> production để chạy smoke test
+hoặc restore.</li>
+<li>Không dán password, token, private key hay dump vào Git.</li>
+<li>Lệnh xoá phải có target cụ thể; không dùng biến chưa được kiểm
+tra.</li>
+<li>Một backup chỉ đáng tin sau khi <code>pg_restore --list</code> và
+restore thử thành công.</li>
+</ol>
+<p>Kiến thức trong sách không phụ thuộc việc bạn chọn native HTTP,
+Express hay NestJS. Framework thay đổi syntax; các invariant về
+identity, ownership, transaction, release và recovery vẫn giữ
+nguyên.</p>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Đọc hệ thống theo luồng dữ liệu, không theo thứ tự thư mục.</li>
+<li>Luôn hỏi “ai sở hữu dữ liệu này?” trước khi viết query.</li>
+<li>Luôn hỏi “nếu bước này hỏng giữa chừng?” trước khi tự động hoá.</li>
+<li>Cài ít công cụ hơn nhưng hiểu rõ failure mode của từng công cụ.</li>
+</ul>
+</div>
+<h1 data-number="1" id="chapter-mental-model"><span class="header-section-number">1</span> Mental model của một hệ thống
+web</h1>
+<h2 data-number="1.1" id="mục-tiêu"><span class="header-section-number">1.1</span> Mục tiêu</h2>
+<p>Sau chương này, bạn có thể vẽ lại đường đi của một request, phân biệt
+source với runtime và biết kiểm tra ở lớp nào khi người dùng báo “ứng
+dụng không chạy”.</p>
+<h2 data-number="1.2" id="bảy-khái-niệm-đủ-để-bắt-đầu"><span class="header-section-number">1.2</span> Bảy khái niệm đủ để bắt
+đầu</h2>
+<ul>
+<li><strong>Client</strong> tạo HTTP request; trong dự án này là
+JavaScript chạy trong browser.</li>
+<li><strong>Server</strong> nhận request và tạo response; đây là process
+Node.js.</li>
+<li><strong>Process</strong> là một chương trình đang chạy, có PID,
+memory và lifecycle.</li>
+<li><strong>Port</strong> giúp hệ điều hành chuyển network traffic tới
+đúng process.</li>
+<li><strong>API</strong> là hợp đồng giữa client và server: method,
+path, input, status, output.</li>
+<li><strong>Database</strong> giữ state lâu dài qua các lần
+restart.</li>
+<li><strong>Environment</strong> cung cấp cấu hình thay đổi theo nơi
+chạy như port và URL DB.</li>
+</ul>
+<p>Một mô hình tối thiểu:</p>
+<pre class="text"><code>Browser
+  -&gt; HTTPS :443
+  -&gt; Nginx reverse proxy
+  -&gt; HTTP 127.0.0.1:5050
+  -&gt; Node.js request handler
+  -&gt; PostgreSQL 127.0.0.1:5432
+  &lt;- JSON/HTML response</code></pre>
+<p>Nginx và Node đều là server nhưng ở hai boundary khác nhau. Nginx kết
+thúc TLS, giới hạn request và proxy. Node hiểu domain rule. PostgreSQL
+thực thi constraint, transaction và lưu state. Đặt đúng trách nhiệm giúp
+lỗi dễ cô lập.</p>
+<h2 data-number="1.3" id="source-build-artifact-và-runtime"><span class="header-section-number">1.3</span> Source, build artifact và
+runtime</h2>
+<p><code>src/</code> là thứ con người sửa. <code>scripts/build.js</code>
+dùng esbuild tạo <code>dist/</code>. Production chạy
+<code>dist/server.js</code>, không chạy TypeScript từ
+<code>src/</code>.</p>
+<pre class="text"><code>source + dependencies + build configuration
+                  |
+                  v
+           reproducible build
+                  |
+                  v
+       dist/server.js + dist/public + migrations
+                  |
+                  v
+            production process</code></pre>
+<p>Điểm quan trọng là <strong>build một lần, chạy cùng
+artifact</strong>. Nếu mỗi host tự build theo dependency và tool version
+khác nhau, “cùng commit” chưa chắc là cùng phần mềm.</p>
+<h2 data-number="1.4" id="theo-dấu-một-request-thật"><span class="header-section-number">1.4</span> Theo dấu một request thật</h2>
+<p>Với <code>GET /api/lessons</code>, đường đi khái quát là:</p>
+<ol type="1">
+<li><code>src/index.ts</code> nhận request, gắn security headers và đo
+thời gian.</li>
+<li><code>src/modules/request-context.ts</code> đọc cookie, tìm user và
+tạo request ID.</li>
+<li><code>src/modules/index.ts</code> tập hợp endpoint registry.</li>
+<li><code>src/lib/dispatcher.ts</code> khớp method/path và kiểm tra
+access metadata.</li>
+<li>Controller chuyển HTTP input thành lời gọi domain/repository.</li>
+<li>Repository gọi <code>src/lib/database.js</code> bằng parameterized
+SQL.</li>
+<li>Response đi ngược lại; logger ghi status và duration.</li>
+</ol>
+<p>Nếu path đúng nhưng method sai, dispatcher trả <code>405</code> và
+header <code>Allow</code>. Nếu không đăng nhập ở endpoint
+<code>user</code>, nó trả <code>401</code>; user thường gọi endpoint
+<code>admin</code> nhận <code>403</code>. Đây là hợp đồng, không phải
+chi tiết UI.</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Endpoint được khai báo bằng
+<code>{ method, pattern, access, controller }</code>. Access có ba mức
+<code>public</code>, <code>user</code>, <code>admin</code>. Unknown
+<code>/api/*</code> luôn trả JSON <code>404</code>, không rơi về HTML
+của frontend.</p>
+</div>
+<h2 data-number="1.5" id="liveness-readiness-và-shutdown"><span class="header-section-number">1.5</span> Liveness, readiness và
+shutdown</h2>
+<p><code>/health/live</code> trả lời “process còn phục vụ HTTP không?”.
+<code>/health/ready</code> còn query <code>SELECT 1</code>, nên trả lời
+“process có đủ dependency để nhận traffic không?”. Không trộn hai khái
+niệm: database tạm down không nhất thiết có nghĩa process đã chết.</p>
+<p>Khi nhận <code>SIGTERM</code>, server dừng nhận kết nối mới, đóng
+connection còn lại sau timeout rồi đóng DB pool. Đây là graceful
+shutdown. Nếu gọi <code>kill -9</code>, ứng dụng không có cơ hội hoàn
+tất quy trình đó.</p>
+<h2 data-number="1.6" id="lab-truy-dấu-endpoint"><span class="header-section-number">1.6</span> Lab: truy dấu endpoint</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> đứng tại root repository; lab chỉ đọc
+source.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">&#39;pattern: &quot;/health/ready&quot;&#39;</span> src/modules</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">&#39;handleReadiness|SELECT 1&#39;</span> src/modules</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">&#39;dispatchEndpoint&#39;</span> src</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">rg</span> <span class="at">-n</span> <span class="st">&#39;createRequestContext&#39;</span> src</span></code></pre></div>
+<p>Với mỗi kết quả, ghi lại input và output của tầng đó. Tiếp tục với
+một endpoint có <code>access: &quot;user&quot;</code> và tìm query cuối cùng.</p>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Bạn phải chỉ ra được nơi path được match, nơi access được chặn và nơi
+PostgreSQL được gọi. Nếu chưa, đừng bắt đầu sửa endpoint.</p>
+</div>
+<h2 data-number="1.7" id="failure-modes"><span class="header-section-number">1.7</span> Failure modes</h2>
+<table>
+<thead>
+<tr>
+<th>Triệu chứng</th>
+<th>Lớp kiểm tra đầu tiên</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Domain không mở</td>
+<td>DNS, firewall, Nginx</td>
+</tr>
+<tr>
+<td><code>502 Bad Gateway</code></td>
+<td>Node process/port</td>
+</tr>
+<tr>
+<td><code>/live</code> 200, <code>/ready</code> 500</td>
+<td>PostgreSQL/config</td>
+</tr>
+<tr>
+<td>API 401</td>
+<td>Cookie/session</td>
+</tr>
+<tr>
+<td>API 403</td>
+<td>Role/ownership</td>
+</tr>
+<tr>
+<td>HTML cũ sau deploy</td>
+<td>Artifact/cache/release symlink</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="1.8" id="tự-kiểm-tra"><span class="header-section-number">1.8</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Tại sao port 5050 không nên mở ra Internet khi đã có Nginx?</li>
+<li>Tại sao source chạy được không chứng minh artifact production chạy
+được?</li>
+<li>Một database outage nên làm liveness hay readiness thất bại?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Tìm entrypoint, request flow, data store và process manager trước
+khi đọc chi tiết.</li>
+<li>Dùng request ID để nối log giữa các boundary.</li>
+<li>Health check phải kiểm tra đúng thứ bạn định tự động phục hồi.</li>
+<li>Một lỗi được khoanh vùng tốt có giá trị hơn một lần restart may
+mắn.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-multi-user">Thiết kế hệ thống nhiều
+người dùng</a>.</p>
+<h1 data-number="2" id="chapter-multi-user"><span class="header-section-number">2</span> Thiết kế hệ thống nhiều người
+dùng</h1>
+<h2 data-number="2.1" id="mục-tiêu-1"><span class="header-section-number">2.1</span> Mục tiêu</h2>
+<p>Thiết kế multi-user không bắt đầu bằng màn hình login. Nó bắt đầu
+bằng việc xác định identity nào đang thao tác và record nào identity đó
+được phép chạm tới.</p>
+<h2 data-number="2.2" id="bốn-câu-hỏi-khác-nhau"><span class="header-section-number">2.2</span> Bốn câu hỏi khác nhau</h2>
+<table>
+<thead>
+<tr>
+<th>Khái niệm</th>
+<th>Câu hỏi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identity</td>
+<td>Chủ thể này là ai?</td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>Bằng chứng nhận dạng có hợp lệ không?</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Chủ thể được phép thực hiện action nào?</td>
+</tr>
+<tr>
+<td>Ownership</td>
+<td>Record cụ thể này thuộc về ai?</td>
+</tr>
+</tbody>
+</table>
+<p>Role <code>USER</code> cho phép gọi endpoint tạo note không đồng
+nghĩa user được sửa mọi note. Role trả lời quyền theo loại hành động;
+ownership trả lời quyền trên từng record.</p>
+<h2 data-number="2.3" id="phân-loại-dữ-liệu-trước-khi-viết-api"><span class="header-section-number">2.3</span> Phân loại dữ liệu trước khi
+viết API</h2>
+<p>Dự án dùng ba loại chính:</p>
+<ul>
+<li><code>USER_PRIVATE</code>: input, note, highlight, favorite,
+selection, study action.</li>
+<li><code>ADMIN_SHARED</code>: lesson/catalog được admin quản lý và
+learner cùng đọc.</li>
+<li><code>SYSTEM_CONFIG</code>: cấu hình build/runtime, không phải nội
+dung cá nhân.</li>
+</ul>
+<p>Mỗi table private có <code>user_id</code> trực tiếp, hoặc join tới
+một record có <code>user_id</code>. Điều này làm ownership trở thành dữ
+liệu có thể query và test, thay vì một giả định trong UI.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, note_date, content</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> manual_notes</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> user_id <span class="op">=</span> $<span class="dv">1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> note_date <span class="kw">DESC</span>;</span></code></pre></div>
+<p>Không query theo <code>id</code> rồi mới hy vọng controller nhớ so
+sánh owner. Cách an toàn hơn là đưa owner vào điều kiện tìm record:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DELETE</span> <span class="kw">FROM</span> manual_notes</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> $<span class="dv">1</span> <span class="kw">AND</span> user_id <span class="op">=</span> $<span class="dv">2</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RETURNING</span> <span class="kw">id</span>;</span></code></pre></div>
+<p>Nếu không có row trả về, API không cần tiết lộ record không tồn tại
+hay thuộc user khác.</p>
+<h2 data-number="2.4" id="idor-và-horizontal-privilege-escalation"><span class="header-section-number">2.4</span> IDOR và horizontal privilege
+escalation</h2>
+<p>IDOR xảy ra khi client thay ID trong URL/body và server tin rằng ID
+hợp lệ đồng nghĩa được phép truy cập. Đây là lỗi phía server; ẩn nút
+trên frontend không sửa được.</p>
+<p>Ví dụ nguy hiểm:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> manual_notes <span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> $<span class="dv">1</span>;</span></code></pre></div>
+<p>User B lấy được UUID của User A bằng log, link chia sẻ nhầm hoặc đoán
+từ API khác thì có thể đọc record. UUID làm việc đoán khó hơn, không
+thay thế authorization.</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Các repository private trong dự án lọc theo authenticated
+<code>user_id</code>. Image bytes được join qua
+<code>user_inputs.user_id</code> trước khi trả nội dung. Smoke suite tạo
+hai user để kiểm tra B không đọc hoặc sửa dữ liệu của A.</p>
+</div>
+<h2 data-number="2.5" id="role-hay-permission"><span class="header-section-number">2.5</span> Role hay permission?</h2>
+<p>Hai role <code>USER</code>/<code>ADMIN</code> đủ khi policy đơn giản
+và ổn định. Khi xuất hiện editor, support, content reviewer hoặc quyền
+theo tổ chức, một chuỗi <code>if role === ...</code> sẽ nhanh chóng khó
+kiểm soát.</p>
+<p>Chuyển sang permission khi:</p>
+<ul>
+<li>Một user có nhiều vai trò theo tenant/project.</li>
+<li>Cùng action nhưng scope khác nhau.</li>
+<li>Policy cần audit và thay đổi không deploy code.</li>
+</ul>
+<p>Đừng thiết kế RBAC tổng quát trước khi có yêu cầu. Với ứng dụng nhỏ,
+endpoint access metadata cộng ownership query rõ ràng dễ review hơn.</p>
+<h2 data-number="2.6" id="lab-ma-trận-hai-user"><span class="header-section-number">2.6</span> Lab: ma trận hai user</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> chạy server với một
+<code>TEST_DATABASE_URL</code> có tên chứa <code>test</code>; không dùng
+dữ liệu production.</p>
+<ol type="1">
+<li>Đăng ký User A và User B, mỗi user giữ cookie jar riêng.</li>
+<li>A tạo một manual note, ghi lại ID.</li>
+<li>B thử list, read, update và delete ID của A.</li>
+<li>Kỳ vọng B không thấy record và không thay đổi được nó.</li>
+<li>A đọc lại record để chứng minh dữ liệu còn nguyên.</li>
+</ol>
+<p>Có thể dùng smoke suite hiện tại làm oracle:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">TEST_DATABASE_URL</span><span class="op">=</span>postgresql://localhost:5432/ai_learn_jlpt_test <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">npm</span> run test:integration</span></code></pre></div>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Test phải chứng minh cả <strong>không lộ dữ liệu</strong> và
+<strong>không làm thay đổi dữ liệu</strong>. Chỉ test response status là
+chưa đủ; đọc lại record của A sau phép thử của B.</p>
+</div>
+<h2 data-number="2.7" id="failure-modes-1"><span class="header-section-number">2.7</span> Failure modes</h2>
+<ul>
+<li>List lọc owner nhưng update/delete quên lọc.</li>
+<li>Table con không có <code>user_id</code>, join ownership sai hoặc
+thiếu.</li>
+<li>Endpoint admin được bảo vệ nhưng static CMS page lại bị coi là lớp
+bảo mật.</li>
+<li>Dùng email từ request body thay vì user ID từ authenticated
+context.</li>
+<li>Batch query nhận một mảng ID nhưng không giới hạn tất cả ID theo
+owner.</li>
+</ul>
+<h2 data-number="2.8" id="tự-kiểm-tra-1"><span class="header-section-number">2.8</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Vì sao UUID không phải access control?</li>
+<li>Khi nào <code>404</code> an toàn hơn việc nói “record thuộc user
+khác”?</li>
+<li>Shared catalog khác private note ở invariant nào?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Gắn owner vào record ngay từ lúc tạo.</li>
+<li>Lấy owner từ session context, không lấy từ payload của client.</li>
+<li>Viết ma trận quyền trước endpoint: anonymous, owner, non-owner,
+admin.</li>
+<li>Test mọi verb; lỗi ownership thường nằm ở update/delete hơn
+list.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-session-auth">Xây dựng session
+authentication</a>.</p>
+<h1 data-number="3" id="chapter-session-auth"><span class="header-section-number">3</span> Xây dựng session
+authentication</h1>
+<h2 data-number="3.1" id="mục-tiêu-2"><span class="header-section-number">3.1</span> Mục tiêu</h2>
+<p>Hiểu trọn vòng đời register/login/session/logout và các quyết định
+bảo mật đang được hiện thực trong
+<code>src/modules/common/auth/</code>.</p>
+<h2 data-number="3.2" id="authentication-flow"><span class="header-section-number">3.2</span> Authentication flow</h2>
+<pre class="text"><code>email + password
+  -&gt; normalize + validate
+  -&gt; lookup password hash
+  -&gt; scrypt + timing-safe comparison
+  -&gt; random session token
+  -&gt; store SHA-256(token) in PostgreSQL
+  -&gt; send raw token once in HttpOnly cookie</code></pre>
+<p>Server cần raw token để gửi client nhưng không cần lưu nó. Những
+request sau gửi cookie; server hash token rồi join <code>sessions</code>
+với <code>users</code>. Nếu database bị đọc trộm, token hash không thể
+được dùng trực tiếp làm cookie.</p>
+<h2 data-number="3.3" id="password-hash-không-phải-encryption"><span class="header-section-number">3.3</span> Password hash không phải
+encryption</h2>
+<p>Encryption có key để giải mã. Password storage cần hàm một chiều,
+chậm và có salt riêng. Dự án tạo salt 16 byte và dùng
+<code>crypto.scryptSync</code>; chuỗi lưu có dạng:</p>
+<pre class="text"><code>scrypt:&lt;salt-hex&gt;:&lt;derived-key-hex&gt;</code></pre>
+<p>Salt chống bảng hash dựng sẵn và làm hai user cùng password có hash
+khác nhau. <code>timingSafeEqual</code> giảm rò rỉ timing khi so sánh
+derived key.</p>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p>Không tự thiết kế thuật toán mật mã. Việc định dạng hash có
+version/scheme là hữu ích để sau này rehash, nhưng primitive phải đến từ
+thư viện chuẩn đã review.</p>
+</div>
+<h2 data-number="3.4" id="session-và-cookie"><span class="header-section-number">3.4</span> Session và cookie</h2>
+<p>Token được tạo bằng
+<code>randomBytes(32).toString(&quot;base64url&quot;)</code>. Session hết hạn sau
+14 ngày. Cookie có:</p>
+<ul>
+<li><code>HttpOnly</code>: JavaScript browser không đọc token.</li>
+<li><code>SameSite=Lax</code>: giảm một số cross-site request.</li>
+<li><code>Secure</code> ở production: chỉ gửi qua HTTPS.</li>
+<li><code>Path=/</code>: dùng cho toàn ứng dụng.</li>
+<li><code>Expires</code>: browser biết thời điểm bỏ cookie.</li>
+</ul>
+<p><code>HttpOnly</code> không chống việc browser tự gửi cookie trong
+request xấu; vì vậy XSS, CSRF và validation vẫn cần được xử lý
+riêng.</p>
+<h2 data-number="3.5" id="request-context-và-access"><span class="header-section-number">3.5</span> Request context và access</h2>
+<p>Mỗi request đọc token từ cookie, tìm session còn hạn và tạo
+<code>currentUser</code> công khai chỉ gồm <code>id</code>,
+<code>email</code>, <code>role</code>. Password hash không đi vào
+context hoặc response.</p>
+<ul>
+<li>Không có user ở endpoint private:
+<code>401 Authentication required</code>.</li>
+<li>Có user nhưng thiếu role:
+<code>403 Admin access required</code>.</li>
+<li>Có role nhưng record thuộc người khác: repository không trả
+record.</li>
+</ul>
+<p>Logout xoá session trong database rồi gửi cookie có
+<code>Max-Age=0</code>. Chỉ xoá cookie mà không xoá DB session sẽ để
+token bị đánh cắp tiếp tục hợp lệ.</p>
+<h2 data-number="3.6" id="session-hay-jwt"><span class="header-section-number">3.6</span> Session hay JWT?</h2>
+<table>
+<thead>
+<tr>
+<th>Tiêu chí</th>
+<th>Session DB</th>
+<th>JWT access token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Revoke tức thì</td>
+<td>Dễ, xoá row</td>
+<td>Khó nếu không có denylist/TTL ngắn</td>
+</tr>
+<tr>
+<td>Mỗi request</td>
+<td>Query/cache session</td>
+<td>Verify chữ ký</td>
+</tr>
+<tr>
+<td>State server</td>
+<td>Có</td>
+<td>Thường không</td>
+</tr>
+<tr>
+<td>Thay đổi role tức thì</td>
+<td>Có</td>
+<td>Chờ token mới</td>
+</tr>
+<tr>
+<td>Phù hợp browser app nhỏ</td>
+<td>Rất phù hợp</td>
+<td>Thường không cần</td>
+</tr>
+</tbody>
+</table>
+<p>JWT hữu ích giữa service hoặc hệ identity phân tán, nhưng không tự
+động an toàn hơn. Nếu cuối cùng vẫn cần revoke store, refresh token và
+rotation, độ phức tạp có thể cao hơn session.</p>
+<h2 data-number="3.7" id="lab-auth-bằng-curl"><span class="header-section-number">3.7</span> Lab: auth bằng
+<code>curl</code></h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> server local chạy trên test DB; file
+cookie nằm ngoài Git.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="ss">lab</span><span class="pp">*</span><span class="kw">|</span><span class="pp">*</span><span class="ss">test</span><span class="pp">*</span><span class="kw">)</span> <span class="cf">;;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="kw">)</span> <span class="bu">echo</span> <span class="st">&#39;Refusing non-test database&#39;</span><span class="kw">;</span> <span class="bu">exit</span> 1 <span class="cf">;;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="va">cookie_jar</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="fu">mktemp</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="va">base_url</span><span class="op">=</span><span class="st">&quot;http://127.0.0.1:5050&quot;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> <span class="at">-c</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span> <span class="at">-H</span> <span class="st">&#39;Content-Type: application/json&#39;</span> <span class="dt">\</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">&#39;{&quot;email&quot;:&quot;cookbook-user@example.test&quot;,&quot;password&quot;:&quot;safe-lab-password&quot;}&#39;</span> <span class="dt">\</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;</span><span class="va">$base_url</span><span class="st">/api/auth/register&quot;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sS</span> <span class="at">-b</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$base_url</span><span class="st">/api/me&quot;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> <span class="at">-b</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span> <span class="at">-c</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span> <span class="at">-X</span> POST <span class="dt">\</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;</span><span class="va">$base_url</span><span class="st">/api/auth/logout&quot;</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sS</span> <span class="at">-b</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$base_url</span><span class="st">/api/me&quot;</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xv</span> ON_ERROR_STOP=1 <span class="at">-c</span> <span class="dt">\</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;DELETE FROM users WHERE email=&#39;cookbook-user@example.test&#39;&quot;</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> <span class="st">&quot;</span><span class="va">$cookie_jar</span><span class="st">&quot;</span></span></code></pre></div>
+<p>Kỳ vọng: register trả <code>201</code> và <code>Set-Cookie</code>;
+<code>/me</code> đầu có user; logout trả 200; <code>/me</code> cuối có
+<code>user: null</code>.</p>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Mở cookie jar chỉ để xác nhận attribute/format, không chép token vào
+log hoặc tài liệu. Query table <code>sessions</code> phải thấy token
+hash, không thấy raw cookie token.</p>
+</div>
+<h2 data-number="3.8" id="failure-modes-2"><span class="header-section-number">3.8</span> Failure modes</h2>
+<ul>
+<li>Trả password hash trong JSON do dùng <code>SELECT *</code>.</li>
+<li>Phân biệt “email không tồn tại” và “password sai”, hỗ trợ user
+enumeration.</li>
+<li>Production không dùng HTTPS khiến cookie <code>Secure</code> không
+hoạt động đúng luồng.</li>
+<li>Session hết hạn không được dọn định kỳ.</li>
+<li>Role thay đổi nhưng session/JWT cũ vẫn mang policy cũ.</li>
+</ul>
+<h2 data-number="3.9" id="tự-kiểm-tra-2"><span class="header-section-number">3.9</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Tại sao salt có thể lưu cạnh hash?</li>
+<li>Token hash bảo vệ tình huống nào?</li>
+<li>Khác biệt giữa xoá cookie và revoke session là gì?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Auth response chỉ trả public user projection.</li>
+<li>Dùng thông báo login chung để giảm user enumeration.</li>
+<li>Session ID là credential; bảo vệ như password.</li>
+<li>Chọn session trước nếu hệ thống là browser app cùng domain và cần
+revoke dễ.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-auth-hardening">Làm auth đủ an toàn cho
+production</a>.</p>
+<h1 data-number="4" id="chapter-auth-hardening"><span class="header-section-number">4</span> Làm auth đủ an toàn cho
+production</h1>
+<h2 data-number="4.1" id="mục-tiêu-3"><span class="header-section-number">4.1</span> Mục tiêu</h2>
+<p>Auth hiện tại có nền tảng tốt nhưng “đăng nhập được” khác “chịu được
+Internet”. Chương này sắp thứ tự các lớp phòng vệ cần bổ sung theo rủi
+ro.</p>
+<h2 data-number="4.2" id="threat-model-tối-thiểu"><span class="header-section-number">4.2</span> Threat model tối thiểu</h2>
+<p>Giả định attacker có thể:</p>
+<ul>
+<li>Gửi login/register tự động với tốc độ cao.</li>
+<li>Biết email từ nguồn khác và thử password bị lộ.</li>
+<li>Lừa user mở trang ngoài để gửi request chéo.</li>
+<li>Có được một session token qua máy dùng chung hoặc log sai cách.</li>
+<li>Thay ID, role hoặc <code>user_id</code> trong payload.</li>
+</ul>
+<p>Threat model biến từ “hãy làm auth an toàn” thành test cụ thể.</p>
+<h2 data-number="4.3" id="ưu-tiên-1-giới-hạn-thử-credential"><span class="header-section-number">4.3</span> Ưu tiên 1: giới hạn thử
+credential</h2>
+<div class="recommendation admonition">
+<p><strong>Khuyến nghị</strong></p>
+<p>Thêm rate limit theo cả IP và normalized account key. Ví dụ: cửa sổ
+ngắn cho IP, backoff tăng dần cho account, log sự kiện nhưng không log
+password. Trả response giống nhau cho email tồn tại và không tồn
+tại.</p>
+</div>
+<p>Không khoá account vĩnh viễn sau vài lần sai; attacker có thể dùng cơ
+chế đó để DoS người khác. Một thiết kế hợp lý kết hợp delay, limit và
+cảnh báo.</p>
+<h2 data-number="4.4" id="ưu-tiên-2-session-lifecycle"><span class="header-section-number">4.4</span> Ưu tiên 2: session
+lifecycle</h2>
+<ul>
+<li>Rotate session sau login hoặc thay đổi privilege.</li>
+<li>Cho user xem và revoke các session khác.</li>
+<li>Revoke toàn bộ khi đổi/reset password.</li>
+<li>Dọn <code>expires_at &lt;= NOW()</code> bằng job định kỳ.</li>
+<li>Lưu metadata tối thiểu phục vụ audit như created time; cân nhắc
+privacy trước khi lưu IP/user agent dài hạn.</li>
+</ul>
+<p>Query cleanup đơn giản:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DELETE</span> <span class="kw">FROM</span> sessions <span class="kw">WHERE</span> expires_at <span class="op">&lt;=</span> NOW();</span></code></pre></div>
+<h2 data-number="4.5" id="csrf-và-samesite"><span class="header-section-number">4.5</span> CSRF và SameSite</h2>
+<p><code>SameSite=Lax</code> giảm nhiều cross-site POST truyền thống
+nhưng không thay thế toàn bộ CSRF defense. Nếu có endpoint nhạy cảm,
+cross-origin integration hoặc thay đổi cookie policy, dùng CSRF token
+gắn với session và kiểm tra <code>Origin</code>.</p>
+<p>Không dùng GET để thay đổi state. <code>GET /logout</code> hay
+<code>GET /delete</code> khiến browser, prefetcher và crawler có thể
+kích hoạt action ngoài ý muốn.</p>
+<h2 data-number="4.6" id="email-verification-và-reset-password"><span class="header-section-number">4.6</span> Email verification và reset
+password</h2>
+<p>Hai luồng này nên dùng token ngẫu nhiên một lần, lưu token hash cùng
+expiry:</p>
+<pre class="text"><code>request reset
+  -&gt; luôn trả response chung
+  -&gt; nếu account tồn tại: tạo random token
+  -&gt; lưu hash(token), purpose, user_id, expires_at, used_at
+  -&gt; gửi raw token qua email
+  -&gt; consume trong transaction
+  -&gt; đổi password + revoke sessions + đánh dấu used_at</code></pre>
+<p>Schema đề xuất có thể dùng table <code>auth_tokens</code> với unique
+token hash, <code>purpose</code> giới hạn
+<code>VERIFY_EMAIL</code>/<code>RESET_PASSWORD</code>, expiry ngắn và
+<code>used_at</code>.</p>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p>Không lưu raw reset token, không gửi password mới qua email và không
+cho phép một token được dùng hai lần. Link reset có thể xuất hiện trong
+browser history hoặc proxy log; TTL phải ngắn.</p>
+</div>
+<h2 data-number="4.7" id="audit-mfa-và-oauth"><span class="header-section-number">4.7</span> Audit, MFA và OAuth</h2>
+<p>Audit log nên ghi <code>event</code>, <code>actor_user_id</code>,
+<code>target_user_id</code>, request ID, time và outcome; không ghi
+password/token/body. Sự kiện quan trọng: login success/fail, password
+reset, role change, revoke session và admin action.</p>
+<p>MFA đáng thêm khi account có dữ liệu giá trị cao hoặc quyền admin.
+OAuth/OIDC đáng thêm khi tổ chức đã có identity provider. Cả hai tạo
+recovery và operational work mới; không nên thêm chỉ để thay form login
+đang đủ dùng.</p>
+<h2 data-number="4.8" id="recipe-triển-khai-theo-lát-dọc"><span class="header-section-number">4.8</span> Recipe triển khai theo lát
+dọc</h2>
+<ol type="1">
+<li>Viết threat/test case trước.</li>
+<li>Thêm schema bằng migration forward-only.</li>
+<li>Tạo repository chỉ xử lý token hash và transaction.</li>
+<li>Tạo service áp policy TTL/one-time/revoke.</li>
+<li>Controller chỉ parse input và map lỗi chung.</li>
+<li>Thêm audit event và metric.</li>
+<li>Test token hết hạn, reuse, concurrent consume và cross-user.</li>
+</ol>
+<h2 data-number="4.9" id="lab-review-auth-hiện-tại"><span class="header-section-number">4.9</span> Lab: review auth hiện tại</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p>Không sửa code. Lập bảng cho <code>register</code>,
+<code>login</code>, <code>logout</code>, <code>change role</code> với
+các cột: asset, attacker, abuse case, control hiện có, control còn
+thiếu, test.</p>
+<p>Đối chiếu các file <code>auth.js</code>, <code>session.js</code>,
+<code>controller.ts</code>, <code>dispatcher.ts</code> và smoke test. Ưu
+tiên ba gap có impact cao nhất thay vì liệt kê công nghệ.</p>
+</div>
+<h2 data-number="4.10" id="failure-modes-3"><span class="header-section-number">4.10</span> Failure modes</h2>
+<ul>
+<li>Rate limit chỉ theo IP, làm hỏng user sau NAT hoặc dễ đổi IP để
+vượt.</li>
+<li>Reset token không one-time hoặc không revoke session cũ.</li>
+<li>Audit log chứa credential.</li>
+<li>Bật OAuth nhưng bỏ qua account linking takeover.</li>
+<li>Thêm MFA nhưng không thiết kế recovery code/support flow.</li>
+</ul>
+<h2 data-number="4.11" id="tự-kiểm-tra-3"><span class="header-section-number">4.11</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Tại sao account lock cứng có thể trở thành DoS?</li>
+<li>Vì sao reset password cần revoke session?</li>
+<li>Khi nào SameSite chưa đủ chống CSRF?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Hardening theo threat, không theo checklist công nghệ.</li>
+<li>Token một lần phải có purpose, expiry và atomic consume.</li>
+<li>Admin là mục tiêu ưu tiên cho MFA và audit.</li>
+<li>Recovery flow thường rủi ro hơn happy-path login; review nó trước
+go-live.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-postgresql-setup">Cài đặt và kết nối
+PostgreSQL</a>.</p>
+<h1 data-number="5" id="chapter-postgresql-setup"><span class="header-section-number">5</span> Cài đặt và kết nối
+PostgreSQL</h1>
+<h2 data-number="5.1" id="mục-tiêu-4"><span class="header-section-number">5.1</span> Mục tiêu</h2>
+<p>Hiểu PostgreSQL đang chạy ở đâu, đăng nhập bằng identity nào và phân
+biệt lỗi service, network, role với database. Đây là nền để mọi chương
+SQL sau có thể thực hành an toàn.</p>
+<h2 data-number="5.2" id="mental-model"><span class="header-section-number">5.2</span> Mental model</h2>
+<pre class="text"><code>PostgreSQL cluster (một server process)
+  +-- role: postgres          quản trị
+  +-- role: ai_learn_app      ứng dụng
+  +-- database: postgres      maintenance
+  +-- database: ai_learn_jlpt
+        +-- schema: public
+              +-- users
+              +-- sessions
+              +-- ...</code></pre>
+<p><strong>Role</strong> là identity/quyền trong PostgreSQL.
+<strong>Database</strong> là vùng dữ liệu có connection boundary.
+<strong>Schema</strong> là namespace bên trong database.
+<strong>Table</strong> giữ row. Một cluster có nhiều database; một
+connection chỉ làm việc trong một database tại một thời điểm.</p>
+<h2 data-number="5.3" id="cài-cho-development"><span class="header-section-number">5.3</span> Cài cho development</h2>
+<p>Trên macOS với Homebrew:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install postgresql@16</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> services start postgresql@16</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="at">--version</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_isready</span></span></code></pre></div>
+<p>Trên Ubuntu VPS:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install postgresql postgresql-client</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl enable <span class="at">--now</span> postgresql</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status postgresql <span class="at">--no-pager</span></span></code></pre></div>
+<p>Docker phù hợp cho môi trường lab tạm thời nhưng thêm volume/network
+lifecycle. Nếu đã có PostgreSQL native ổn định, không cần thêm container
+chỉ để “chuẩn hoá”.</p>
+<h2 data-number="5.4" id="tạo-role-và-database"><span class="header-section-number">5.4</span> Tạo role và database</h2>
+<p>Production nên dùng role riêng, không để ứng dụng kết nối bằng
+superuser:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-u</span> postgres createuser <span class="at">--no-superuser</span> <span class="at">--no-createdb</span> <span class="at">--no-createrole</span> ai_learn_app</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-u</span> postgres createdb <span class="at">--owner</span><span class="op">=</span>ai_learn_app ai_learn_jlpt</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-u</span> postgres psql <span class="at">-c</span> <span class="st">&quot;ALTER ROLE ai_learn_app PASSWORD &#39;REPLACE_ME&#39;;&quot;</span></span></code></pre></div>
+<p>Không đặt password thật trực tiếp trong shell history. Script
+provision của dự án tạo password ngẫu nhiên và ghi environment file
+quyền hạn chế.</p>
+<p>Connection string có cấu trúc:</p>
+<pre class="text"><code>postgresql://USER:PASSWORD@HOST:PORT/DATABASE</code></pre>
+<p>Ví dụ local không có credential thật:</p>
+<pre class="dotenv"><code>DATABASE_URL=postgresql://localhost:5432/ai_learn_jlpt</code></pre>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p><code>src/lib/config.js</code> fail fast nếu thiếu
+<code>DATABASE_URL</code>; <code>src/lib/database.js</code> tạo
+<code>pg.Pool</code>. Server query <code>SELECT 1</code> trước khi
+listen nên cấu hình DB sai không tạo ra một process “có vẻ chạy” nhưng
+vô dụng.</p>
+</div>
+<h2 data-number="5.5" id="làm-việc-với-psql"><span class="header-section-number">5.5</span> Làm việc với
+<code>psql</code></h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span></span></code></pre></div>
+<p>Các meta-command chạy bên trong <code>psql</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Lệnh</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>\conninfo</code></td>
+<td>Connection hiện tại</td>
+</tr>
+<tr>
+<td><code>\l</code></td>
+<td>Danh sách database</td>
+</tr>
+<tr>
+<td><code>\du</code></td>
+<td>Role và attribute</td>
+</tr>
+<tr>
+<td><code>\c db_name</code></td>
+<td>Đổi database</td>
+</tr>
+<tr>
+<td><code>\dn</code></td>
+<td>Danh sách schema</td>
+</tr>
+<tr>
+<td><code>\dt</code></td>
+<td>Table trong search path</td>
+</tr>
+<tr>
+<td><code>\d users</code></td>
+<td>Mô tả table/index/constraint</td>
+</tr>
+<tr>
+<td><code>\x</code></td>
+<td>Bật/tắt expanded output</td>
+</tr>
+<tr>
+<td><code>\timing</code></td>
+<td>Hiện thời gian query</td>
+</tr>
+<tr>
+<td><code>\q</code></td>
+<td>Thoát</td>
+</tr>
+</tbody>
+</table>
+<p>Với automation, dùng <code>-X</code> để không đọc
+<code>.psqlrc</code>, <code>-A -t</code> để output máy đọc và
+<code>-v ON_ERROR_STOP=1</code> để dừng khi SQL lỗi.</p>
+<h2 data-number="5.6" id="lab-database-cô-lập"><span class="header-section-number">5.6</span> Lab: database cô lập</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> xác nhận đang ở máy local và user có
+quyền tạo database.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_lab</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LAB_DATABASE_URL</span><span class="op">=</span>postgresql://localhost:5432/ai_learn_jlpt_lab</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$LAB_DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xv</span> ON_ERROR_STOP=1 <span class="at">-c</span> <span class="dt">\</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;SELECT current_database(), current_user, version();&quot;</span></span></code></pre></div>
+<p>Apply schema của dự án:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="va">DATABASE_URL</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$LAB_DATABASE_URL</span><span class="st">&quot;</span> <span class="ex">npm</span> run db:migrate</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$LAB_DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xc</span> <span class="st">&#39;\dt&#39;</span></span></code></pre></div>
+<p>Cleanup sau khi thoát mọi connection:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dropdb</span> ai_learn_jlpt_lab</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="bu">unset</span> <span class="va">LAB_DATABASE_URL</span></span></code></pre></div>
+</div>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p>Trước <code>dropdb</code>, in chính xác target:
+<code>printf &#39;%s\n&#39; &quot;$LAB_DATABASE_URL&quot;</code>. Script tự động nên từ
+chối nếu tên database không chứa <code>lab</code> hoặc
+<code>test</code>.</p>
+</div>
+<h2 data-number="5.7" id="chẩn-đoán-theo-lớp"><span class="header-section-number">5.7</span> Chẩn đoán theo lớp</h2>
+<table>
+<thead>
+<tr>
+<th>Lỗi</th>
+<th>Kiểm tra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connection refused</code></td>
+<td>Service, host, port, firewall</td>
+</tr>
+<tr>
+<td><code>password authentication failed</code></td>
+<td>Role/password/<code>pg_hba.conf</code></td>
+</tr>
+<tr>
+<td><code>database does not exist</code></td>
+<td>Tên DB và cluster đang kết nối</td>
+</tr>
+<tr>
+<td><code>permission denied</code></td>
+<td>Owner/grant; không giải bằng superuser lâu dài</td>
+</tr>
+<tr>
+<td><code>relation does not exist</code></td>
+<td>Database/schema/search path/migration</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="5.8" id="tự-kiểm-tra-4"><span class="header-section-number">5.8</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Role khác database thế nào?</li>
+<li>Vì sao application role không nên có <code>CREATEDB</code> hoặc
+superuser?</li>
+<li><code>pg_isready</code> chứng minh được gì và chưa chứng minh được
+gì?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Luôn bắt đầu bằng <code>\conninfo</code>; nhiều lỗi SQL thực ra là
+kết nối nhầm database.</li>
+<li>Tách credential của app, migration và DBA khi hệ thống lớn dần.</li>
+<li>Connection URL là secret nếu chứa password.</li>
+<li>Production database không cần public port khi app chạy cùng private
+network.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-practical-sql">SQL thực chiến</a>.</p>
+<h1 data-number="6" id="chapter-practical-sql"><span class="header-section-number">6</span> SQL thực chiến trên schema dự
+án</h1>
+<h2 data-number="6.1" id="mục-tiêu-5"><span class="header-section-number">6.1</span> Mục tiêu</h2>
+<p>Đọc và viết SQL bảo toàn invariant, chống injection và có thể giải
+thích bằng query plan. Ví dụ dùng schema AI Learn JLPT thay vì table
+minh hoạ xa lạ.</p>
+<h2 data-number="6.2" id="data-type-là-một-phần-của-thiết-kế"><span class="header-section-number">6.2</span> Data type là một phần của thiết
+kế</h2>
+<ul>
+<li><code>UUID</code>: ID khó va chạm, tạo độc lập; không phải access
+control.</li>
+<li><code>TIMESTAMPTZ</code>: thời điểm tuyệt đối; hiển thị theo
+timezone ở UI.</li>
+<li><code>DATE</code>: ngày lịch như ngày học, không phải timestamp lúc
+nửa đêm.</li>
+<li><code>JSONB</code>: cấu trúc linh hoạt cần query; không thay thế mọi
+column/relationship.</li>
+<li><code>BYTEA</code>: binary nhỏ/vừa cần transaction cùng dữ liệu; ảnh
+lớn nên cân nhắc object storage khi scale.</li>
+</ul>
+<p><code>NOT NULL</code>, <code>DEFAULT</code>, <code>CHECK</code>,
+<code>UNIQUE</code> và foreign key làm database bảo vệ invariant dù dữ
+liệu đi vào từ API, migration hay admin script.</p>
+<h2 data-number="6.3" id="crud-có-scope"><span class="header-section-number">6.3</span> CRUD có scope</h2>
+<p>Insert một note private:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> manual_notes (user_id, note_date, content)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> ($<span class="dv">1</span>, $<span class="dv">2</span>, $<span class="dv">3</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RETURNING</span> <span class="kw">id</span>, note_date, content, completed;</span></code></pre></div>
+<p>Update phải khóa theo owner:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> manual_notes</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span> content <span class="op">=</span> $<span class="dv">3</span>, updated_at <span class="op">=</span> NOW()</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> $<span class="dv">1</span> <span class="kw">AND</span> user_id <span class="op">=</span> $<span class="dv">2</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RETURNING</span> <span class="kw">id</span>, content, updated_at;</span></code></pre></div>
+<p>Placeholder <code>$1</code> không chỉ giúp escape quote; nó tách SQL
+structure khỏi data. Không thể parameterize tên table/column — dynamic
+identifier cần allowlist.</p>
+<h2 data-number="6.4" id="join-và-quan-hệ"><span class="header-section-number">6.4</span> JOIN và quan hệ</h2>
+<p>Session lookup hiện tại join identity với credential state:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> users.<span class="kw">id</span>, users.email, users.<span class="kw">role</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> sessions</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> users <span class="kw">ON</span> users.<span class="kw">id</span> <span class="op">=</span> sessions.user_id</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> sessions.token_hash <span class="op">=</span> $<span class="dv">1</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> sessions.expires_at <span class="op">&gt;</span> NOW();</span></code></pre></div>
+<p>Foreign key
+<code>sessions.user_id REFERENCES users(id) ON DELETE CASCADE</code> đảm
+bảo xoá user cũng xoá session. <code>CASCADE</code> hữu ích khi child
+không còn ý nghĩa độc lập; với lịch sử/audit, có thể cần
+<code>RESTRICT</code> hoặc <code>SET NULL</code>.</p>
+<h2 data-number="6.5" id="aggregate-cte-và-pagination"><span class="header-section-number">6.5</span> Aggregate, CTE và
+pagination</h2>
+<p>Đếm study action theo ngày:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> action_date, <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">AS</span> actions</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> study_actions</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> user_id <span class="op">=</span> $<span class="dv">1</span> <span class="kw">AND</span> action_date <span class="op">&gt;=</span> $<span class="dv">2</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> action_date</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> action_date;</span></code></pre></div>
+<p>CTE làm các bước biến đổi dễ đọc, nhưng đừng dùng nó để che một query
+quá phức tạp. Pagination nhỏ có thể dùng <code>LIMIT/OFFSET</code>;
+dataset lớn nên dùng cursor dựa trên cặp sort ổn định như
+<code>(created_at, id)</code>.</p>
+<h2 data-number="6.6" id="transaction"><span class="header-section-number">6.6</span> Transaction</h2>
+<p>Transaction cần khi nhiều câu lệnh phải cùng thành công hoặc cùng
+thất bại:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span>;</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">UPDATE</span> users <span class="kw">SET</span> password_hash <span class="op">=</span> $<span class="dv">1</span>, updated_at <span class="op">=</span> NOW() <span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> $<span class="dv">2</span>;</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">DELETE</span> <span class="kw">FROM</span> sessions <span class="kw">WHERE</span> user_id <span class="op">=</span> $<span class="dv">2</span>;</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">COMMIT</span>;</span></code></pre></div>
+<p>Nếu update password thành công nhưng revoke session thất bại,
+invariant bảo mật bị phá. Transaction đóng gói hai thay đổi thành một
+đơn vị atomic.</p>
+<p>Trong Node, mọi câu của transaction phải dùng <strong>cùng
+connection</strong>. Gọi helper <code>query()</code> trên pool cho từng
+câu có thể lấy connection khác nhau.</p>
+<h2 data-number="6.7" id="index-và-query-plan"><span class="header-section-number">6.7</span> Index và query plan</h2>
+<p>Index đổi chi phí đọc lấy chi phí storage/write. Tạo index theo query
+thật:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">INDEX</span> idx_manual_notes_user_date</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ON</span> manual_notes(user_id, note_date);</span></code></pre></div>
+<p>Thứ tự column quan trọng. Index trên
+<code>(user_id, note_date)</code> phù hợp filter owner rồi range/order
+theo date. Nó không nhất thiết tốt cho query chỉ theo
+<code>note_date</code>.</p>
+<p>Đọc plan:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPLAIN</span> (<span class="kw">ANALYZE</span>, BUFFERS)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> manual_notes</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> user_id <span class="op">=</span> <span class="st">&#39;00000000-0000-0000-0000-000000000000&#39;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> note_date <span class="kw">DESC</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">20</span>;</span></code></pre></div>
+<p><code>ANALYZE</code> thực thi query; không dùng tuỳ tiện với
+DELETE/UPDATE production. Quan sát estimated/actual rows, scan type,
+sort và buffer — đừng chỉ tìm chữ “Index Scan”. Table nhỏ thường
+sequential scan là đúng.</p>
+<h2 data-number="6.8" id="jsonb-dùng-có-chủ-đích"><span class="header-section-number">6.8</span> JSONB: dùng có chủ đích</h2>
+<p><code>metadata JSONB</code> phù hợp thuộc tính phụ thay đổi theo
+action. Những field cần foreign key, unique, range validation hoặc join
+thường nên là column. Nếu query một JSON path thường xuyên, thêm
+expression/GIN index sau khi đo workload.</p>
+<h2 data-number="6.9" id="lab-query-an-toàn"><span class="header-section-number">6.9</span> Lab: query an toàn</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> <code>LAB_DATABASE_URL</code> phải chứa
+<code>lab</code> hoặc <code>test</code>.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> <span class="st">&quot;</span><span class="va">$LAB_DATABASE_URL</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="ss">lab</span><span class="pp">*</span><span class="kw">|</span><span class="pp">*</span><span class="ss">test</span><span class="pp">*</span><span class="kw">)</span> <span class="cf">;;</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="kw">)</span> <span class="bu">echo</span> <span class="st">&#39;Refusing non-lab database&#39;</span><span class="kw">;</span> <span class="bu">exit</span> 1 <span class="cf">;;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$LAB_DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xv</span> ON_ERROR_STOP=1</span></code></pre></div>
+<p>Trong <code>psql</code>:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>\timing <span class="kw">on</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span>;</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> users (email, password_hash)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;sql-lab@example.test&#39;</span>, <span class="st">&#39;lab:not-a-real-password-hash&#39;</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="kw">RETURNING</span> <span class="kw">id</span>;</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="kw">ROLLBACK</span>;</span></code></pre></div>
+<p>Sau rollback, query email phải trả 0 row. Tiếp theo chọn một index
+hiện có trong <code>\d manual_notes</code>, viết query phù hợp và so
+sánh <code>EXPLAIN</code> trước/sau khi tăng dữ liệu lab.</p>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Bạn phải giải thích được constraint nào bảo vệ dữ liệu, query nào
+dùng index và tại sao transaction rollback không để lại row.</p>
+</div>
+<h2 data-number="6.10" id="failure-modes-4"><span class="header-section-number">6.10</span> Failure modes</h2>
+<ul>
+<li><code>SELECT *</code> làm API vô tình lộ column nhạy cảm.</li>
+<li>Dùng offset lớn gây scan/sort tốn kém.</li>
+<li>Index từng column nhưng query cần composite index.</li>
+<li>Transaction giữ mở trong lúc gọi network API, gây lock lâu.</li>
+<li>JSONB biến thành nơi cất mọi thứ và mất constraint.</li>
+</ul>
+<h2 data-number="6.11" id="tự-kiểm-tra-5"><span class="header-section-number">6.11</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Khi nào <code>ON DELETE CASCADE</code> không phù hợp?</li>
+<li>Vì sao transaction trong pool cần cùng client?</li>
+<li>Tại sao sequential scan chưa chắc là lỗi?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Viết invariant trước, rồi chọn constraint và transaction để bảo vệ
+nó.</li>
+<li>Index theo filter + sort của query nóng, không theo cảm giác.</li>
+<li>Luôn scope private query bằng owner.</li>
+<li>Đo plan trên dữ liệu gần với production; table 10 row đánh lừa
+optimizer review.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-postgresql-app">PostgreSQL bên trong ứng
+dụng</a>.</p>
+<h1 data-number="7" id="chapter-postgresql-app"><span class="header-section-number">7</span> PostgreSQL bên trong ứng
+dụng</h1>
+<h2 data-number="7.1" id="mục-tiêu-6"><span class="header-section-number">7.1</span> Mục tiêu</h2>
+<p>Kết nối kiến thức SQL với lifecycle của Node process: pool,
+transaction, migration, backup và các failure mode chỉ xuất hiện khi có
+concurrency.</p>
+<h2 data-number="7.2" id="connection-pool"><span class="header-section-number">7.2</span> Connection pool</h2>
+<p>Mở connection PostgreSQL có chi phí; giữ một pool cho process giúp
+tái sử dụng. <code>src/lib/database.js</code> lazy-create
+<code>pg.Pool</code> với:</p>
+<ul>
+<li><code>max</code>: số connection tối đa của process.</li>
+<li><code>connectionTimeoutMillis</code>: chờ mở/lấy connection bao
+lâu.</li>
+<li><code>idleTimeoutMillis</code>: đóng connection idle sau bao
+lâu.</li>
+</ul>
+<p>Pool sizing là bài toán toàn hệ thống:</p>
+<pre class="text"><code>tổng connection tiềm năng
+  = số app process × DB_POOL_MAX
+    + migration/admin/monitoring headroom</code></pre>
+<p>Nếu PostgreSQL cho 100 connection, 10 replica × pool 20 là cấu hình
+không thể đạt. Pool không tạo capacity; nó giới hạn concurrency vào
+database.</p>
+<h2 data-number="7.3" id="query-và-transaction"><span class="header-section-number">7.3</span> Query và transaction</h2>
+<p>Helper <code>query(text, params)</code> phù hợp câu độc lập.
+<code>withClient(callback)</code> giữ một client cho transaction:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">withClient</span>(<span class="kw">async</span> (client) <span class="kw">=&gt;</span> {</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> client<span class="op">.</span><span class="fu">query</span>(<span class="st">&quot;BEGIN&quot;</span>)<span class="op">;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> client<span class="op">.</span><span class="fu">query</span>(<span class="st">&quot;UPDATE ...&quot;</span><span class="op">,</span> values)<span class="op">;</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> client<span class="op">.</span><span class="fu">query</span>(<span class="st">&quot;DELETE ...&quot;</span><span class="op">,</span> values)<span class="op">;</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> client<span class="op">.</span><span class="fu">query</span>(<span class="st">&quot;COMMIT&quot;</span>)<span class="op">;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> (error) {</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> client<span class="op">.</span><span class="fu">query</span>(<span class="st">&quot;ROLLBACK&quot;</span>)<span class="op">;</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> error<span class="op">;</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>Luôn release client trong <code>finally</code>. Client bị giữ quên sẽ
+làm pool cạn dần và request mới timeout dù database vẫn healthy.</p>
+<h2 data-number="7.4" id="migration-như-release-contract"><span class="header-section-number">7.4</span> Migration như release
+contract</h2>
+<p>Migration runner đọc file <code>NNN_name.sql</code>, sort, kiểm tra
+<code>schema_migrations</code> rồi chạy mỗi file trong transaction. Quy
+tắc:</p>
+<ol type="1">
+<li>Migration đã apply không được sửa nội dung trong lịch sử.</li>
+<li>Thay đổi mới là file số tiếp theo.</li>
+<li>Migration phải tương thích với version app trong cửa sổ
+rollout/rollback.</li>
+<li>Backup trước migration có rủi ro dữ liệu.</li>
+<li>Chạy migration một lần ở release step, không để mỗi replica tranh
+nhau.</li>
+</ol>
+<p>Forward-only không có nghĩa không thể phục hồi. Nó nghĩa rollback
+thường là một migration sửa tiếp hoặc restore có kiểm soát, không phải
+tự động chạy “down.sql” trên production đang có traffic.</p>
+<h2 data-number="7.5" id="lock-deadlock-và-timeout"><span class="header-section-number">7.5</span> Lock, deadlock và timeout</h2>
+<p>Update giữ row lock tới cuối transaction. Schema migration có thể cần
+lock mạnh hơn. Một transaction dài làm request khác chờ; hai transaction
+lấy resource theo thứ tự ngược nhau có thể deadlock và PostgreSQL sẽ huỷ
+một transaction.</p>
+<p>Giảm rủi ro bằng cách:</p>
+<ul>
+<li>Transaction ngắn, không gọi HTTP/email bên trong.</li>
+<li>Cập nhật resource theo thứ tự ổn định.</li>
+<li>Đặt lock/statement timeout phù hợp cho migration.</li>
+<li>Retry chỉ transaction idempotent với lỗi transient đã phân
+loại.</li>
+</ul>
+<h2 data-number="7.6" id="backup-và-restore"><span class="header-section-number">7.6</span> Backup và restore</h2>
+<p>Custom format hỗ trợ validate và chọn object khi restore:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_dump</span> <span class="at">-Fc</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-f</span> app.dump</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--list</span> app.dump <span class="op">&gt;</span>/dev/null</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="ex">shasum</span> <span class="at">-a</span> 256 app.dump <span class="op">&gt;</span> app.dump.sha256</span></code></pre></div>
+<p>Restore an toàn vào database mới:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_restore_test</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--exit-on-error</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="dt">\</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--dbname</span><span class="op">=</span>postgresql://localhost:5432/ai_learn_jlpt_restore_test app.dump</span></code></pre></div>
+<p>Sau restore: chạy migration mới nhất, smoke test và kiểm tra
+ownership/content. Chỉ đổi <code>DATABASE_URL</code> sau khi database
+mới đạt acceptance criteria.</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Các script trong <code>scripts/ops/</code> tạo dump, validate bằng
+<code>pg_restore --list</code>, ghi SHA-256 và từ chối initial restore
+nếu database đã có table. Release script tạo backup
+<code>predeploy</code> trước migration.</p>
+</div>
+<h2 data-number="7.7" id="lab-recovery-drill"><span class="header-section-number">7.7</span> Lab: recovery drill</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Preflight:</strong> dùng source database lab và tên target
+chứa <code>restore_test</code>.</p>
+<ol type="1">
+<li>Tạo vài record marker trong DB lab.</li>
+<li>Chạy <code>pg_dump -Fc</code> và
+<code>pg_restore --list</code>.</li>
+<li>Restore vào database mới.</li>
+<li>So sánh migration count, user count và marker record.</li>
+<li>Chạy application smoke test với target restore.</li>
+<li>Drop cả hai DB lab sau khi ghi kết quả.</li>
+</ol>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Một file dump tồn tại không phải checkpoint. Checkpoint là ứng dụng
+kết nối được, migration state đúng và các invariant dữ liệu vượt qua
+smoke test.</p>
+</div>
+<h2 data-number="7.8" id="failure-modes-5"><span class="header-section-number">7.8</span> Failure modes</h2>
+<ul>
+<li>Pool max hợp lý cho một process nhưng vượt DB limit khi scale
+replica.</li>
+<li>Migration sửa table lớn giữ lock lâu hơn thời gian deploy.</li>
+<li>Backup nằm cùng disk/VPS và mất cùng incident.</li>
+<li>Restore trực tiếp đè production thay vì tạo database mới.</li>
+<li>Retry query ghi dữ liệu không idempotent tạo duplicate.</li>
+</ul>
+<h2 data-number="7.9" id="tự-kiểm-tra-6"><span class="header-section-number">7.9</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Pool 10 với 8 replica cần reserve ít nhất bao nhiêu connection?</li>
+<li>Tại sao backup và migration phải nằm trước switch traffic?</li>
+<li>Restore test cần kiểm tra điều gì ngoài row count?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Budget connection ở cấp hệ thống, không ở từng service riêng
+lẻ.</li>
+<li>Migration là code production; review lock và backward
+compatibility.</li>
+<li>Recovery drill nên chạy định kỳ trước khi có incident.</li>
+<li>Giữ ít nhất một backup ngoài failure domain của VPS.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-components">Ghép các thành phần thành hệ
+thống</a>.</p>
+<h1 data-number="8" id="chapter-components"><span class="header-section-number">8</span> Ghép các thành phần thành hệ
+thống</h1>
+<h2 data-number="8.1" id="mục-tiêu-7"><span class="header-section-number">8.1</span> Mục tiêu</h2>
+<p>Nhìn codebase như các boundary cộng tác thay vì một danh sách file.
+Mục tiêu của kiến trúc không phải tạo nhiều layer, mà là đặt mỗi quyết
+định ở đúng nơi.</p>
+<h2 data-number="8.2" id="dependency-map"><span class="header-section-number">8.2</span> Dependency map</h2>
+<pre class="text"><code>Browser UI
+   |
+HTTP controller + endpoint metadata
+   |
+Domain service / use-case
+   |
+Repository contract
+   |
+PostgreSQL adapter
+
+Cross-cutting: config, logger, auth context, error mapping, build</code></pre>
+<ul>
+<li>Controller hiểu HTTP nhưng không nên chứa SQL dài.</li>
+<li>Service hiểu use-case nhưng không nên biết cookie/header.</li>
+<li>Repository hiểu persistence và ownership query.</li>
+<li>Composition root nối dependency và đăng ký endpoint.</li>
+</ul>
+<p>Layer không cần là class hoặc framework. Trong dự án, TypeScript được
+dùng ở HTTP/composition boundary; service/repository JavaScript vẫn có
+public contract rõ. Boundary quan trọng hơn đuôi file.</p>
+<h2 data-number="8.3" id="request-flow-và-failure-boundary"><span class="header-section-number">8.3</span> Request flow và failure
+boundary</h2>
+<pre class="text"><code>request
+  -&gt; validate config/request
+  -&gt; resolve identity
+  -&gt; authorize endpoint
+  -&gt; execute domain action
+  -&gt; query transactionally
+  -&gt; map result/error
+  -&gt; structured log + response</code></pre>
+<p>Mỗi bước phải trả lời: input tin cậy đến đâu, error nào có thể xảy
+ra, log gì mà không lộ secret, và retry có an toàn không.</p>
+<h2 data-number="8.4" id="config"><span class="header-section-number">8.4</span> Config</h2>
+<p>Config thay đổi theo environment; code behavior/invariant nằm trong
+source. <code>HOST</code>, <code>PORT</code>, <code>DATABASE_URL</code>,
+pool size và timeout là config. SQL table name, cookie security policy
+production hay access rule không nên được biến thành một biến tuỳ tiện
+chỉ để “linh hoạt”.</p>
+<p>Validate config trước listen. Fail fast tạo lỗi rõ ở deploy thay vì
+lỗi ngẫu nhiên ở request đầu tiên.</p>
+<h2 data-number="8.5" id="error-và-log"><span class="header-section-number">8.5</span> Error và log</h2>
+<p>Error nội bộ cần context để điều tra; response public cần ổn định và
+không lộ stack/SQL. Structured log của request nên có request ID,
+method, path, status, duration. Không log cookie, password, token hoặc
+toàn bộ request body.</p>
+<p>Request ID giúp ghép <code>request_failed</code> với log proxy và
+client report. Chỉ chấp nhận request ID đầu vào có charset/length an
+toàn; nếu không, tự sinh UUID.</p>
+<h2 data-number="8.6" id="build-và-static-assets"><span class="header-section-number">8.6</span> Build và static assets</h2>
+<p>Build script bundle backend, browser JS/CSS, copy HTML/config và
+migrations vào <code>dist/</code>. Artifact production phải chứa đủ:</p>
+<ul>
+<li><code>dist/server.js</code>.</li>
+<li><code>dist/public/</code>.</li>
+<li><code>dist/bin/migrate.js</code>.</li>
+<li><code>dist/migrations/</code>.</li>
+<li>Production dependencies theo lockfile.</li>
+</ul>
+<p>Smoke test artifact tìm lỗi mà unit test source không thấy: asset
+thiếu, path resolution sai hoặc migration không được đóng gói.</p>
+<h2 data-number="8.7" id="security-và-resilience-là-thành-phần"><span class="header-section-number">8.7</span> Security và resilience là thành
+phần</h2>
+<p>Security headers, body limit, ownership filter và parameter binding
+không phải “cleanup sau”. Health check, timeout, shutdown, backup và
+restart cũng là một phần thiết kế. Một feature không hoàn thành nếu chỉ
+có happy path controller.</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Architecture tests ngăn import xuyên boundary, dispatcher thống nhất
+access và smoke suite kiểm tra auth, CMS, image ownership cùng nhiều
+loại private learning data. Production process chạy artifact
+<code>dist/</code>.</p>
+</div>
+<h2 data-number="8.8" id="lab-thiết-kế-endpoint-trước-khi-code"><span class="header-section-number">8.8</span> Lab: thiết kế endpoint trước
+khi code</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p>Thiết kế <code>POST /api/manual-notes/:id/archive</code> trên
+giấy:</p>
+<ol type="1">
+<li>Endpoint metadata: method, pattern, access.</li>
+<li>Request context: identity nào được dùng.</li>
+<li>Validation: ID và state transition.</li>
+<li>Repository query có <code>id</code> + <code>user_id</code>.</li>
+<li>Response codes cho anonymous, non-owner, missing và success.</li>
+<li>Log fields, không log content.</li>
+<li>Test matrix và migration nếu cần column mới.</li>
+</ol>
+<p>Sau đó chỉ ra file/boundary sẽ thay đổi; không cần viết code.</p>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Thiết kế đạt khi reviewer có thể kiểm tra ownership và failure
+behavior mà không cần đoán controller sẽ “nhớ làm đúng”.</p>
+</div>
+<h2 data-number="8.9" id="failure-modes-6"><span class="header-section-number">8.9</span> Failure modes</h2>
+<ul>
+<li>Controller vừa parse HTTP, vừa query, vừa quyết định business
+rule.</li>
+<li>Shared module import internal repository của feature khác.</li>
+<li>Catch mọi error và trả 200 với <code>{error}</code>.</li>
+<li>Build production khác lệnh được CI kiểm tra.</li>
+<li>Health endpoint luôn 200 dù dependency bắt buộc đã chết.</li>
+</ul>
+<h2 data-number="8.10" id="tự-kiểm-tra-7"><span class="header-section-number">8.10</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Boundary nào nên biết cookie?</li>
+<li>Tại sao migration phải nằm trong artifact?</li>
+<li>Request ID giải quyết vấn đề quan sát nào?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Kiến trúc tốt làm policy dễ tìm và test, không tối đa số layer.</li>
+<li>Composition root là nơi dependency gặp nhau; domain không nên tự tìm
+dependency.</li>
+<li>Build artifact là sản phẩm deploy, không phải thư mục phụ.</li>
+<li>Hoàn thiện vertical slice gồm auth, data, error, test và
+operation.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-tool-selection">Chọn framework, OS và
+plugin</a>.</p>
+<h1 data-number="9" id="chapter-tool-selection"><span class="header-section-number">9</span> Chọn framework, OS và plugin</h1>
+<h2 data-number="9.1" id="mục-tiêu-8"><span class="header-section-number">9.1</span> Mục tiêu</h2>
+<p>Chọn công cụ theo constraint và operational cost. “Phổ biến” không có
+nghĩa phù hợp; dependency mới luôn tạo thêm update, security và failure
+surface.</p>
+<h2 data-number="9.2" id="framework-http"><span class="header-section-number">9.2</span> Framework HTTP</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Lựa chọn</th>
+<th>Điểm mạnh</th>
+<th>Chi phí</th>
+<th>Dùng khi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Native Node HTTP</td>
+<td>Ít dependency, hiểu rõ protocol</td>
+<td>Tự xây routing/middleware</td>
+<td>API nhỏ, contract ổn định</td>
+</tr>
+<tr>
+<td>Express</td>
+<td>Ecosystem lớn, quen thuộc</td>
+<td>Middleware quality không đồng đều</td>
+<td>Team cần convention phổ biến</td>
+</tr>
+<tr>
+<td>Fastify</td>
+<td>Validation/plugin model, hiệu năng</td>
+<td>Học lifecycle/plugin</td>
+<td>API tăng nhanh, cần schema</td>
+</tr>
+<tr>
+<td>NestJS</td>
+<td>DI/module/convention mạnh</td>
+<td>Nặng và nhiều abstraction</td>
+<td>Team lớn, domain/module phức tạp</td>
+</tr>
+</tbody>
+</table>
+<p>Native HTTP hiện tại không phải thiếu framework; nó là một lựa chọn
+có chủ đích. Chuyển framework chỉ đáng giá nếu vấn đề lặp lại như
+validation, plugin lifecycle hoặc team convention lớn hơn migration
+cost.</p>
+<h2 data-number="9.3" id="database-access"><span class="header-section-number">9.3</span> Database access</h2>
+<p>Raw SQL với <code>pg</code> cho query rõ, tận dụng PostgreSQL và ít
+abstraction. Query builder hỗ trợ composition/type nhưng vẫn cần hiểu
+SQL. ORM tăng tốc CRUD và relation phổ biến nhưng không xoá nhu cầu hiểu
+transaction, index hoặc plan.</p>
+<p>Chọn ORM khi productivity/schema tooling thắng chi phí generated
+query và migration convention. Không thêm ORM chỉ để tránh học SQL —
+người trực production vẫn phải đọc query và lock.</p>
+<h2 data-number="9.4" id="process-và-packaging"><span class="header-section-number">9.4</span> Process và packaging</h2>
+<ul>
+<li><strong>systemd</strong>: có sẵn trên Ubuntu, restart, log, sandbox,
+timer; phù hợp VPS.</li>
+<li><strong>PM2</strong>: tiện cho Node cluster/UI nhưng trùng nhiều
+trách nhiệm với systemd.</li>
+<li><strong>Docker</strong>: artifact và isolation nhất quán; thêm
+registry, image, volume, network và update lifecycle.</li>
+</ul>
+<p>Một VPS đơn không cần đồng thời PM2, Docker và systemd quản lý cùng
+process. Trong case study, systemd chạy Node artifact là đường ngắn và
+dễ điều tra.</p>
+<h2 data-number="9.5" id="reverse-proxy-và-os"><span class="header-section-number">9.5</span> Reverse proxy và OS</h2>
+<p>Nginx mature, explicit và có hệ sinh thái lớn. Caddy đơn giản hoá
+automatic TLS. Nếu provision/runbook đã dùng Nginx ổn định, đổi proxy
+chỉ vì config ngắn hơn ít tạo giá trị.</p>
+<p>Ubuntu/Debian có package/documentation phù hợp server phổ thông.
+Alpine nhỏ hơn nhưng musl và package khác có thể làm native dependency
+khó debug. Image nhỏ không tự động đồng nghĩa hệ thống rẻ hơn nếu thời
+gian vận hành tăng.</p>
+<h2 data-number="9.6" id="khi-nào-thêm-thành-phần"><span class="header-section-number">9.6</span> Khi nào thêm thành phần</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Thành phần</th>
+<th>Signal thực tế</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Redis cache</td>
+<td>Đã đo query nóng, cache semantics/invalidations rõ</td>
+</tr>
+<tr>
+<td>Queue/worker</td>
+<td>Công việc chậm cần retry, không nằm trong request latency</td>
+</tr>
+<tr>
+<td>Object storage</td>
+<td>Binary lớn, cần CDN/lifecycle/scale độc lập DB</td>
+</tr>
+<tr>
+<td>External IdP</td>
+<td>SSO doanh nghiệp, federation hoặc compliance</td>
+</tr>
+<tr>
+<td>Multiple replicas</td>
+<td>Availability/throughput đã vượt một process</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Nhiều service/team cần orchestration chuẩn, không phải một VPS</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="9.7" id="dependency-gate"><span class="header-section-number">9.7</span> Dependency gate</h2>
+<p>Trước khi cài package/plugin, trả lời:</p>
+<ol type="1">
+<li>Vấn đề cụ thể và metric nào chứng minh?</li>
+<li>Có thể giải bằng platform/20 dòng code rõ ràng không?</li>
+<li>Package có maintainer, release và security policy còn hoạt động
+không?</li>
+<li>Có bao nhiêu transitive dependency và quyền runtime nào?</li>
+<li>Test/upgrade/rollback ai sở hữu?</li>
+<li>Nếu package dừng, exit strategy là gì?</li>
+</ol>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p>Runtime dự án chỉ có dependency <code>pg</code>. esbuild, TypeScript
+và <code>tsx</code> là development dependencies.
+Nginx/systemd/PostgreSQL xử lý trách nhiệm hạ tầng thay vì thêm package
+Node tương đương.</p>
+</div>
+<h2 data-number="9.8" id="bộ-cài-tối-thiểu"><span class="header-section-number">9.8</span> Bộ cài tối thiểu</h2>
+<p><strong>Development:</strong> Git, Node 22, npm, PostgreSQL
+client/server, editor. Pandoc và XeLaTeX chỉ cần nếu build sách.</p>
+<p><strong>VPS đơn:</strong> Node runtime, PostgreSQL, Nginx, Certbot,
+curl và systemd có sẵn. Không cài compiler/dev dependency sau khi
+artifact đã build.</p>
+<p><strong>CI:</strong> checkout, Node, npm; build/test/package rồi dùng
+OpenSSH có sẵn để deploy.</p>
+<h2 data-number="9.9" id="lab-architecture-decision-record"><span class="header-section-number">9.9</span> Lab: architecture decision
+record</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p>Chọn một đề xuất như “thêm Redis” và viết ADR một trang: context,
+decision, alternatives, evidence, operational cost, rollback và trigger
+review lại. Nếu không có metric/constraint cụ thể, decision mặc định là
+chưa thêm.</p>
+</div>
+<h2 data-number="9.10" id="tự-kiểm-tra-8"><span class="header-section-number">9.10</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Docker giải quyết vấn đề nào mà systemd deployment hiện tại chưa
+giải quyết?</li>
+<li>ORM có loại bỏ nhu cầu migration review không?</li>
+<li>Signal nào hợp lý để thêm queue?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Tối ưu tổng chi phí sở hữu, không tối ưu số dòng config.</li>
+<li>Ưu tiên primitive của OS/database trước dependency cùng chức
+năng.</li>
+<li>Một công cụ mới phải có owner, upgrade path và failure
+playbook.</li>
+<li>Trì hoãn dependency là quyết định kiến trúc hợp lệ khi evidence chưa
+đủ.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-deployment">Deploy và CI/CD</a>.</p>
+<h1 data-number="10" id="chapter-deployment"><span class="header-section-number">10</span> Deploy và CI/CD</h1>
+<h2 data-number="10.1" id="mục-tiêu-9"><span class="header-section-number">10.1</span> Mục tiêu</h2>
+<p>Hiểu release như một state transition có checkpoint, không phải thao
+tác copy file. Mỗi bước phải fail closed và để lại đường phục hồi.</p>
+<h2 data-number="10.2" id="topology-vps-đơn"><span class="header-section-number">10.2</span> Topology VPS đơn</h2>
+<pre class="text"><code>DNS -&gt; VPS :443 -&gt; Nginx -&gt; Node 127.0.0.1:5050 -&gt; PostgreSQL localhost:5432
+                         |                         |
+                         + systemd restart        + daily backup
+
+GitHub Actions -&gt; SSH deploy user -&gt; versioned release directories</code></pre>
+<p>Chỉ SSH/80/443 mở ở firewall. Node và PostgreSQL nghe
+loopback/private network. Nginx kết thúc TLS và giữ public boundary
+nhỏ.</p>
+<h2 data-number="10.3" id="artifact-và-release-directory"><span class="header-section-number">10.3</span> Artifact và release
+directory</h2>
+<p>CI chạy <code>npm ci</code>, check, test và build. Artifact gồm
+<code>dist</code>, manifest/lockfile và ops scripts. Host giải nén
+vào:</p>
+<pre class="text"><code>/opt/ai-learn-jlpt/
+  releases/&lt;commit-sha&gt;/
+  current -&gt; releases/&lt;active-sha&gt;/
+  shared/
+  incoming/</code></pre>
+<p>Versioned directory làm switch/rollback mã bằng symlink atomic. Không
+chép đè file process đang dùng; không <code>git pull</code> và build tuỳ
+ý trên production.</p>
+<h2 data-number="10.4" id="thứ-tự-release"><span class="header-section-number">10.4</span> Thứ tự release</h2>
+<pre class="text"><code>verify artifact
+  -&gt; acquire deploy lock
+  -&gt; install production dependencies
+  -&gt; backup database
+  -&gt; apply forward migration
+  -&gt; atomically switch current
+  -&gt; restart service
+  -&gt; wait /health/ready
+  -&gt; keep or rollback application symlink</code></pre>
+<p>Backup trước migration vì migration là thay đổi state khó đảo. Switch
+sau migration vì app mới có thể cần schema mới. Health gate sau restart
+vì <code>systemctl restart</code> thành công chỉ chứng minh process được
+tạo, chưa chứng minh app dùng được.</p>
+<div class="current admonition">
+<p><strong>Hệ thống hiện có</strong></p>
+<p><code>.github/workflows/deploy-production.yml</code> serialize
+production workflow, build artifact rồi upload qua SSH.
+<code>remote-deploy.sh</code> dùng <code>flock</code>, backup predeploy,
+migrate, switch symlink, chờ readiness và rollback app nếu release mới
+không ready. systemd tự restart khi process crash; timer restart sau
+nhiều readiness failure liên tiếp.</p>
+</div>
+<h2 data-number="10.5" id="secret-và-least-privilege"><span class="header-section-number">10.5</span> Secret và least privilege</h2>
+<p>GitHub environment giữ host, port, user, private key, known hosts và
+production URL. <code>known_hosts</code> phải được đối chiếu fingerprint
+qua console tin cậy; nếu chỉ chạy <code>ssh-keyscan</code> trên cùng
+network chưa xác minh, ta vẫn có thể lưu key của attacker.</p>
+<p>Deploy user sở hữu release directory nhưng sudo chỉ được
+start/stop/restart đúng service/timer. App bind loopback port nên không
+cần root. Environment file DB có quyền đọc hạn chế và không nằm trong
+artifact.</p>
+<h2 data-number="10.6" id="systemd-và-nginx"><span class="header-section-number">10.6</span> systemd và Nginx</h2>
+<p>systemd định nghĩa command, user, working directory, environment,
+restart và sandbox. Nginx proxy <code>Host</code>, client IP/proto và
+giới hạn body/timeout. Certbot quản lý certificate lifecycle.</p>
+<p>Cookie <code>Secure</code> phụ thuộc HTTPS end-to-end từ browser tới
+Nginx. Node có thể nhận HTTP loopback nhưng public URL phải là
+HTTPS.</p>
+<h2 data-number="10.7" id="rollback-nào"><span class="header-section-number">10.7</span> Rollback nào?</h2>
+<p>Rollback application đổi symlink về artifact cũ. Migration forward đã
+chạy vẫn còn đó. Vì vậy migration phải backward-compatible trong cửa sổ
+rollback hoặc cần recovery procedure riêng.</p>
+<p>Pattern expand/contract:</p>
+<ol type="1">
+<li>Expand schema, app cũ và mới cùng chạy được.</li>
+<li>Deploy app dùng schema mới.</li>
+<li>Backfill/quan sát.</li>
+<li>Contract ở release sau khi không còn reader cũ.</li>
+</ol>
+<h2 data-number="10.8" id="lab-đọc-release-như-state-machine"><span class="header-section-number">10.8</span> Lab: đọc release như state
+machine</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p>Không deploy. Mở <code>.github/workflows/deploy-production.yml</code>
+và <code>scripts/ops/remote-deploy.sh</code>, lập bảng cho từng bước:
+input, state mutation, checkpoint, failure cleanup và rollback. Tìm các
+điểm trước/sau migration và trước/sau switch symlink.</p>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Bạn phải mô tả được trạng thái host nếu npm install, backup,
+migration, restart hoặc readiness lần lượt thất bại. Nếu có trạng thái
+không rõ, automation chưa đủ an toàn.</p>
+</div>
+<h2 data-number="10.9" id="failure-modes-7"><span class="header-section-number">10.9</span> Failure modes</h2>
+<ul>
+<li>CI xanh nhưng artifact thiếu migration/static assets.</li>
+<li>Hai workflow production chạy đồng thời.</li>
+<li>Host key không được pin.</li>
+<li>Migration destructive làm app cũ không rollback được.</li>
+<li>Public health check qua CDN vẫn xanh trong khi origin sai
+release.</li>
+</ul>
+<h2 data-number="10.10" id="tự-kiểm-tra-9"><span class="header-section-number">10.10</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Vì sao build trên CI tốt hơn build lại trên host?</li>
+<li><code>systemctl restart</code> thành công khác readiness 200 thế
+nào?</li>
+<li>Tại sao application rollback không tự động rollback database?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Release là chuỗi checkpoint có state rõ ràng.</li>
+<li>Deploy lock và concurrency control giải quyết hai lớp khác
+nhau.</li>
+<li>Migration tương thích ngược là nền tảng rollback an toàn.</li>
+<li>Secret không được đóng gói cùng artifact mà nó bảo vệ.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-operations">Vận hành và xử lý sự
+cố</a>.</p>
+<h1 data-number="11" id="chapter-operations"><span class="header-section-number">11</span> Vận hành và xử lý sự cố</h1>
+<h2 data-number="11.1" id="mục-tiêu-10"><span class="header-section-number">11.1</span> Mục tiêu</h2>
+<p>Giữ hệ thống có thể quan sát, phục hồi và thay đổi an toàn sau
+go-live. Operations không chỉ là restart; nó là vòng lặp detect →
+diagnose → mitigate → learn.</p>
+<h2 data-number="11.2" id="bốn-tín-hiệu-đầu-tiên"><span class="header-section-number">11.2</span> Bốn tín hiệu đầu tiên</h2>
+<ul>
+<li><strong>Traffic:</strong> request rate và pattern.</li>
+<li><strong>Errors:</strong> HTTP 5xx, auth anomalies, job failure.</li>
+<li><strong>Latency:</strong> p50/p95/p99; tách app và database khi có
+thể.</li>
+<li><strong>Saturation:</strong> CPU, RAM, disk, DB connections, event
+loop/pool queue.</li>
+</ul>
+<p>VPS nhỏ chưa cần monitoring stack lớn. Structured journal, health
+check, disk alert và external uptime check đã tạo giá trị. Thêm metrics
+stack khi câu hỏi vận hành không còn trả lời được từ những nguồn đó.</p>
+<h2 data-number="11.3" id="evidence-trước-action"><span class="header-section-number">11.3</span> Evidence trước action</h2>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status ai-learn-jlpt <span class="at">--no-pager</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> ai-learn-jlpt <span class="at">--since</span> <span class="st">&#39;15 minutes ago&#39;</span> <span class="at">--no-pager</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://127.0.0.1:5050/health/live</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://127.0.0.1:5050/health/ready</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span></code></pre></div>
+<p>Ghi timestamp, symptom, release SHA và action đã làm. Restart có thể
+giảm impact nhưng xoá evidence tạm thời; thu thập log/status trước nếu
+incident cho phép.</p>
+<h2 data-number="11.4" id="playbook-app-crash"><span class="header-section-number">11.4</span> Playbook: app crash</h2>
+<ol type="1">
+<li>Kiểm tra exit reason và restart count trong systemd/journal.</li>
+<li>Xác định lỗi startup config, DB hay runtime exception.</li>
+<li>Nếu liên quan release mới, xác nhận <code>current</code> và rollback
+artifact.</li>
+<li>Nếu crash loop, dừng traffic/restart storm rồi điều tra.</li>
+<li>Sau mitigate, thêm regression test hoặc guard.</li>
+</ol>
+<h2 data-number="11.5" id="playbook-postgresql-không-ready"><span class="header-section-number">11.5</span> Playbook: PostgreSQL không
+ready</h2>
+<ol type="1">
+<li><code>/live</code> và <code>/ready</code> phân biệt process với
+dependency.</li>
+<li><code>pg_isready</code>, <code>systemctl status postgresql</code>,
+journal và disk.</li>
+<li>Kiểm tra connection count/long transaction, không tăng pool mù
+quáng.</li>
+<li>Không restart DB nếu chưa biết recovery/checkpoint impact.</li>
+<li>Nếu corruption/loss, phục hồi vào database mới từ backup
+verified.</li>
+</ol>
+<h2 data-number="11.6" id="playbook-disk-đầy"><span class="header-section-number">11.6</span> Playbook: disk đầy</h2>
+<p>Disk đầy có thể làm app log lỗi, PostgreSQL ngừng write và backup
+fail. Xác định consumer bằng <code>du</code> với target cụ thể. Không
+xoá PostgreSQL data/WAL thủ công. Giảm log/backup cũ theo retention đã
+thiết kế, mở rộng disk nếu growth hợp lệ.</p>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p>Không chạy lệnh xoá recursive trên <code>/</code>,
+<code>$HOME</code>, PostgreSQL data directory hoặc path ghép từ biến
+chưa validate. “Giải phóng disk nhanh” có thể biến outage thành mất dữ
+liệu.</p>
+</div>
+<h2 data-number="11.7" id="playbook-migrationrelease-lỗi"><span class="header-section-number">11.7</span> Playbook: migration/release
+lỗi</h2>
+<ul>
+<li>Migration transaction fail trước commit: app cũ vẫn active; sửa
+migration mới.</li>
+<li>Migration commit nhưng app mới fail: rollback app chỉ khi schema
+compatible.</li>
+<li>Release không ready: xem journal của đúng SHA, DB connectivity và
+assets.</li>
+<li>Không sửa migration đã apply; tạo migration correction.</li>
+</ul>
+<h2 data-number="11.8" id="tls-và-certificate"><span class="header-section-number">11.8</span> TLS và certificate</h2>
+<p>Theo dõi expiry từ bên ngoài. <code>certbot renew --dry-run</code>
+kiểm tra renewal path. Nếu TLS lỗi, phân biệt DNS sai, port 80/443 bị
+chặn, Nginx config sai và rate limit CA. Không tắt HTTPS để “tạm chạy”
+auth production.</p>
+<h2 data-number="11.9" id="backup-operations"><span class="header-section-number">11.9</span> Backup operations</h2>
+<p>Backup hằng ngày giữ 14 ngày là baseline, không phải chiến lược hoàn
+chỉnh. Có ít nhất một copy ngoài VPS và định kỳ restore drill. Theo dõi
+tuổi file backup, size bất thường và exit status timer.</p>
+<p>Recovery Point Objective (RPO) là lượng dữ liệu có thể mất; Recovery
+Time Objective (RTO) là thời gian phục hồi chấp nhận được. Tần suất
+backup và runbook phải xuất phát từ hai con số này.</p>
+<h2 data-number="11.10" id="khi-nào-scale"><span class="header-section-number">11.10</span> Khi nào scale</h2>
+<ul>
+<li>Tách PostgreSQL khi tài nguyên/backup/availability cần failure
+domain riêng.</li>
+<li>Thêm replica app khi CPU/availability cần, sau khi session/data đã
+shared.</li>
+<li>Thêm cache khi query plan/index không đủ và cache invalidation
+rõ.</li>
+<li>Thêm queue khi công việc dài/retry làm request không ổn định.</li>
+</ul>
+<h2 data-number="11.11" id="lab-game-day-không-phá-dữ-liệu"><span class="header-section-number">11.11</span> Lab: game day không phá dữ
+liệu</h2>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p>Trên môi trường test, lần lượt dừng app process, dùng DB URL sai và
+deploy một artifact cố ý thiếu config. Với mỗi tình huống ghi:
+alert/symptom, lệnh thu thập bằng chứng, automatic recovery, manual
+mitigation và regression guard.</p>
+<p>Không mô phỏng disk full hoặc kill PostgreSQL production.</p>
+</div>
+<h2 data-number="11.12" id="tự-kiểm-tra-10"><span class="header-section-number">11.12</span> Tự kiểm tra</h2>
+<ol type="1">
+<li>Vì sao restart không phải root-cause analysis?</li>
+<li>RPO/RTO ảnh hưởng backup thế nào?</li>
+<li>Khi nào thêm replica app chưa giải quyết availability?</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Quan sát theo traffic, errors, latency và saturation.</li>
+<li>Mọi incident nên tạo một guard mới: test, alert, limit hoặc
+runbook.</li>
+<li>Backup age là metric quan trọng hơn việc timer “active”.</li>
+<li>Scale sau khi đo bottleneck; thêm thành phần cũng thêm failure
+mode.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-commands">Command cookbook</a>.</p>
+<h1 data-number="12" id="chapter-commands"><span class="header-section-number">12</span> Command cookbook</h1>
+<p>Chương này dùng để tra nhanh. Ký hiệu rủi ro: <strong>R0</strong> chỉ
+đọc, <strong>R1</strong> tạo output cục bộ, <strong>R2</strong> thay đổi
+service/dữ liệu có kiểm soát, <strong>R3</strong> có thể mất dữ
+liệu.</p>
+<h2 data-number="12.1" id="git-dependency-và-build"><span class="header-section-number">12.1</span> Git, dependency và build</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Nơi</th>
+<th>Lệnh</th>
+<th>Mục đích</th>
+<th>Risk/output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local</td>
+<td><code>git status --short</code></td>
+<td>Xem thay đổi</td>
+<td>R0</td>
+</tr>
+<tr>
+<td>Local/CI</td>
+<td><code>npm ci</code></td>
+<td>Cài đúng lockfile</td>
+<td>R1, tạo <code>node_modules</code></td>
+</tr>
+<tr>
+<td>Local/CI</td>
+<td><code>npm run check</code></td>
+<td>JS check + typecheck</td>
+<td>R0/R1 cache</td>
+</tr>
+<tr>
+<td>Local/CI</td>
+<td><code>npm test</code></td>
+<td>Unit + architecture</td>
+<td>R0</td>
+</tr>
+<tr>
+<td>Local/CI</td>
+<td><code>npm run build</code></td>
+<td>Tạo <code>dist/</code></td>
+<td>R1</td>
+</tr>
+<tr>
+<td>Test</td>
+<td><code>npm run test:integration</code></td>
+<td>API smoke trên DB cô lập</td>
+<td>R2, bắt buộc <code>TEST_DATABASE_URL</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>npm ci</code> phù hợp CI/release vì từ chối lockfile lệch;
+<code>npm install</code> phù hợp khi cố ý thay dependency và cập nhật
+lockfile.</p>
+<h2 data-number="12.2" id="postgresql-status-và-khám-phá"><span class="header-section-number">12.2</span> PostgreSQL status và khám
+phá</h2>
+<div class="sourceCode" id="cb42"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_isready</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-XAtqc</span> <span class="st">&#39;SELECT current_database(), current_user&#39;</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xc</span> <span class="st">&#39;\dt&#39;</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-Xc</span> <span class="st">&#39;\d users&#39;</span></span></code></pre></div>
+<p>Nơi: local hoặc VPS. Risk R0. Output phải cho đúng database/user
+trước mọi thao tác tiếp theo.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-XAtqc</span> <span class="dt">\</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;SELECT count(*) FROM pg_stat_activity WHERE datname=current_database();&quot;</span></span></code></pre></div>
+<p>Risk R0; dùng để điều tra connection pressure.</p>
+<h2 data-number="12.3" id="database-lifecycle"><span class="header-section-number">12.3</span> Database lifecycle</h2>
+<div class="sourceCode" id="cb44"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_lab</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="va">DATABASE_URL</span><span class="op">=</span>postgresql://localhost:5432/ai_learn_jlpt_lab <span class="ex">npm</span> run db:migrate</span></code></pre></div>
+<p>Nơi: local. Risk R2. Output migration phải là <code>APPLY</code> hoặc
+<code>SKIP</code> có chủ đích.</p>
+<div class="warning admonition">
+<p><strong>Cảnh báo</strong></p>
+<p><code>dropdb</code> là R3. Chỉ chạy sau preflight:</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="va">target_db</span><span class="op">=</span>ai_learn_jlpt_lab</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> <span class="st">&quot;</span><span class="va">$target_db</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="ss">lab</span><span class="pp">*</span><span class="kw">|</span><span class="pp">*</span><span class="ss">test</span><span class="pp">*</span><span class="kw">)</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">dropdb</span> <span class="st">&quot;</span><span class="va">$target_db</span><span class="st">&quot;</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="pp">*</span><span class="kw">)</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&#39;Refused&#39;</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">;;</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="cf">esac</span></span></code></pre></div>
+</div>
+<h2 data-number="12.4" id="backup-và-restore-1"><span class="header-section-number">12.4</span> Backup và restore</h2>
+<div class="sourceCode" id="cb46"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_dump</span> <span class="at">-Fc</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="st">&quot;</span><span class="va">$DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-f</span> app.dump</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--list</span> app.dump <span class="op">&gt;</span>/dev/null</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="ex">shasum</span> <span class="at">-a</span> 256 app.dump <span class="op">&gt;</span> app.dump.sha256</span></code></pre></div>
+<p>Nơi: local/VPS. Risk R1; đọc DB và tạo file chứa dữ liệu nhạy cảm.
+Output dump phải quyền hạn chế và lưu ngoài Git.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_restore_test</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--exit-on-error</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="dt">\</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> postgresql://localhost:5432/ai_learn_jlpt_restore_test app.dump</span></code></pre></div>
+<p>Risk R2 trên DB mới. Không dùng <code>--clean</code> vào production
+nếu chưa có recovery plan được review.</p>
+<h2 data-number="12.5" id="http-và-health"><span class="header-section-number">12.5</span> HTTP và health</h2>
+<div class="sourceCode" id="cb48"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://127.0.0.1:5050/health/live</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://127.0.0.1:5050/health/ready</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--fail</span> <span class="at">--silent</span> <span class="at">--show-error</span> https://learn.example.com/health/ready</span></code></pre></div>
+<p>Nơi: hai lệnh đầu trên VPS, lệnh cuối từ ngoài. Risk R0. So sánh
+internal và public giúp khoanh vùng Nginx/DNS/TLS.</p>
+<h2 data-number="12.6" id="systemd-và-journal"><span class="header-section-number">12.6</span> systemd và journal</h2>
+<div class="sourceCode" id="cb49"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl status ai-learn-jlpt <span class="at">--no-pager</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> ai-learn-jlpt <span class="at">-n</span> 100 <span class="at">--no-pager</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> journalctl <span class="at">-u</span> ai-learn-jlpt <span class="at">-f</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl list-timers <span class="st">&#39;ai-learn-jlpt*&#39;</span></span></code></pre></div>
+<p>Risk R0. Restart là R2:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart ai-learn-jlpt</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--fail</span> http://127.0.0.1:5050/health/ready</span></code></pre></div>
+<p>Luôn theo restart bằng readiness; không coi command exit 0 là
+acceptance test.</p>
+<h2 data-number="12.7" id="port-process-và-resource"><span class="header-section-number">12.7</span> Port, process và resource</h2>
+<div class="sourceCode" id="cb51"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-ltnp</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> <span class="at">-iTCP:5050</span> <span class="at">-sTCP:LISTEN</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ps</span> <span class="at">-ef</span> <span class="kw">|</span> <span class="ex">rg</span> <span class="st">&#39;dist/server.js&#39;</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-h</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span></code></pre></div>
+<p><code>ss/free</code> phổ biến trên Linux; <code>lsof</code> dùng tốt
+trên macOS. Risk R0.</p>
+<h2 data-number="12.8" id="nginx-dns-và-tls"><span class="header-section-number">12.8</span> Nginx, DNS và TLS</h2>
+<div class="sourceCode" id="cb52"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> nginx <span class="at">-t</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl reload nginx</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dig</span> +short learn.example.com</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-Iv</span> https://learn.example.com</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> certbot renew <span class="at">--dry-run</span></span></code></pre></div>
+<p><code>nginx -t</code>, DNS và curl là R0. Reload là R2 nhưng giữ
+connection tốt hơn restart. Chỉ reload sau config test thành công.</p>
+<h2 data-number="12.9" id="ssh-và-deploy"><span class="header-section-number">12.9</span> SSH và deploy</h2>
+<div class="sourceCode" id="cb53"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-lf</span> /etc/ssh/ssh_host_ed25519_key.pub</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">readlink</span> <span class="at">-f</span> /opt/ai-learn-jlpt/current</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lt</span> /opt/ai-learn-jlpt/releases</span></code></pre></div>
+<p>Risk R0. Dùng fingerprint qua trusted console để tạo known-host
+secret.</p>
+<p>Rollback app là R2 và phải xác nhận compatibility:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="va">previous</span><span class="op">=</span>/opt/ai-learn-jlpt/releases/REVIEWED_COMMIT_SHA</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="bu">test</span> <span class="at">-f</span> <span class="st">&quot;</span><span class="va">$previous</span><span class="st">/dist/server.js&quot;</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-u</span> deploy ln <span class="at">-sfn</span> <span class="st">&quot;</span><span class="va">$previous</span><span class="st">&quot;</span> /opt/ai-learn-jlpt/current.rollback</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> <span class="at">-u</span> deploy mv <span class="at">-Tf</span> /opt/ai-learn-jlpt/current.rollback /opt/ai-learn-jlpt/current</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> systemctl restart ai-learn-jlpt</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--fail</span> http://127.0.0.1:5050/health/ready</span></code></pre></div>
+<h2 data-number="12.10" id="cách-dùng-cookbook-khi-incident"><span class="header-section-number">12.10</span> Cách dùng cookbook khi
+incident</h2>
+<ol type="1">
+<li>Bắt đầu R0: status, log, health, disk, DB connection.</li>
+<li>Ghi evidence và release SHA.</li>
+<li>Chọn action R2 nhỏ nhất có khả năng giảm impact.</li>
+<li>R3 chỉ sau backup, target validation và peer review.</li>
+</ol>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Mọi lệnh automation cần <code>set -euo pipefail</code> và target cụ
+thể.</li>
+<li>Luôn phân biệt nơi chạy: local, CI, deploy user hay root.</li>
+<li>Lệnh thành công chưa phải hệ thống thành công; theo bằng checkpoint
+domain.</li>
+<li>Không copy lệnh R3 từ runbook mà bỏ preflight.</li>
+</ul>
+</div>
+<p>Tiếp theo: <a href="#chapter-capstone">Capstone và checklist</a>.</p>
+<h1 data-number="13" id="chapter-capstone"><span class="header-section-number">13</span> Capstone và checklist</h1>
+<h2 data-number="13.1" id="mục-tiêu-11"><span class="header-section-number">13.1</span> Mục tiêu</h2>
+<p>Ghép các phần thành một vòng đời duy nhất và tự đánh giá khả năng
+giải thích, thực hiện, chẩn đoán và phục hồi hệ thống.</p>
+<h2 data-number="13.2" id="capstone-từ-login-tới-recovery"><span class="header-section-number">13.2</span> Capstone: từ login tới
+recovery</h2>
+<pre class="text"><code>login -&gt; cookie -&gt; request context -&gt; authorization -&gt; create note
+      -&gt; PostgreSQL -&gt; build -&gt; release -&gt; readiness -&gt; backup/restore</code></pre>
+<div class="lab admonition">
+<p><strong>Lab thực hành</strong></p>
+<p><strong>Môi trường:</strong> local server và database có tên chứa
+<code>capstone_test</code>. Không dùng credential/dump production.</p>
+<h3 data-number="13.2.1" id="chuẩn-bị"><span class="header-section-number">13.2.1</span> 1. Chuẩn bị</h3>
+<div class="sourceCode" id="cb56"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_capstone_test</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TEST_DATABASE_URL</span><span class="op">=</span>postgresql://localhost:5432/ai_learn_jlpt_capstone_test</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="va">DATABASE_URL</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$TEST_DATABASE_URL</span><span class="st">&quot;</span> <span class="ex">npm</span> run db:migrate</span></code></pre></div>
+<h3 data-number="13.2.2" id="identity-và-ownership"><span class="header-section-number">13.2.2</span> 2. Identity và
+ownership</h3>
+<p>Chạy app bằng test DB. Đăng ký A/B với hai cookie jar. A tạo note; B
+thử truy cập ID đó; A đọc lại. Ghi status và query chứng minh owner
+không đổi.</p>
+<h3 data-number="13.2.3" id="artifact"><span class="header-section-number">13.2.3</span> 3. Artifact</h3>
+<div class="sourceCode" id="cb57"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run check</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="va">DATABASE_URL</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$TEST_DATABASE_URL</span><span class="st">&quot;</span> <span class="va">SMOKE_ENTRY</span><span class="op">=</span>dist/server.js <span class="dt">\</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="ex">node</span> scripts/qa/smoke-test.js</span></code></pre></div>
+<p>Xác nhận <code>dist/server.js</code>, public HTML và migration runner
+tồn tại.</p>
+<h3 data-number="13.2.4" id="backuprecovery"><span class="header-section-number">13.2.4</span> 4. Backup/recovery</h3>
+<div class="sourceCode" id="cb58"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_dump</span> <span class="at">-Fc</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="st">&quot;</span><span class="va">$TEST_DATABASE_URL</span><span class="st">&quot;</span> <span class="at">-f</span> /tmp/capstone.dump</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--list</span> /tmp/capstone.dump <span class="op">&gt;</span>/dev/null</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="ex">createdb</span> ai_learn_jlpt_capstone_restore_test</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_restore</span> <span class="at">--exit-on-error</span> <span class="at">--no-owner</span> <span class="at">--no-acl</span> <span class="dt">\</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> postgresql://localhost:5432/ai_learn_jlpt_capstone_restore_test <span class="dt">\</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  /tmp/capstone.dump</span></code></pre></div>
+<p>Chạy migration + smoke trên DB restore. So sánh marker data và
+migration count.</p>
+<h3 data-number="13.2.5" id="cleanup"><span class="header-section-number">13.2.5</span> 5. Cleanup</h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dropdb</span> ai_learn_jlpt_capstone_restore_test</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dropdb</span> ai_learn_jlpt_capstone_test</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> /tmp/capstone.dump</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="bu">unset</span> <span class="va">TEST_DATABASE_URL</span></span></code></pre></div>
+</div>
+<div class="checkpoint admonition">
+<p><strong>Checkpoint</strong></p>
+<p>Capstone đạt khi bạn có evidence cho auth cookie, cross-user
+isolation, artifact, health, backup validity và restored application —
+không chỉ một danh sách command exit 0.</p>
+</div>
+<h2 data-number="13.3" id="maturity-matrix"><span class="header-section-number">13.3</span> Maturity matrix</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mức</th>
+<th>Đặc điểm</th>
+<th>Bước tiếp theo khi có signal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local</td>
+<td>Một process, local DB</td>
+<td>Test DB, reproducible build</td>
+</tr>
+<tr>
+<td>VPS production</td>
+<td>Nginx, TLS, systemd, backup, CI/CD</td>
+<td>External backup/monitoring</td>
+</tr>
+<tr>
+<td>Resilient single region</td>
+<td>DB managed/tách host, nhiều app replica</td>
+<td>Pool/capacity/session review</td>
+</tr>
+<tr>
+<td>Distributed</td>
+<td>Queue/cache/object storage/observability</td>
+<td>Chỉ thêm theo workload</td>
+</tr>
+</tbody>
+</table>
+<p>Không nhảy level vì xu hướng. Mỗi level làm tăng chi phí deploy, data
+consistency, security và incident coordination.</p>
+<h2 data-number="13.4" id="checklist-kiến-thức"><span class="header-section-number">13.4</span> Checklist kiến thức</h2>
+<ul class="task-list">
+<li><label><input type="checkbox"></input>Vẽ được request flow từ browser tới
+DB.</label></li>
+<li><label><input type="checkbox"></input>Phân biệt authentication,
+authorization, role và ownership.</label></li>
+<li><label><input type="checkbox"></input>Giải thích password salt/hash và
+session token hash.</label></li>
+<li><label><input type="checkbox"></input>Giải thích 401, 403 và non-owner
+behavior.</label></li>
+<li><label><input type="checkbox"></input>Viết private query luôn scope
+<code>user_id</code>.</label></li>
+<li><label><input type="checkbox"></input>Dùng transaction trên cùng DB
+client.</label></li>
+<li><label><input type="checkbox"></input>Đọc constraint, index và query plan
+cơ bản.</label></li>
+<li><label><input type="checkbox"></input>Tính tổng pool connection khi tăng
+replica.</label></li>
+<li><label><input type="checkbox"></input>Viết migration forward và review
+lock/compatibility.</label></li>
+<li><label><input type="checkbox"></input>Backup, validate và restore vào
+database mới.</label></li>
+<li><label><input type="checkbox"></input>Phân biệt source, artifact và active
+release.</label></li>
+<li><label><input type="checkbox"></input>Phân biệt liveness, readiness và
+process status.</label></li>
+<li><label><input type="checkbox"></input>Mô tả rollback app và giới hạn với
+database.</label></li>
+<li><label><input type="checkbox"></input>Thu thập evidence trước action trong
+incident.</label></li>
+</ul>
+<h2 data-number="13.5" id="security-review"><span class="header-section-number">13.5</span> Security review</h2>
+<ul class="task-list">
+<li><label><input type="checkbox"></input>Password/token/credential không xuất
+hiện trong log hoặc response.</label></li>
+<li><label><input type="checkbox"></input>Production cookie có
+<code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code> phù
+hợp.</label></li>
+<li><label><input type="checkbox"></input>Login có rate limit/backoff theo
+threat model.</label></li>
+<li><label><input type="checkbox"></input>Reset/verification token được hash,
+có TTL và one-time consume.</label></li>
+<li><label><input type="checkbox"></input>Mọi private CRUD được test
+owner/non-owner.</label></li>
+<li><label><input type="checkbox"></input>Admin action có access guard và
+audit.</label></li>
+<li><label><input type="checkbox"></input>DB/app không public port không cần
+thiết.</label></li>
+<li><label><input type="checkbox"></input>Deploy key và sudo theo least
+privilege.</label></li>
+<li><label><input type="checkbox"></input>Secret không nằm trong
+source/artifact.</label></li>
+</ul>
+<h2 data-number="13.6" id="database-và-go-live-review"><span class="header-section-number">13.6</span> Database và go-live
+review</h2>
+<ul class="task-list">
+<li><label><input type="checkbox"></input>Constraint phản ánh invariant quan
+trọng.</label></li>
+<li><label><input type="checkbox"></input>Query dùng parameter
+binding.</label></li>
+<li><label><input type="checkbox"></input>Index gắn với query thật và đã xem
+plan.</label></li>
+<li><label><input type="checkbox"></input>Migration đã thử trên bản sao dữ
+liệu.</label></li>
+<li><label><input type="checkbox"></input>Predeploy backup
+verified.</label></li>
+<li><label><input type="checkbox"></input>Restore drill thành
+công.</label></li>
+<li><label><input type="checkbox"></input>DNS, TLS, Nginx và external
+readiness đều đúng.</label></li>
+<li><label><input type="checkbox"></input>systemd service, health timer và
+backup timer active.</label></li>
+<li><label><input type="checkbox"></input>Login, CMS, private data và image
+path được smoke test.</label></li>
+<li><label><input type="checkbox"></input>Có bản backup ngoài VPS và owner
+nhận alert.</label></li>
+</ul>
+<h2 data-number="13.7" id="câu-hỏi-tình-huống"><span class="header-section-number">13.7</span> Câu hỏi tình huống</h2>
+<ol type="1">
+<li><code>/live</code> 200 nhưng <code>/ready</code> 500: thu thập gì
+trước?</li>
+<li>Release mới migration thành công nhưng app fail: điều kiện nào cho
+phép rollback?</li>
+<li>User B update được note A nhưng không list được: boundary nào có khả
+năng sai?</li>
+<li>Tăng từ 1 lên 8 replica và DB bắt đầu từ chối connection: tính lại
+gì?</li>
+<li>Backup timer active nhưng file mới nhất ba ngày tuổi: hệ thống đang
+xanh không?</li>
+</ol>
+<h2 data-number="13.8" id="những-thứ-chưa-cần-vội-dùng"><span class="header-section-number">13.8</span> Những thứ chưa cần vội
+dùng</h2>
+<ul>
+<li><strong>JWT:</strong> session DB đang đáp ứng browser app và revoke
+tốt.</li>
+<li><strong>Redis:</strong> chưa có query/latency evidence hoặc cache
+policy.</li>
+<li><strong>ORM:</strong> raw SQL nhỏ, rõ và được test.</li>
+<li><strong>Microservices:</strong> module boundary chưa cần network
+boundary.</li>
+<li><strong>Kubernetes:</strong> một VPS/systemd còn đáp ứng
+topology.</li>
+<li><strong>MFA:</strong> ưu tiên rate limit, reset lifecycle và admin
+threat trước; thêm khi risk yêu cầu.</li>
+</ul>
+<div class="hint admonition">
+<p><strong>Hint đúc kết</strong></p>
+<ul>
+<li>Nắm invariant và failure mode trước syntax công cụ.</li>
+<li>Một hệ thống trưởng thành khi có thể thay đổi và phục hồi có kiểm
+chứng.</li>
+<li>“Chưa cần” là kết luận kỹ thuật, không phải thiếu tham vọng.</li>
+<li>Khi gặp codebase mới: vẽ request flow, data ownership, failure
+boundary và operational loop — bốn bản đồ này mở gần như mọi ngõ
+ngách.</li>
+</ul>
+</div>
+    </main>
+  </div>
+  <footer class="book-footer">Cookbook Xây dựng và Vận hành Hệ thống Web Multi-user</footer>
+</body>
+</html>
