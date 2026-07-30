@@ -76,9 +76,27 @@ src/<cookbook>/
 định thứ tự xuất bản. Một lesson có thể xuất hiện trong nhiều path mà không sao
 chép nội dung.
 
+## Tạo lesson mới
+
+```bash
+./build.sh create-lesson web-system-foundations cache \
+  --title "Cache" \
+  --depth standard
+```
+
+Lệnh chỉ thực hiện hai thay đổi chắc chắn:
+
+1. Tạo `lessons/cache.md` ở trạng thái `draft`.
+2. Thêm node `cache` vào `graph.yml`.
+
+Lệnh không tự đoán relation và không tự chèn lesson vào learning path. Sau khi
+viết nội dung, hãy chọn một trong ba vai trò: `core`, `optional` hoặc
+`graph-only`, rồi chạy validation.
+
+Guideline đầy đủ nằm trong `guidelines/`.
+
 ## Kiểm thử
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 ```
-

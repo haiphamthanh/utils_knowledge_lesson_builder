@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from knowledge_builder.authoring import create_lesson
 from knowledge_builder.builder import build
 from knowledge_builder.core import create_plan
 from knowledge_builder.models import BuilderError
@@ -40,12 +41,43 @@ def parser() -> argparse.ArgumentParser:
     add_selection_arguments(build_parser)
     validate_parser = subparsers.add_parser("validate", help="Chỉ validate cấu trúc")
     add_selection_arguments(validate_parser)
+    create_parser = subparsers.add_parser(
+        "create-lesson",
+        help="Tạo lesson draft và đăng ký graph node, không tự sửa learning path",
+    )
+    create_parser.add_argument("cookbook", help="ID cookbook")
+    create_parser.add_argument("lesson_id", help="ID lesson mới")
+    create_parser.add_argument("--title", required=True, help="Tiêu đề hiển thị")
+    create_parser.add_argument(
+        "--depth",
+        choices=("overview", "standard", "deep-dive"),
+        default="standard",
+        help="Độ sâu nội dung; mặc định standard",
+    )
     return root
 
 
 def main(argv: list[str] | None = None) -> None:
     args = parser().parse_args(argv)
     try:
+        if args.command == "create-lesson":
+            target = create_lesson(
+                root=project_root(),
+                cookbook_id=args.cookbook,
+                lesson_id=args.lesson_id,
+                title=args.title,
+                depth=args.depth,
+            )
+            relative_target = target.relative_to(project_root())
+            print(f"[knowledge-builder] Created draft: {relative_target}")
+            print(f"[knowledge-builder] Added graph node: {args.lesson_id}")
+            print("[knowledge-builder] Next:")
+            print("  1. Viết nội dung và chọn relation trong graph.yml.")
+            print("  2. Quyết định graph-only, optional hoặc core.")
+            print("  3. Nếu xuất bản, thêm lesson vào đúng chapter của path.")
+            print(f"  4. Chạy: ./build.sh validate {args.cookbook} --include-draft")
+            return
+
         plan = create_plan(
             root=project_root(),
             cookbook_id=args.cookbook,
