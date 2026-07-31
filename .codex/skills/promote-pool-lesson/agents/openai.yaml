@@ -1,4 +1,4 @@
 interface:
   display_name: "Promote Pool Lesson"
-  short_description: "Chuyển resource trong pool thành lesson"
+  short_description: "Promote pool resource to lesson"
   default_prompt: "Use $promote-pool-lesson to review a pool resource and create the confirmed lesson."
