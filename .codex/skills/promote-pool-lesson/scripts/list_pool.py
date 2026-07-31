@@ -10,25 +10,22 @@ import sys
 def find_project(start: Path) -> Path:
     current = start.resolve()
     for candidate in (current, *current.parents):
-        if (
-            (candidate / "build.sh").is_file()
-            and (candidate / "resource" / "index.yml").is_file()
-        ):
+        if (candidate / "build.sh").is_file() and (
+            candidate / "resource" / "index.yml"
+        ).is_file():
             return candidate
-    raise RuntimeError(
-        f"Khong tim thay Knowledge Lesson Builder project tu: {start}"
-    )
+    raise RuntimeError(f"Không tìm thấy Knowledge Lesson Builder project từ: {start}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Liet ke resource item san sang trong pool duoi dang JSON."
+        description="Liệt kê resource item sẵn sàng trong pool dưới dạng JSON."
     )
     parser.add_argument(
         "--project",
         type=Path,
         default=Path.cwd(),
-        help="Project root hoac mot thu muc con cua project.",
+        help="Project root hoặc một thư mục con của project.",
     )
     args = parser.parse_args()
 
