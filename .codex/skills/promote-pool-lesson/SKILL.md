@@ -1,0 +1,29 @@
+---
+name: promote-pool-lesson
+description: Convert a reviewed resource item from resource/pool into a structured Knowledge Lesson Builder lesson. Use when the user asks to list pool candidates, choose one source, propose its cookbook/lesson/graph/path placement, require confirmation, create the lesson, validate it, and move the source to resource/done.
+---
+
+# Promote Pool Lesson
+
+1. Locate the project root containing `build.sh` and `resource/index.yml`.
+2. Read `AGENTS.md` and every project guideline it requires.
+3. Run `python <skill-dir>/scripts/list_pool.py --project <root>`.
+4. Present the returned candidates and ask the user to choose one. Stop if the
+   pool is empty.
+5. Read the selected file or the relevant files inside the selected directory.
+   Inspect the target cookbook, graph, path, lesson template, and nearby lessons.
+6. Propose one concrete change set: title, stable lesson ID, depth, target
+   cookbook, graph relations, and `core`, `optional`, or `graph-only` placement.
+   Require explicit confirmation before writing or moving anything.
+7. After confirmation:
+   - Run `./build.sh create-lesson <cookbook> <lesson-id> --title <title> --depth <depth>`.
+   - Replace the scaffold with source-grounded content that follows
+     `templates/lesson.md`; set status to `review`.
+   - Add only confirmed graph relations and path placement.
+   - Run unit tests, cookbook validation, and one affected build.
+   - Run `./build.sh resource complete <resource-id> --cookbook <cookbook> --lesson <lesson-id>`.
+8. Commit the coherent change if the project requires staged commits. Never
+   include unrelated files.
+
+Do not overwrite an existing lesson, infer missing facts, move the resource
+before validation succeeds, or let the graph author the learning path.

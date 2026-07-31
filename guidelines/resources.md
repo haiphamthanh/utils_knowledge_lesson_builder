@@ -58,3 +58,6 @@ Gọi `$promote-pool-lesson` để:
 3. Xem đề xuất cookbook, lesson ID, depth, relation và vị trí path.
 4. Xác nhận trước khi agent tạo lesson.
 5. Validate/build thành công rồi mới chuyển resource sang done.
+
+Skill này được lưu tại `.codex/skills/promote-pool-lesson` trong repo để chỉ áp
+dụng cho project hiện tại.
