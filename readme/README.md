@@ -6,6 +6,7 @@ chiếu, không phải hướng dẫn vận hành hiện tại.
 
 | Tài liệu | Nội dung |
 |---|---|
+| [`user-guide.md`](user-guide.md) | Hướng dẫn cơ bản từ resource đến cookbook đã build |
 | [`architecture.md`](architecture.md) | Kiến trúc, sequence diagram và đánh giá hệ thống |
 | [`knowledge-model.md`](knowledge-model.md) | Ranh giới lesson, graph và learning path |
 | [`authoring.md`](authoring.md) | Quy trình phân loại, viết và xuất bản lesson |

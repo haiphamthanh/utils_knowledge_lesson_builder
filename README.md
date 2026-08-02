@@ -13,6 +13,9 @@ một learning path tuyến tính. Thiết kế cốt lõi:
 Kiến trúc tổng thể, sequence diagram, quy tắc authoring và tài liệu vận hành được
 gom trong thư mục [`readme/`](readme/README.md).
 
+Bắt đầu với [`readme/user-guide.md`](readme/user-guide.md) để đi trọn quy trình
+từ resource thô đến cookbook đã build.
+
 ## Cài đặt
 
 Yêu cầu Python 3.11+, Pandoc 3.x; build PDF cần thêm XeLaTeX.
