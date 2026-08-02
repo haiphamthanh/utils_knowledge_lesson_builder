@@ -167,7 +167,7 @@ class ResourceManager:
             )
 
         lesson_path = (
-            self.root / "src" / cookbook_id / "lessons" / f"{lesson_id}.md"
+            self.root / "knowledge" / cookbook_id / "lessons" / f"{lesson_id}.md"
         )
         if not lesson_path.is_file():
             raise BuilderError(f"Không tìm thấy lesson đích: {lesson_path}")
@@ -236,4 +236,3 @@ def items_as_table(items: list[dict[str, Any]]) -> str:
         for item in items
     )
     return "\n".join(rows)
-

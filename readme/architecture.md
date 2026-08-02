@@ -14,9 +14,9 @@ Ba nguồn sự thật về tri thức được giữ tách biệt:
 
 | Nguồn sự thật   | Trả lời câu hỏi               | Vị trí                                  |
 | --------------- | ----------------------------- | --------------------------------------- |
-| Lesson          | Chủ đề giải thích điều gì?    | `src/<cookbook>/lessons/<lesson-id>.md` |
-| Knowledge graph | Các chủ đề liên hệ thế nào?   | `src/<cookbook>/graph.yml`              |
-| Learning path   | Người đọc đi theo thứ tự nào? | `src/<cookbook>/paths/<path-id>.yml`    |
+| Lesson          | Chủ đề giải thích điều gì?    | `knowledge/<cookbook>/lessons/<lesson-id>.md` |
+| Knowledge graph | Các chủ đề liên hệ thế nào?   | `knowledge/<cookbook>/graph.yml`              |
+| Learning path   | Người đọc đi theo thứ tự nào? | `knowledge/<cookbook>/paths/<path-id>.yml`    |
 
 Nguyên tắc chi phối validation là:
 
@@ -63,7 +63,7 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 ├── build.sh                       # entrypoint công khai
 ├── config.yml                     # mặc định toàn project
 ├── knowledge_builder/             # application core và CLI
-├── src/<cookbook>/                # nguồn tri thức xuất bản
+├── knowledge/<cookbook>/          # nguồn tri thức xuất bản
 │   ├── cookbook.yml
 │   ├── graph.yml
 │   ├── lessons/*.md
@@ -73,7 +73,7 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 │   └── <template>/template.yml
 ├── resource/                      # nguồn đầu vào và lifecycle index
 ├── .codex/skills/                 # automation chỉ dùng trong repo
-├── guidelines/                    # quy tắc authoring và vận hành
+├── readme/                        # kiến trúc, hướng dẫn và quy tắc vận hành
 ├── tests/                         # unit tests
 └── specs/                         # idea và prototype tham chiếu ban đầu
 ```
@@ -98,10 +98,10 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 | Vị trí                        | Vai trò                                           | Cách quản lý                        |
 | ----------------------------- | ------------------------------------------------- | ----------------------------------- |
 | `config.yml`                  | Default build directory, template và format       | Có                                  |
-| `src/<cookbook>/cookbook.yml` | Metadata và default của một cookbook              | Có                                  |
-| `src/<cookbook>/lessons/*.md` | Front matter + nội dung lesson                    | Có                                  |
-| `src/<cookbook>/graph.yml`    | Registry node và relations                        | Có                                  |
-| `src/<cookbook>/paths/*.yml`  | Chapter, core/optional và thứ tự đọc              | Có                                  |
+| `knowledge/<cookbook>/cookbook.yml` | Metadata và default của một cookbook              | Có                                  |
+| `knowledge/<cookbook>/lessons/*.md` | Front matter + nội dung lesson                    | Có                                  |
+| `knowledge/<cookbook>/graph.yml`    | Registry node và relations                        | Có                                  |
+| `knowledge/<cookbook>/paths/*.yml`  | Chapter, core/optional và thứ tự đọc              | Có                                  |
 | `templates/<name>/`           | Cấu hình format và asset Pandoc                   | Có                                  |
 | `resource/index.yml`          | Trạng thái, timestamp và lesson đích của resource | Có                                  |
 | `build/.work/`                | Markdown trung gian                               | Generated, được `.gitignore` bỏ qua |
@@ -114,7 +114,7 @@ Repository hiện có đúng hai file shell được Git quản lý:
 | Script                              | Phạm vi              | Trách nhiệm                                                                                                                          | Khi nên dùng                                                             | Ghi chú                                                                     |
 | ----------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
 | `./build.sh`                        | Hệ thống hiện tại    | Tìm Python trong `.venv` hoặc `PYTHON_BIN_OVERRIDE`, kiểm tra PyYAML, rồi chuyển toàn bộ argument sang `python -m knowledge_builder` | Mọi thao tác hằng ngày: `validate`, `build`, `create-lesson`, `resource` | Đây là entrypoint công khai duy nhất của core hiện tại                      |
-| `./specs/example-cookbook/build.sh` | Prototype tham chiếu | Gọi Pandoc/XeLaTeX trực tiếp để build hoặc xóa output của example cũ                                                                 | Chỉ khi cần tái hiện prototype trong `specs/example-cookbook`            | Không dùng `src/`, graph, path, template registry hoặc Python core hiện tại |
+| `./specs/example-cookbook/build.sh` | Prototype tham chiếu | Gọi Pandoc/XeLaTeX trực tiếp để build hoặc xóa output của example cũ                                                                 | Chỉ khi cần tái hiện prototype trong `specs/example-cookbook`            | Không dùng `knowledge/`, graph, path, template registry hoặc Python core hiện tại |
 
 `build.sh` ở root cố ý mỏng: trách nhiệm nghiệp vụ nằm trong Python để có thể
 unit test. Script Python

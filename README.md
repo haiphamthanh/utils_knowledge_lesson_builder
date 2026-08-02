@@ -10,8 +10,8 @@ một learning path tuyến tính. Thiết kế cốt lõi:
 
 > Graph validates the path. Graph does not author the path.
 
-Kiến trúc tổng thể, sequence diagram, trách nhiệm của các script và đánh giá
-hiện trạng nằm trong [`docs/architecture.md`](docs/architecture.md).
+Kiến trúc tổng thể, sequence diagram, quy tắc authoring và tài liệu vận hành được
+gom trong thư mục [`readme/`](readme/README.md).
 
 ## Cài đặt
 
@@ -66,7 +66,7 @@ thay đổi.
 ## Cấu trúc cookbook
 
 ```text
-src/<cookbook>/
+knowledge/<cookbook>/
 ├── cookbook.yml
 ├── graph.yml
 ├── paths/
@@ -96,7 +96,7 @@ Lệnh không tự đoán relation và không tự chèn lesson vào learning pa
 viết nội dung, hãy chọn một trong ba vai trò: `core`, `optional` hoặc
 `graph-only`, rồi chạy validation.
 
-Guideline đầy đủ nằm trong `guidelines/`.
+Guideline đầy đủ nằm trong [`readme/`](readme/README.md).
 
 ## Resource lifecycle
 
@@ -116,7 +116,7 @@ resource/raw → resource/pool → resource/done
 ```
 
 `resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
-`guidelines/resources.md` để biết quy tắc transition.
+[`readme/resources.md`](readme/resources.md) để biết quy tắc transition.
 
 Skill `$promote-pool-lesson` nằm trong
 `.codex/skills/promote-pool-lesson` của chính repo này. Khi gọi skill, agent sẽ

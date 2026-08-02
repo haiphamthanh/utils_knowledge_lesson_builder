@@ -57,7 +57,7 @@ class ResourceManagerTests(unittest.TestCase):
         source.write_text("Cache notes", encoding="utf-8")
         self.manager.sync()
         self.manager.review("cache-notes")
-        lesson_dir = self.root / "src" / "demo" / "lessons"
+        lesson_dir = self.root / "knowledge" / "demo" / "lessons"
         lesson_dir.mkdir(parents=True)
         (lesson_dir / "cache.md").write_text(
             """---
@@ -87,7 +87,7 @@ tags: []
         source.write_text("Cache notes", encoding="utf-8")
         self.manager.sync()
         self.manager.review("cache-notes")
-        lesson_dir = self.root / "src" / "demo" / "lessons"
+        lesson_dir = self.root / "knowledge" / "demo" / "lessons"
         lesson_dir.mkdir(parents=True)
         (lesson_dir / "cache.md").write_text(
             """---

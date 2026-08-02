@@ -25,7 +25,7 @@ def create_lesson(
     if depth not in ALLOWED_DEPTHS:
         raise BuilderError(f"depth phải thuộc {sorted(ALLOWED_DEPTHS)}")
 
-    cookbook_dir = root / "src" / cookbook_id
+    cookbook_dir = root / "knowledge" / cookbook_id
     cookbook_path = cookbook_dir / "cookbook.yml"
     cookbook = load_yaml(cookbook_path)
     if cookbook.get("id") != cookbook_id:
