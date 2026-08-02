@@ -10,6 +10,9 @@ một learning path tuyến tính. Thiết kế cốt lõi:
 
 > Graph validates the path. Graph does not author the path.
 
+Kiến trúc tổng thể, sequence diagram, trách nhiệm của các script và đánh giá
+hiện trạng nằm trong [`docs/architecture.md`](docs/architecture.md).
+
 ## Cài đặt
 
 Yêu cầu Python 3.11+, Pandoc 3.x; build PDF cần thêm XeLaTeX.
