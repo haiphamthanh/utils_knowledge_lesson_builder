@@ -12,11 +12,11 @@ thập đến khi đã tạo thành lesson.
 
 Ba nguồn sự thật về tri thức được giữ tách biệt:
 
-| Nguồn sự thật | Trả lời câu hỏi | Vị trí |
-|---|---|---|
-| Lesson | Chủ đề giải thích điều gì? | `src/<cookbook>/lessons/<lesson-id>.md` |
-| Knowledge graph | Các chủ đề liên hệ thế nào? | `src/<cookbook>/graph.yml` |
-| Learning path | Người đọc đi theo thứ tự nào? | `src/<cookbook>/paths/<path-id>.yml` |
+| Nguồn sự thật   | Trả lời câu hỏi               | Vị trí                                  |
+| --------------- | ----------------------------- | --------------------------------------- |
+| Lesson          | Chủ đề giải thích điều gì?    | `src/<cookbook>/lessons/<lesson-id>.md` |
+| Knowledge graph | Các chủ đề liên hệ thế nào?   | `src/<cookbook>/graph.yml`              |
+| Learning path   | Người đọc đi theo thứ tự nào? | `src/<cookbook>/paths/<path-id>.yml`    |
 
 Nguyên tắc chi phối validation là:
 
@@ -80,41 +80,41 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 
 ### Thành phần Python
 
-| Thành phần | Trách nhiệm hiện tại | Không chịu trách nhiệm |
-|---|---|---|
-| `knowledge_builder.cli` | Parse command, điều phối use case, in kết quả/lỗi | Parse YAML, validate nghiệp vụ, render |
-| `knowledge_builder.core` | Resolve config/cookbook/path/template và tạo `BuildPlan` hợp lệ | Gọi Pandoc, sửa nội dung |
-| `knowledge_builder.loading` | Đọc YAML, parse lesson/chapter, kiểm tra shape cơ bản | Quan hệ graph và thứ tự path |
-| `knowledge_builder.validation` | Kiểm tra graph, dependency cycle, path, core/optional/draft | Tự sinh thứ tự path |
-| `knowledge_builder.builder` | Ghép Markdown, dựng lệnh Pandoc, tạo output | Chọn lesson hoặc thay đổi source |
-| `knowledge_builder.authoring` | Tạo lesson draft và đăng ký graph node | Đoán relation hoặc vị trí path |
-| `knowledge_builder.resources` | Đồng bộ index và transition `raw → pool → done` | Viết nội dung lesson |
-| `knowledge_builder.resource_cli` | Khai báo và dispatch nhóm lệnh `resource` | Thực thi quy tắc lifecycle |
-| `knowledge_builder.models` | Model bất biến, enum và `BuilderError` | I/O |
-| `knowledge_builder.io_utils` | Ghi file nguyên tử bằng temporary file + replace | Quy tắc nghiệp vụ |
+| Thành phần                       | Trách nhiệm hiện tại                                            | Không chịu trách nhiệm                 |
+| -------------------------------- | --------------------------------------------------------------- | -------------------------------------- |
+| `knowledge_builder.cli`          | Parse command, điều phối use case, in kết quả/lỗi               | Parse YAML, validate nghiệp vụ, render |
+| `knowledge_builder.core`         | Resolve config/cookbook/path/template và tạo `BuildPlan` hợp lệ | Gọi Pandoc, sửa nội dung               |
+| `knowledge_builder.loading`      | Đọc YAML, parse lesson/chapter, kiểm tra shape cơ bản           | Quan hệ graph và thứ tự path           |
+| `knowledge_builder.validation`   | Kiểm tra graph, dependency cycle, path, core/optional/draft     | Tự sinh thứ tự path                    |
+| `knowledge_builder.builder`      | Ghép Markdown, dựng lệnh Pandoc, tạo output                     | Chọn lesson hoặc thay đổi source       |
+| `knowledge_builder.authoring`    | Tạo lesson draft và đăng ký graph node                          | Đoán relation hoặc vị trí path         |
+| `knowledge_builder.resources`    | Đồng bộ index và transition `raw → pool → done`                 | Viết nội dung lesson                   |
+| `knowledge_builder.resource_cli` | Khai báo và dispatch nhóm lệnh `resource`                       | Thực thi quy tắc lifecycle             |
+| `knowledge_builder.models`       | Model bất biến, enum và `BuilderError`                          | I/O                                    |
+| `knowledge_builder.io_utils`     | Ghi file nguyên tử bằng temporary file + replace                | Quy tắc nghiệp vụ                      |
 
 ### Nguồn dữ liệu và output
 
-| Vị trí | Vai trò | Cách quản lý |
-|---|---|---|
-| `config.yml` | Default build directory, template và format | Có |
-| `src/<cookbook>/cookbook.yml` | Metadata và default của một cookbook | Có |
-| `src/<cookbook>/lessons/*.md` | Front matter + nội dung lesson | Có |
-| `src/<cookbook>/graph.yml` | Registry node và relations | Có |
-| `src/<cookbook>/paths/*.yml` | Chapter, core/optional và thứ tự đọc | Có |
-| `templates/<name>/` | Cấu hình format và asset Pandoc | Có |
-| `resource/index.yml` | Trạng thái, timestamp và lesson đích của resource | Có |
-| `build/.work/` | Markdown trung gian | Generated, được `.gitignore` bỏ qua |
-| `build/<cookbook>/<path>/` | Tài liệu kết quả | Generated, được `.gitignore` bỏ qua |
+| Vị trí                        | Vai trò                                           | Cách quản lý                        |
+| ----------------------------- | ------------------------------------------------- | ----------------------------------- |
+| `config.yml`                  | Default build directory, template và format       | Có                                  |
+| `src/<cookbook>/cookbook.yml` | Metadata và default của một cookbook              | Có                                  |
+| `src/<cookbook>/lessons/*.md` | Front matter + nội dung lesson                    | Có                                  |
+| `src/<cookbook>/graph.yml`    | Registry node và relations                        | Có                                  |
+| `src/<cookbook>/paths/*.yml`  | Chapter, core/optional và thứ tự đọc              | Có                                  |
+| `templates/<name>/`           | Cấu hình format và asset Pandoc                   | Có                                  |
+| `resource/index.yml`          | Trạng thái, timestamp và lesson đích của resource | Có                                  |
+| `build/.work/`                | Markdown trung gian                               | Generated, được `.gitignore` bỏ qua |
+| `build/<cookbook>/<path>/`    | Tài liệu kết quả                                  | Generated, được `.gitignore` bỏ qua |
 
 ## 4. Các shell script theo trách nhiệm
 
 Repository hiện có đúng hai file shell được Git quản lý:
 
-| Script | Phạm vi | Trách nhiệm | Khi nên dùng | Ghi chú |
-|---|---|---|---|---|
-| `./build.sh` | Hệ thống hiện tại | Tìm Python trong `.venv` hoặc `PYTHON_BIN_OVERRIDE`, kiểm tra PyYAML, rồi chuyển toàn bộ argument sang `python -m knowledge_builder` | Mọi thao tác hằng ngày: `validate`, `build`, `create-lesson`, `resource` | Đây là entrypoint công khai duy nhất của core hiện tại |
-| `./specs/example-cookbook/build.sh` | Prototype tham chiếu | Gọi Pandoc/XeLaTeX trực tiếp để build hoặc xóa output của example cũ | Chỉ khi cần tái hiện prototype trong `specs/example-cookbook` | Không dùng `src/`, graph, path, template registry hoặc Python core hiện tại |
+| Script                              | Phạm vi              | Trách nhiệm                                                                                                                          | Khi nên dùng                                                             | Ghi chú                                                                     |
+| ----------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `./build.sh`                        | Hệ thống hiện tại    | Tìm Python trong `.venv` hoặc `PYTHON_BIN_OVERRIDE`, kiểm tra PyYAML, rồi chuyển toàn bộ argument sang `python -m knowledge_builder` | Mọi thao tác hằng ngày: `validate`, `build`, `create-lesson`, `resource` | Đây là entrypoint công khai duy nhất của core hiện tại                      |
+| `./specs/example-cookbook/build.sh` | Prototype tham chiếu | Gọi Pandoc/XeLaTeX trực tiếp để build hoặc xóa output của example cũ                                                                 | Chỉ khi cần tái hiện prototype trong `specs/example-cookbook`            | Không dùng `src/`, graph, path, template registry hoặc Python core hiện tại |
 
 `build.sh` ở root cố ý mỏng: trách nhiệm nghiệp vụ nằm trong Python để có thể
 unit test. Script Python
@@ -256,27 +256,27 @@ transaction tự động hoàn toàn.
 
 ### Vấn đề và rủi ro
 
-| Ưu tiên | Quan sát | Ảnh hưởng | Hướng xử lý nhỏ nhất |
-|---|---|---|---|
-| Cao | `resource sync` chấp nhận item đã được move thủ công vào `done`, tự đặt `completed_at` nhưng không bắt buộc `cookbook` và `lesson_id` | `index.yml` có thể nói item đã hoàn thành nhưng không truy ngược được lesson | Khi sync thấy `done`, yêu cầu liên kết lesson hợp lệ; hoặc đánh dấu trạng thái riêng như `needs-link` thay vì coi là hoàn tất |
-| Trung bình | `graph.yml` lưu lại `title` vốn đã có trong front matter của lesson, nhưng validation chỉ so ID | Hai title có thể lệch nhau và không rõ file nào là nguồn sự thật | Chỉ lưu node ID, hoặc validate title graph luôn khớp lesson; phương án đầu sạch hơn nhưng cần migration |
-| Trung bình | `specs/example-cookbook` chứa một pipeline build cũ và cả output HTML/PDF đã commit | Người mới có thể chạy nhầm script hoặc tưởng có hai kiến trúc được hỗ trợ | Gắn nhãn `legacy prototype` rõ trong README của specs; sau khi không còn cần đối chiếu, archive hoặc bỏ generated output bằng commit riêng |
-| Trung bình | `template.yml` chỉ cấu hình được tập option Pandoc mà `builder.py` đã hard-code hỗ trợ | Thêm format có option mới vẫn phải sửa Python, chưa hoàn toàn “copy template rồi build” | Xác định contract option được hỗ trợ; sau đó thêm danh sách `pandoc_args` có kiểm soát hoặc adapter theo format nếu thực sự phát sinh nhu cầu |
-| Trung bình | Skill tự động hóa việc đề xuất và điều phối, nhưng các bước sửa lesson/graph/path vẫn là thao tác nhiều file của agent | Nếu dừng giữa chừng sẽ còn draft/node chưa hoàn tất; có thể phục hồi nhưng chưa có resume/status rõ | Thêm lệnh read-only `status`/`doctor` trước; chỉ tạo workflow transaction khi số lần gián đoạn thực tế đủ lớn |
-| Thấp | Chỉ `resource/index.yml` có `version`; cookbook, graph, path và template chưa có schema version | Khó migration an toàn khi cấu trúc YAML thay đổi về sau | Thêm version khi có migration schema đầu tiên, chưa cần framework schema ngay |
-| Thấp | CLI chưa có lệnh khám phá cookbook, path, template hoặc kiểm tra dependency hệ thống | Người dùng phải đọc cây thư mục và nhớ ID; lỗi môi trường chỉ xuất hiện khi chạy | Thêm `list` và `doctor` tối giản, giữ `build.sh` là entrypoint duy nhất |
-| Thấp | Test chưa chạy Pandoc qua mock/integration và chưa phủ manual move, collision/rename của resource | Một số regression chỉ lộ khi build hoặc khi dữ liệu filesystem lệch index | Bổ sung test theo từng invariant khi sửa chính invariant đó |
+| Ưu tiên    | Quan sát                                                                                                                              | Ảnh hưởng                                                                                           | Hướng xử lý nhỏ nhất                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cao        | `resource sync` chấp nhận item đã được move thủ công vào `done`, tự đặt `completed_at` nhưng không bắt buộc `cookbook` và `lesson_id` | `index.yml` có thể nói item đã hoàn thành nhưng không truy ngược được lesson                        | Khi sync thấy `done`, yêu cầu liên kết lesson hợp lệ; hoặc đánh dấu trạng thái riêng như `needs-link` thay vì coi là hoàn tất                 |
+| Trung bình | `graph.yml` lưu lại `title` vốn đã có trong front matter của lesson, nhưng validation chỉ so ID                                       | Hai title có thể lệch nhau và không rõ file nào là nguồn sự thật                                    | Chỉ lưu node ID, hoặc validate title graph luôn khớp lesson; phương án đầu sạch hơn nhưng cần migration                                       |
+| Trung bình | `specs/example-cookbook` chứa một pipeline build cũ và cả output HTML/PDF đã commit                                                   | Người mới có thể chạy nhầm script hoặc tưởng có hai kiến trúc được hỗ trợ                           | Gắn nhãn `legacy prototype` rõ trong README của specs; sau khi không còn cần đối chiếu, archive hoặc bỏ generated output bằng commit riêng    |
+| Trung bình | `template.yml` chỉ cấu hình được tập option Pandoc mà `builder.py` đã hard-code hỗ trợ                                                | Thêm format có option mới vẫn phải sửa Python, chưa hoàn toàn “copy template rồi build”             | Xác định contract option được hỗ trợ; sau đó thêm danh sách `pandoc_args` có kiểm soát hoặc adapter theo format nếu thực sự phát sinh nhu cầu |
+| Trung bình | Skill tự động hóa việc đề xuất và điều phối, nhưng các bước sửa lesson/graph/path vẫn là thao tác nhiều file của agent                | Nếu dừng giữa chừng sẽ còn draft/node chưa hoàn tất; có thể phục hồi nhưng chưa có resume/status rõ | Thêm lệnh read-only `status`/`doctor` trước; chỉ tạo workflow transaction khi số lần gián đoạn thực tế đủ lớn                                 |
+| Thấp       | Chỉ `resource/index.yml` có `version`; cookbook, graph, path và template chưa có schema version                                       | Khó migration an toàn khi cấu trúc YAML thay đổi về sau                                             | Thêm version khi có migration schema đầu tiên, chưa cần framework schema ngay                                                                 |
+| Thấp       | CLI chưa có lệnh khám phá cookbook, path, template hoặc kiểm tra dependency hệ thống                                                  | Người dùng phải đọc cây thư mục và nhớ ID; lỗi môi trường chỉ xuất hiện khi chạy                    | Thêm `list` và `doctor` tối giản, giữ `build.sh` là entrypoint duy nhất                                                                       |
+| Thấp       | Test chưa chạy Pandoc qua mock/integration và chưa phủ manual move, collision/rename của resource                                     | Một số regression chỉ lộ khi build hoặc khi dữ liệu filesystem lệch index                           | Bổ sung test theo từng invariant khi sửa chính invariant đó                                                                                   |
 
 ### Mức độ dễ sử dụng
 
-| Tác vụ | Đánh giá | Lý do |
-|---|---|---|
-| Validate/build cookbook có sẵn | Dễ | Một lệnh, default rõ, lỗi có ngữ cảnh |
-| Chọn template/format | Khá dễ | Chọn bằng tên; chưa có lệnh liệt kê capability |
-| Tạo lesson draft | Khá dễ | Scaffold và graph node tự sinh; relation/path cố ý để người viết quyết định |
-| Đưa raw sang pool | Dễ | Hai lệnh `sync`, `review` và index tự cập nhật |
-| Đưa pool thành lesson | Trung bình | Có skill hướng dẫn nhưng vẫn cần quyết định nội dung và xác nhận nhiều file |
-| Mở rộng format hoàn toàn mới | Trung bình | Dễ nếu dùng các option đã hỗ trợ, cần sửa core nếu Pandoc option khác |
+| Tác vụ                         | Đánh giá   | Lý do                                                                       |
+| ------------------------------ | ---------- | --------------------------------------------------------------------------- |
+| Validate/build cookbook có sẵn | Dễ         | Một lệnh, default rõ, lỗi có ngữ cảnh                                       |
+| Chọn template/format           | Khá dễ     | Chọn bằng tên; chưa có lệnh liệt kê capability                              |
+| Tạo lesson draft               | Khá dễ     | Scaffold và graph node tự sinh; relation/path cố ý để người viết quyết định |
+| Đưa raw sang pool              | Dễ         | Hai lệnh `sync`, `review` và index tự cập nhật                              |
+| Đưa pool thành lesson          | Trung bình | Có skill hướng dẫn nhưng vẫn cần quyết định nội dung và xác nhận nhiều file |
+| Mở rộng format hoàn toàn mới   | Trung bình | Dễ nếu dùng các option đã hỗ trợ, cần sửa core nếu Pandoc option khác       |
 
 ## 7. Thứ tự cải tiến đề xuất
 
