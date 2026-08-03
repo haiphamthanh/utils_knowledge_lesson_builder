@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import yaml
 
-from knowledge_builder.models import BuilderError
-from knowledge_builder.resources import ResourceManager
+from scripts.models import BuilderError
+from scripts.resources import ResourceManager
 
 
 class ResourceManagerTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class ResourceManagerTests(unittest.TestCase):
         )
         (self.root / "resource" / "raw" / "database-topic").mkdir()
 
-        with patch("knowledge_builder.resources._now", return_value="2026-07-31T09:00:00+07:00"):
+        with patch("scripts.resources._now", return_value="2026-07-31T09:00:00+07:00"):
             data = self.manager.sync()
 
         self.assertEqual(data["items"]["cache-notes"]["kind"], "file")
@@ -39,7 +39,7 @@ class ResourceManagerTests(unittest.TestCase):
         source.write_text("Cache notes", encoding="utf-8")
         self.manager.sync()
 
-        with patch("knowledge_builder.resources._now", return_value="2026-07-31T10:00:00+07:00"):
+        with patch("scripts.resources._now", return_value="2026-07-31T10:00:00+07:00"):
             destination = self.manager.review("cache-notes")
 
         data = yaml.safe_load(
@@ -73,7 +73,7 @@ tags: []
             encoding="utf-8",
         )
 
-        with patch("knowledge_builder.resources._now", return_value="2026-07-31T11:00:00+07:00"):
+        with patch("scripts.resources._now", return_value="2026-07-31T11:00:00+07:00"):
             destination = self.manager.complete("cache-notes", "demo", "cache")
 
         item = self.manager.sync()["items"]["cache-notes"]

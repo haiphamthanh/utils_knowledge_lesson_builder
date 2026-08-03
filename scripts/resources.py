@@ -8,9 +8,9 @@ from typing import Any
 
 import yaml
 
-from knowledge_builder.io_utils import atomic_write
-from knowledge_builder.loading import parse_lesson, require_slug
-from knowledge_builder.models import BuilderError
+from scripts.io_utils import atomic_write
+from scripts.loading import parse_lesson, require_slug
+from scripts.models import BuilderError
 
 
 RESOURCE_STATUSES = ("raw", "pool", "done")

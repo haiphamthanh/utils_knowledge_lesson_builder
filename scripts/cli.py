@@ -4,11 +4,11 @@ import argparse
 import sys
 from pathlib import Path
 
-from knowledge_builder.authoring import create_lesson
-from knowledge_builder.builder import build
-from knowledge_builder.core import create_plan
-from knowledge_builder.models import BuilderError
-from knowledge_builder.resource_cli import add_resource_parser, handle_resource_command
+from scripts.authoring import create_lesson
+from scripts.builder import build
+from scripts.core import create_plan
+from scripts.models import BuilderError
+from scripts.resource_cli import add_resource_parser, handle_resource_command
 
 
 def project_root() -> Path:

@@ -4,9 +4,9 @@ import unittest
 
 import yaml
 
-from knowledge_builder.authoring import create_lesson
-from knowledge_builder.loading import parse_lesson
-from knowledge_builder.models import BuilderError
+from scripts.authoring import create_lesson
+from scripts.loading import parse_lesson
+from scripts.models import BuilderError
 
 
 class AuthoringTests(unittest.TestCase):

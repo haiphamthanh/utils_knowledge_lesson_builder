@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from knowledge_builder.resources import ResourceManager, items_as_json, items_as_table
+from scripts.resources import ResourceManager, items_as_json, items_as_table
 
 
 def add_resource_parser(subparsers: argparse._SubParsersAction) -> None:
@@ -62,4 +62,3 @@ def handle_resource_command(args: argparse.Namespace, root: Path) -> None:
         )
         return
     raise AssertionError(f"Unsupported resource command: {args.resource_command}")
-

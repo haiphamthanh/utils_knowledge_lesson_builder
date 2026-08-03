@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from knowledge_builder.loading import (
+from scripts.loading import (
     load_lessons,
     load_yaml,
     parse_chapters,
     require_slug,
     require_string,
 )
-from knowledge_builder.models import (
+from scripts.models import (
     BuildPlan,
     BuilderError,
 )
-from knowledge_builder.validation import validate_graph, validate_path
+from scripts.validation import validate_graph, validate_path
 
 
 def create_plan(

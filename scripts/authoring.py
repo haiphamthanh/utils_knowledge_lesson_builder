@@ -4,9 +4,9 @@ from pathlib import Path
 
 import yaml
 
-from knowledge_builder.io_utils import atomic_write
-from knowledge_builder.loading import load_yaml, require_slug
-from knowledge_builder.models import ALLOWED_DEPTHS, BuilderError
+from scripts.io_utils import atomic_write
+from scripts.loading import load_yaml, require_slug
+from scripts.models import ALLOWED_DEPTHS, BuilderError
 
 
 def create_lesson(

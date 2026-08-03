@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from knowledge_builder.models import BuildPlan, BuilderError
+from scripts.models import BuildPlan, BuilderError
 
 
 def _format_config(plan: BuildPlan) -> dict[str, Any]:

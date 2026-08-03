@@ -1,9 +1,9 @@
 from pathlib import Path
 import unittest
 
-from knowledge_builder.core import create_plan
-from knowledge_builder.models import BuilderError, Chapter, Lesson
-from knowledge_builder.validation import validate_path
+from scripts.core import create_plan
+from scripts.models import BuilderError, Chapter, Lesson
+from scripts.validation import validate_path
 
 
 ROOT = Path(__file__).resolve().parent.parent

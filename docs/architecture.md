@@ -62,7 +62,7 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 .
 ├── build.sh                       # entrypoint công khai
 ├── config.yml                     # mặc định toàn project
-├── knowledge_builder/             # application core và CLI
+├── scripts/                       # application core và CLI
 ├── knowledge/<cookbook>/          # nguồn tri thức xuất bản
 │   ├── cookbook.yml
 │   ├── graph.yml
@@ -83,16 +83,16 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 
 | Thành phần                       | Trách nhiệm hiện tại                                            | Không chịu trách nhiệm                 |
 | -------------------------------- | --------------------------------------------------------------- | -------------------------------------- |
-| `knowledge_builder.cli`          | Parse command, điều phối use case, in kết quả/lỗi               | Parse YAML, validate nghiệp vụ, render |
-| `knowledge_builder.core`         | Resolve config/cookbook/path/template và tạo `BuildPlan` hợp lệ | Gọi Pandoc, sửa nội dung               |
-| `knowledge_builder.loading`      | Đọc YAML, parse lesson/chapter, kiểm tra shape cơ bản           | Quan hệ graph và thứ tự path           |
-| `knowledge_builder.validation`   | Kiểm tra graph, dependency cycle, path, core/optional/draft     | Tự sinh thứ tự path                    |
-| `knowledge_builder.builder`      | Ghép Markdown, dựng lệnh Pandoc, tạo output                     | Chọn lesson hoặc thay đổi source       |
-| `knowledge_builder.authoring`    | Tạo lesson draft và đăng ký graph node                          | Đoán relation hoặc vị trí path         |
-| `knowledge_builder.resources`    | Đồng bộ index và transition `raw → pool → done`                 | Viết nội dung lesson                   |
-| `knowledge_builder.resource_cli` | Khai báo và dispatch nhóm lệnh `resource`                       | Thực thi quy tắc lifecycle             |
-| `knowledge_builder.models`       | Model bất biến, enum và `BuilderError`                          | I/O                                    |
-| `knowledge_builder.io_utils`     | Ghi file nguyên tử bằng temporary file + replace                | Quy tắc nghiệp vụ                      |
+| `scripts.cli`          | Parse command, điều phối use case, in kết quả/lỗi               | Parse YAML, validate nghiệp vụ, render |
+| `scripts.core`         | Resolve config/cookbook/path/template và tạo `BuildPlan` hợp lệ | Gọi Pandoc, sửa nội dung               |
+| `scripts.loading`      | Đọc YAML, parse lesson/chapter, kiểm tra shape cơ bản           | Quan hệ graph và thứ tự path           |
+| `scripts.validation`   | Kiểm tra graph, dependency cycle, path, core/optional/draft     | Tự sinh thứ tự path                    |
+| `scripts.builder`      | Ghép Markdown, dựng lệnh Pandoc, tạo output                     | Chọn lesson hoặc thay đổi source       |
+| `scripts.authoring`    | Tạo lesson draft và đăng ký graph node                          | Đoán relation hoặc vị trí path         |
+| `scripts.resources`    | Đồng bộ index và transition `raw → pool → done`                 | Viết nội dung lesson                   |
+| `scripts.resource_cli` | Khai báo và dispatch nhóm lệnh `resource`                       | Thực thi quy tắc lifecycle             |
+| `scripts.models`       | Model bất biến, enum và `BuilderError`                          | I/O                                    |
+| `scripts.io_utils`     | Ghi file nguyên tử bằng temporary file + replace                | Quy tắc nghiệp vụ                      |
 
 ### Nguồn dữ liệu và output
 
@@ -114,7 +114,7 @@ Repository hiện có đúng hai file shell được Git quản lý:
 
 | Script                              | Phạm vi              | Trách nhiệm                                                                                                                          | Khi nên dùng                                                             | Ghi chú                                                                     |
 | ----------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| `./build.sh`                        | Hệ thống hiện tại    | Tìm Python trong `.venv` hoặc `PYTHON_BIN_OVERRIDE`, kiểm tra PyYAML, rồi chuyển toàn bộ argument sang `python -m knowledge_builder` | Mọi thao tác hằng ngày: `validate`, `build`, `create-lesson`, `resource` | Đây là entrypoint công khai duy nhất của core hiện tại                      |
+| `./build.sh`                        | Hệ thống hiện tại    | Tìm Python trong `.venv` hoặc `PYTHON_BIN_OVERRIDE`, kiểm tra PyYAML, rồi chuyển toàn bộ argument sang `python -m scripts` | Mọi thao tác hằng ngày: `validate`, `build`, `create-lesson`, `resource` | Đây là entrypoint công khai duy nhất của core hiện tại                      |
 | `./specs/example-cookbook/build.sh` | Prototype tham chiếu | Gọi Pandoc/XeLaTeX trực tiếp để build hoặc xóa output của example cũ                                                                 | Chỉ khi cần tái hiện prototype trong `specs/example-cookbook`            | Không dùng `knowledge/`, graph, path, template registry hoặc Python core hiện tại |
 
 `build.sh` ở root cố ý mỏng: trách nhiệm nghiệp vụ nằm trong Python để có thể
@@ -131,7 +131,7 @@ JSON.
 sequenceDiagram
     actor User as Người dùng
     participant SH as build.sh
-    participant CLI as knowledge_builder.cli
+    participant CLI as scripts.cli
     participant Core as core.create_plan
     participant Load as loading
     participant Valid as validation
@@ -141,7 +141,7 @@ sequenceDiagram
 
     User->>SH: build <cookbook> [--path] [--template] [--format]
     SH->>SH: Chọn Python và kiểm tra PyYAML
-    SH->>CLI: python -m knowledge_builder ...
+    SH->>CLI: python -m scripts ...
     CLI->>Core: create_plan(...)
     Core->>Load: Đọc config, cookbook, path, template, lessons, graph
     Load-->>Core: Dữ liệu đã parse
