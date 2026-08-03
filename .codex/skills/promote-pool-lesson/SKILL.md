@@ -6,7 +6,8 @@ description: Convert a reviewed resource item from resource/pool into a structur
 # Promote Pool Lesson
 
 1. Locate the project root containing `build.sh` and `resource/index.yml`.
-2. Read `AGENTS.md` and every project document under `readme/` that it requires.
+2. Read `AGENTS.md` and every project document under `guidelines/` that it
+   requires.
 3. Run `python <skill-dir>/scripts/list_pool.py --project <root>`.
 4. Present the returned candidates and ask the user to choose one. Stop if the
    pool is empty.

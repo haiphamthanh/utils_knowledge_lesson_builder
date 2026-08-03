@@ -73,7 +73,8 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 │   └── <template>/template.yml
 ├── resource/                      # nguồn đầu vào và lifecycle index
 ├── .codex/skills/                 # automation chỉ dùng trong repo
-├── readme/                        # kiến trúc, hướng dẫn và quy tắc vận hành
+├── docs/                          # kiến trúc và tài liệu thiết kế
+├── guidelines/                    # hướng dẫn và quy tắc vận hành
 ├── tests/                         # unit tests
 └── specs/                         # idea và prototype tham chiếu ban đầu
 ```
