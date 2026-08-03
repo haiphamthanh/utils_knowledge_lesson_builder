@@ -4,10 +4,11 @@ import argparse
 import sys
 from pathlib import Path
 
-from knowledge_builder.authoring import create_lesson
-from knowledge_builder.builder import build
-from knowledge_builder.core import create_plan
-from knowledge_builder.models import BuilderError
+from scripts.authoring import create_lesson
+from scripts.builder import build
+from scripts.core import create_plan
+from scripts.models import BuilderError
+from scripts.resource_cli import add_resource_parser, handle_resource_command
 
 
 def project_root() -> Path:
@@ -54,12 +55,16 @@ def parser() -> argparse.ArgumentParser:
         default="standard",
         help="Độ sâu nội dung; mặc định standard",
     )
+    add_resource_parser(subparsers)
     return root
 
 
 def main(argv: list[str] | None = None) -> None:
     args = parser().parse_args(argv)
     try:
+        if args.command == "resource":
+            handle_resource_command(args, project_root())
+            return
         if args.command == "create-lesson":
             target = create_lesson(
                 root=project_root(),

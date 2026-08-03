@@ -4,9 +4,9 @@ import unittest
 
 import yaml
 
-from knowledge_builder.authoring import create_lesson
-from knowledge_builder.loading import parse_lesson
-from knowledge_builder.models import BuilderError
+from scripts.authoring import create_lesson
+from scripts.loading import parse_lesson
+from scripts.models import BuilderError
 
 
 class AuthoringTests(unittest.TestCase):
@@ -31,7 +31,7 @@ tags: []
 """,
             encoding="utf-8",
         )
-        cookbook_dir = self.root / "src" / "demo"
+        cookbook_dir = self.root / "knowledge" / "demo"
         (cookbook_dir / "lessons").mkdir(parents=True)
         (cookbook_dir / "cookbook.yml").write_text(
             "id: demo\ntitle: Demo\n",
@@ -56,14 +56,14 @@ tags: []
 
         lesson = parse_lesson(target)
         graph = yaml.safe_load(
-            (self.root / "src" / "demo" / "graph.yml").read_text(encoding="utf-8")
+            (self.root / "knowledge" / "demo" / "graph.yml").read_text(encoding="utf-8")
         )
         self.assertEqual(lesson.id, "cache")
         self.assertEqual(lesson.status, "draft")
         self.assertEqual(graph["nodes"]["cache"]["title"], "Cache")
 
     def test_create_lesson_never_overwrites_existing_file(self) -> None:
-        target = self.root / "src" / "demo" / "lessons" / "cache.md"
+        target = self.root / "knowledge" / "demo" / "lessons" / "cache.md"
         target.write_text("keep me", encoding="utf-8")
 
         with self.assertRaisesRegex(BuilderError, "đã tồn tại"):
@@ -80,4 +80,3 @@ tags: []
 
 if __name__ == "__main__":
     unittest.main()
-

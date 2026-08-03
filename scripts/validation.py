@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from knowledge_builder.models import (
+from scripts.models import (
     ALLOWED_RELATIONS,
     BuilderError,
     Chapter,
@@ -148,4 +148,3 @@ def validate_path(
                 f"{', '.join(sorted(optional_dependencies))}"
             )
     return tuple(ordered)
-

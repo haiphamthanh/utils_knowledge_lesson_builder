@@ -5,7 +5,7 @@ from typing import Any
 
 import yaml
 
-from knowledge_builder.models import (
+from scripts.models import (
     ALLOWED_DEPTHS,
     ALLOWED_STATUSES,
     ID_PATTERN,
@@ -151,4 +151,3 @@ def parse_chapters(
             )
         )
     return tuple(chapters)
-

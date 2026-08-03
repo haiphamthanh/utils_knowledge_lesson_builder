@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from knowledge_builder.loading import (
+from scripts.loading import (
     load_lessons,
     load_yaml,
     parse_chapters,
     require_slug,
     require_string,
 )
-from knowledge_builder.models import (
+from scripts.models import (
     BuildPlan,
     BuilderError,
 )
-from knowledge_builder.validation import validate_graph, validate_path
+from scripts.validation import validate_graph, validate_path
 
 
 def create_plan(
@@ -28,7 +28,7 @@ def create_plan(
     root = root.resolve()
     settings = load_yaml(root / "config.yml")
     cookbook_id = require_slug(cookbook_id, "Cookbook id")
-    cookbook_dir = root / "src" / cookbook_id
+    cookbook_dir = root / "knowledge" / cookbook_id
     cookbook_path = cookbook_dir / "cookbook.yml"
     cookbook = load_yaml(cookbook_path)
     if cookbook.get("id") != cookbook_id:

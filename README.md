@@ -10,6 +10,13 @@ một learning path tuyến tính. Thiết kế cốt lõi:
 
 > Graph validates the path. Graph does not author the path.
 
+Kiến trúc tổng thể và sequence diagram nằm tại
+[`docs/architecture.md`](docs/architecture.md). Quy tắc authoring và tài liệu
+vận hành được gom trong [`guidelines/`](guidelines/README.md).
+
+Bắt đầu với [`guidelines/user-guide.md`](guidelines/user-guide.md) để đi trọn quy trình
+từ resource thô đến cookbook đã build.
+
 ## Cài đặt
 
 Yêu cầu Python 3.11+, Pandoc 3.x; build PDF cần thêm XeLaTeX.
@@ -63,7 +70,7 @@ thay đổi.
 ## Cấu trúc cookbook
 
 ```text
-src/<cookbook>/
+knowledge/<cookbook>/
 ├── cookbook.yml
 ├── graph.yml
 ├── paths/
@@ -93,7 +100,36 @@ Lệnh không tự đoán relation và không tự chèn lesson vào learning pa
 viết nội dung, hãy chọn một trong ba vai trò: `core`, `optional` hoặc
 `graph-only`, rồi chạy validation.
 
-Guideline đầy đủ nằm trong `guidelines/`.
+Guideline đầy đủ nằm trong [`guidelines/`](guidelines/README.md).
+
+## Resource lifecycle
+
+Nội dung đầu vào đi qua ba trạng thái:
+
+```text
+resource/raw → resource/pool → resource/done
+```
+
+```bash
+./build.sh resource sync
+./build.sh resource list --status pool
+./build.sh resource review <resource-id>
+./build.sh resource complete <resource-id> \
+  --cookbook web-system-foundations \
+  --lesson request-response
+```
+
+`resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
+[`guidelines/resources.md`](guidelines/resources.md) để biết quy tắc transition.
+
+Skill `$promote-pool-lesson` nằm trong
+`.codex/skills/promote-pool-lesson` của chính repo này. Khi gọi skill, agent sẽ
+liệt kê pool, đề xuất lesson/graph/path và yêu cầu xác nhận trước khi tạo nội
+dung hoặc move resource.
+
+Skill `$review-lesson-placement` nằm trong
+`.codex/skills/review-lesson-placement` và chỉ audit cookbook, chapter,
+prerequisite cùng độ sâu nội dung; skill này không tự sửa file.
 
 ## Kiểm thử
 

@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from knowledge_builder.models import BuildPlan, BuilderError
+from scripts.models import BuildPlan, BuilderError
 
 
 def _format_config(plan: BuildPlan) -> dict[str, Any]:
@@ -93,7 +93,7 @@ def build(plan: BuildPlan) -> Path:
         "--toc-depth=2",
         "--number-sections",
         "--top-level-division=chapter",
-        f"--resource-path={plan.root}:{plan.root / 'src' / plan.cookbook_id}",
+        f"--resource-path={plan.root}:{plan.root / 'knowledge' / plan.cookbook_id}",
         f"--output={output_path}",
     ]
     target = format_config.get("to")
