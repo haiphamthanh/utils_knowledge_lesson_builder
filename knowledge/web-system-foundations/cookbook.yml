@@ -5,9 +5,8 @@ author: "Knowledge Cookbook"
 language: vi-VN
 edition: "MVP 0.1"
 default_path: foundation
-template: default
+template: chapter-lesson
 format: html
 description: >-
   Một ví dụ nhỏ cho cách tách lesson, knowledge graph và learning path trong
   hệ thống Knowledge Lesson Builder.
-

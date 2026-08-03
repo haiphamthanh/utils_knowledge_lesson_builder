@@ -38,8 +38,8 @@ Output:
 
 ```text
 build/web-system-foundations/foundation/
-├── web-system-foundations-foundation-default.html
-└── web-system-foundations-foundation-default.pdf
+├── web-system-foundations-foundation-chapter-lesson.html
+└── web-system-foundations-foundation-chapter-lesson.pdf
 ```
 
 ## Chọn template

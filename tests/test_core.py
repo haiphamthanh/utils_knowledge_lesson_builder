@@ -23,7 +23,7 @@ class CorePlanTests(unittest.TestCase):
         )
 
         self.assertEqual(plan.path_id, "foundation")
-        self.assertEqual(plan.template_id, "default")
+        self.assertEqual(plan.template_id, "chapter-lesson")
         self.assertEqual(plan.format_id, "html")
         self.assertEqual(
             plan.ordered_lesson_ids,
