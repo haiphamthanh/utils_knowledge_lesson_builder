@@ -33,6 +33,13 @@ def add_resource_parser(subparsers: argparse._SubParsersAction) -> None:
     verify_parser.add_argument("item_id")
     verify_parser.add_argument("--json", action="store_true", help="Xuất JSON")
 
+    prepare_parser = commands.add_parser(
+        "prepare", help="Validate plan và materialize candidate trong build/"
+    )
+    prepare_parser.add_argument("item_id")
+    prepare_parser.add_argument("--plan", required=True, type=Path)
+    prepare_parser.add_argument("--allow-large-single", action="store_true")
+
     review_parser = commands.add_parser("review", help="Chuyển raw nhỏ sang pool")
     review_parser.add_argument("item_id")
     review_parser.add_argument(
@@ -67,6 +74,12 @@ def handle_resource_command(args: argparse.Namespace, root: Path) -> None:
         print(report_as_json(report) if args.json else report_as_table(report))
         if not report["valid"]:
             raise BuilderError(f"Resource {args.resource_command} failed")
+        return
+    if args.resource_command == "prepare":
+        report = manager.prepare(
+            args.item_id, args.plan, args.allow_large_single
+        )
+        print(report_as_json(report))
         return
     if args.resource_command == "review":
         destination = manager.review(args.item_id, args.allow_large_single)

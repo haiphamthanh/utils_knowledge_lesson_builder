@@ -230,6 +230,15 @@ class ResourceManager:
             "valid": not errors,
         }
 
+    def prepare(
+        self, item_id: str, plan_path: Path, allow_large_single: bool = False
+    ) -> dict[str, Any]:
+        from scripts.resource_preparation import ResourcePreparationEngine
+
+        return ResourcePreparationEngine(self).prepare(
+            item_id, plan_path, allow_large_single
+        )
+
     def review(self, item_id: str, allow_large_single: bool = False) -> Path:
         item_id = require_slug(item_id, "Resource id")
         data = self.sync()
@@ -247,6 +256,11 @@ class ResourceManager:
             raise BuilderError(
                 "Resource vượt soft_max_words; dùng resource prepare hoặc "
                 "--allow-large-single sau khi đã review ngữ nghĩa"
+            )
+        preparation_root = self.root / "build" / "resource-preparation" / item_id
+        if preparation_root.is_dir() and any(preparation_root.iterdir()):
+            raise BuilderError(
+                "Resource đã có preparation; không được bypass bằng resource review"
             )
         destination = self.resource_dir / "pool" / Path(item["source"]).name
         return self._move(data, item_id, item, destination, reviewed_at=_now())
