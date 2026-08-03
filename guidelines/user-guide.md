@@ -1,4 +1,83 @@
-# Hướng dẫn sử dụng cơ bản
+# Hướng dẫn dùng ngay
+
+Chạy từ thư mục gốc của project và thay các ID mẫu bằng ID thực tế.
+
+## Step 1: Copy source thô vào `resource/raw`
+
+```bash
+cp /duong-dan/toi/cache-notes.md resource/raw/cache-notes.md
+```
+
+Source gồm nhiều file thì copy cả thư mục:
+
+```bash
+cp -R /duong-dan/toi/cache-notes resource/raw/cache-notes
+```
+
+## Step 2: Đồng bộ và inspect source
+
+```bash
+./build.sh resource sync
+./build.sh resource list --status raw
+./build.sh resource inspect cache-notes --json
+```
+
+## Step 3: Đưa source vào pool
+
+Nguồn nhỏ, chỉ có một chủ đề:
+
+```bash
+./build.sh resource review cache-notes
+```
+
+Nguồn lớn, nhiều file hoặc nhiều chủ đề, gọi trong Codex:
+
+```text
+Sử dụng $prepare-raw-resource để xử lý resource cache-notes.
+```
+
+Xác nhận proposal và verification report khi skill yêu cầu.
+
+## Step 4: Tạo lesson từ pool
+
+```bash
+./build.sh resource list --status pool
+```
+
+Sau đó gọi trong Codex:
+
+```text
+Sử dụng $promote-pool-lesson để tạo lesson từ resource <resource-id>.
+```
+
+Xác nhận cookbook, graph relation và vị trí learning path được đề xuất.
+
+## Step 5: Validate và build cookbook
+
+```bash
+./build.sh validate web-system-foundations
+./build.sh build web-system-foundations
+```
+
+Output nằm trong:
+
+```text
+build/<cookbook-id>/<path-id>/
+```
+
+## Step 6: Kiểm tra kết quả
+
+```bash
+./build.sh resource list --status done
+```
+
+Khi cần kiểm tra lesson đã nằm đúng sách và đúng thứ tự, gọi:
+
+```text
+Sử dụng $review-lesson-placement để kiểm tra lesson <lesson-id> trong cookbook <cookbook-id>.
+```
+
+# Hướng dẫn chi tiết
 
 Tài liệu này đi theo một vòng đời hoàn chỉnh:
 
