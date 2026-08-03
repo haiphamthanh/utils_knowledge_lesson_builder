@@ -61,3 +61,6 @@ khi đã kiểm chứng, đổi sang `complete`.
 
 Build phát hành thông thường không dùng `--include-draft`.
 
+Khi cần kiểm tra lesson đã thuộc đúng cookbook, chapter, vai trò và thứ tự
+prerequisite hay chưa, gọi `$review-lesson-placement`. Skill này chỉ đọc và báo
+cáo; mọi thay đổi sau review vẫn cần được xác nhận riêng.

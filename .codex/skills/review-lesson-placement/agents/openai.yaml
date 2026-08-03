@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Lesson Placement"
+  short_description: "Review cookbook lesson placement"
+  default_prompt: "Use $review-lesson-placement to verify that a lesson belongs in the correct cookbook, chapter, role, and prerequisite order."

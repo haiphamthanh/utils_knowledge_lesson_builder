@@ -14,6 +14,19 @@ resource/done
 
 Chạy các lệnh từ thư mục gốc của project.
 
+## Automation nào nên dùng?
+
+| Tác vụ | Cách phù hợp | Lý do |
+|---|---|---|
+| Copy nguồn vào `raw` | Filesystem + `resource sync` | Deterministic, không cần agent suy luận |
+| Chuyển `raw → pool` | Người dùng review + `resource review` | Quyết định tin cậy nguồn cần người dùng xác nhận; command đã move và ghi timestamp chính xác |
+| Chuyển `pool → lesson → done` | `$promote-pool-lesson` | Phải đọc nội dung, chọn cookbook/relation/path và phối hợp nhiều file |
+| Validate/build cookbook | `build.sh` | CLI cho kết quả lặp lại được và báo lỗi trực tiếp |
+| Review lesson nằm đúng sách/vị trí | `$review-lesson-placement` | Cần kết hợp validation với đánh giá objective, depth và Progressive Disclosure |
+
+Không tạo skill chỉ để bọc một command có sẵn. Skill được dành cho bước cần
+đọc nhiều nguồn sự thật hoặc cần đánh giá ngữ nghĩa.
+
 ## 1. Thêm một nguồn kiến thức vào raw
 
 Mỗi resource là một file hoặc một thư mục con cấp đầu tiên trong
@@ -164,6 +177,17 @@ thư mục ID mới trong `knowledge/` với `cookbook.yml`, `graph.yml`, `lesso
 
 ## 5. Kiểm tra lesson đã nằm đúng sách và đúng vị trí
 
+Cách nhanh nhất là gọi skill read-only:
+
+```text
+Sử dụng $review-lesson-placement để kiểm tra lesson cache trong cookbook
+web-system-foundations.
+```
+
+Skill đọc lesson, graph, các path liên quan và lesson lân cận; sau đó chạy
+validation phù hợp và trả bảng evidence. Skill không tự sửa file. Các bước bên
+dưới là cách kiểm tra thủ công hoặc dùng để xác minh lại báo cáo của skill.
+
 ### Bước 1: Tìm path đang chứa lesson
 
 ```bash
@@ -244,6 +268,7 @@ thêm vào cuối path và không dùng graph để tự sinh thứ tự đọc.
 | Review raw → pool | `./build.sh resource review <resource-id>` |
 | Liệt kê pool | `./build.sh resource list --status pool` |
 | Tạo lesson từ pool | Gọi `$promote-pool-lesson` trong Codex |
+| Review vị trí lesson | Gọi `$review-lesson-placement` trong Codex |
 | Kiểm tra cookbook/path | `./build.sh validate <cookbook> --path <path>` |
 | Build HTML mặc định | `./build.sh build <cookbook>` |
 | Build cả optional | `./build.sh build <cookbook> --include-optional` |

@@ -127,6 +127,10 @@ Skill `$promote-pool-lesson` nằm trong
 liệt kê pool, đề xuất lesson/graph/path và yêu cầu xác nhận trước khi tạo nội
 dung hoặc move resource.
 
+Skill `$review-lesson-placement` nằm trong
+`.codex/skills/review-lesson-placement` và chỉ audit cookbook, chapter,
+prerequisite cùng độ sâu nội dung; skill này không tự sửa file.
+
 ## Kiểm thử
 
 ```bash
