@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -12,6 +13,7 @@ from scripts.io_utils import atomic_write
 from scripts.loading import parse_lesson, require_slug
 from scripts.models import BuilderError
 from scripts.resource_integrity import (
+    file_sha256,
     inspect_resource,
     load_resource_settings,
     resource_sha256,
@@ -45,6 +47,11 @@ def _v2_defaults() -> dict[str, Any]:
     }
 
 
+def _source_lines(source: Path, relative: str) -> list[bytes]:
+    path = source if source.is_file() and relative == source.name else source / relative
+    return path.read_bytes().splitlines(keepends=True)
+
+
 class ResourceManager:
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
@@ -57,6 +64,10 @@ class ResourceManager:
             (self.resource_dir / status).mkdir(exist_ok=True)
         if not self.index_path.exists():
             atomic_write(self.index_path, "version: 2\nitems: {}\n")
+
+    @staticmethod
+    def now() -> str:
+        return _now()
 
     def _load(self) -> dict[str, Any]:
         self.ensure_layout()
@@ -220,6 +231,14 @@ class ResourceManager:
             errors.append("Index chưa có content_sha256")
         elif actual_hash != expected_hash:
             errors.append("content_sha256 không khớp index")
+        if source.exists() and item.get("status") == "archive":
+            errors.extend(self._verify_archive(item_id, item, data))
+        elif source.exists() and item.get("parent_id"):
+            parent = data["items"].get(item["parent_id"])
+            if not isinstance(parent, dict) or parent.get("status") != "archive":
+                errors.append("Pool child không có archive parent hợp lệ")
+            else:
+                errors.extend(self._verify_archive(item["parent_id"], parent, data))
         return {
             "id": item_id,
             "status": item.get("status"),
@@ -230,6 +249,109 @@ class ResourceManager:
             "valid": not errors,
         }
 
+    def _verify_archive(
+        self, parent_id: str, parent: dict[str, Any], data: dict[str, Any]
+    ) -> list[str]:
+        errors: list[str] = []
+        archive = self.root / parent["source"]
+        if not archive.exists() or resource_sha256(archive) != parent.get("content_sha256"):
+            errors.append("Archive tree checksum không khớp index")
+        manifest_path = self.root / parent.get("manifest", "")
+        if not manifest_path.is_file():
+            return ["Archive manifest không tồn tại"]
+        try:
+            manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, yaml.YAMLError) as error:
+            return [f"Archive manifest không đọc được: {error}"]
+        if not isinstance(manifest, dict) or manifest.get("resource_id") != parent_id:
+            return ["Archive manifest không hợp lệ"]
+        archive_source = archive / manifest.get("source_path", "")
+        if not archive_source.exists():
+            errors.append("Archive original không tồn tại")
+            return errors
+        try:
+            source_hash = resource_sha256(archive_source)
+        except BuilderError as error:
+            errors.append(str(error))
+            return errors
+        if source_hash != manifest.get("source_sha256"):
+            errors.append("Archive original hash không khớp raw trước split")
+
+        try:
+            inventory = inspect_resource(
+                archive_source, load_resource_settings(self.root)
+            )
+        except BuilderError as error:
+            errors.append(str(error))
+            return errors
+        coverage = {
+            entry["path"]: [0] * entry["line_count"]
+            for entry in inventory["files"]
+            if entry["kind"] == "text"
+        }
+        expected_children = set(parent.get("children", []))
+        manifest_children = {
+            child.get("id"): child
+            for child in manifest.get("children", [])
+            if isinstance(child, dict)
+        }
+        if set(manifest_children) != expected_children:
+            errors.append("Archive children không khớp index")
+        for child_id in sorted(expected_children):
+            child = data["items"].get(child_id)
+            if not isinstance(child, dict) or child.get("parent_id") != parent_id:
+                errors.append(f"Child lineage không hợp lệ: {child_id}")
+                continue
+            child_source = self.root / child["source"]
+            if not child_source.is_dir():
+                errors.append(f"Child không tồn tại: {child_id}")
+                continue
+            actual_tree = resource_sha256(child_source)
+            expected_tree = manifest_children.get(child_id, {}).get("tree_sha256")
+            if actual_tree != child.get("content_sha256") or actual_tree != expected_tree:
+                errors.append(f"Child checksum không khớp: {child_id}")
+            provenance_path = child_source / "provenance.yml"
+            content_path = child_source / "content.md"
+            try:
+                provenance = yaml.safe_load(provenance_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, yaml.YAMLError) as error:
+                errors.append(f"Provenance không đọc được cho {child_id}: {error}")
+                continue
+            if not isinstance(provenance, dict) or provenance.get("parent_id") != parent_id:
+                errors.append(f"Provenance parent không hợp lệ: {child_id}")
+                continue
+            if not content_path.is_file() or file_sha256(content_path) != provenance.get("content_sha256"):
+                errors.append(f"content.md checksum không khớp: {child_id}")
+            expected_content = b""
+            for fragment in provenance.get("fragments", []):
+                relative = fragment.get("path")
+                start = fragment.get("start_line")
+                end = fragment.get("end_line")
+                if relative not in coverage or not isinstance(start, int) or not isinstance(end, int):
+                    errors.append(f"Fragment provenance không hợp lệ: {child_id}")
+                    continue
+                lines = _source_lines(archive_source, relative)
+                if start < 1 or end < start or end > len(lines):
+                    errors.append(f"Fragment provenance ngoài range: {child_id}")
+                    continue
+                fragment_bytes = b"".join(lines[start - 1 : end])
+                expected_content += fragment_bytes
+                if hashlib.sha256(fragment_bytes).hexdigest() != fragment.get("sha256"):
+                    errors.append(f"Fragment checksum không khớp: {child_id}")
+                for index in range(start - 1, end):
+                    coverage[relative][index] += 1
+            if content_path.is_file() and content_path.read_bytes() != expected_content:
+                errors.append(f"content.md không còn nguyên văn fragments: {child_id}")
+            for relative, expected in provenance.get("attachment_sha256", {}).items():
+                attachment = child_source / "attachments" / relative
+                if not attachment.is_file() or file_sha256(attachment) != expected:
+                    errors.append(f"Attachment checksum không khớp: {child_id}/{relative}")
+        gaps = sum(value == 0 for values in coverage.values() for value in values)
+        overlaps = sum(value > 1 for values in coverage.values() for value in values)
+        if gaps or overlaps:
+            errors.append(f"Archive coverage không hợp lệ: gaps={gaps}, overlaps={overlaps}")
+        return errors
+
     def prepare(
         self, item_id: str, plan_path: Path, allow_large_single: bool = False
     ) -> dict[str, Any]:
@@ -238,6 +360,11 @@ class ResourceManager:
         return ResourcePreparationEngine(self).prepare(
             item_id, plan_path, allow_large_single
         )
+
+    def finalize(self, item_id: str, preparation_id: str) -> dict[str, Any]:
+        from scripts.resource_preparation import ResourcePreparationEngine
+
+        return ResourcePreparationEngine(self).finalize(item_id, preparation_id)
 
     def review(self, item_id: str, allow_large_single: bool = False) -> Path:
         item_id = require_slug(item_id, "Resource id")

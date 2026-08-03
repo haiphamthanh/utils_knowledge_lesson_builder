@@ -40,6 +40,12 @@ def add_resource_parser(subparsers: argparse._SubParsersAction) -> None:
     prepare_parser.add_argument("--plan", required=True, type=Path)
     prepare_parser.add_argument("--allow-large-single", action="store_true")
 
+    finalize_parser = commands.add_parser(
+        "finalize", help="Copy-on-write preparation vào archive/pool"
+    )
+    finalize_parser.add_argument("item_id")
+    finalize_parser.add_argument("--preparation", required=True)
+
     review_parser = commands.add_parser("review", help="Chuyển raw nhỏ sang pool")
     review_parser.add_argument("item_id")
     review_parser.add_argument(
@@ -79,6 +85,10 @@ def handle_resource_command(args: argparse.Namespace, root: Path) -> None:
         report = manager.prepare(
             args.item_id, args.plan, args.allow_large_single
         )
+        print(report_as_json(report))
+        return
+    if args.resource_command == "finalize":
+        report = manager.finalize(args.item_id, args.preparation)
         print(report_as_json(report))
         return
     if args.resource_command == "review":

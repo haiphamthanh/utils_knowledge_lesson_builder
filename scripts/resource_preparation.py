@@ -10,7 +10,12 @@ import yaml
 from scripts.io_utils import atomic_write
 from scripts.loading import require_slug
 from scripts.models import BuilderError
-from scripts.resource_integrity import inspect_resource, load_resource_settings
+from scripts.resource_integrity import (
+    file_sha256,
+    inspect_resource,
+    load_resource_settings,
+    resource_sha256,
+)
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -97,6 +102,10 @@ class ResourcePreparationEngine:
                     for fragment in fragments
                 ],
                 "attachments": part["attachments"],
+                "attachment_sha256": {
+                    relative: file_sha256(self._source_path(source, relative))
+                    for relative in part["attachments"]
+                },
                 "content_sha256": _sha256(content),
             }
             atomic_write(
@@ -115,6 +124,7 @@ class ResourcePreparationEngine:
                     "word_count": part["word_count"],
                     "fragments": len(fragments),
                     "attachments": len(part["attachments"]),
+                    "tree_sha256": resource_sha256(part_dir),
                 }
             )
 
@@ -141,6 +151,203 @@ class ResourcePreparationEngine:
             yaml.safe_dump(report, allow_unicode=True, sort_keys=False),
         )
         return {**report, "directory": str(target.relative_to(self.root))}
+
+    def finalize(self, item_id: str, preparation_id: str) -> dict[str, Any]:
+        item_id = require_slug(item_id, "Resource id")
+        data = self.manager._load()
+        item = self.manager._get_item(data, item_id)
+        preparation = (
+            self.root / "build" / "resource-preparation" / item_id / preparation_id
+        )
+        plan = _load_yaml(preparation / "plan.yml")
+        report = _load_yaml(preparation / "report.yml")
+        if report.get("preparation_id") != preparation_id or not report.get("valid"):
+            raise BuilderError("Preparation report không hợp lệ")
+        if plan.get("resource_id") != item_id or report.get("resource_id") != item_id:
+            raise BuilderError("Preparation không thuộc resource được yêu cầu")
+        if item.get("preparation_id") == preparation_id and item["status"] in {
+            "archive", "pool", "done"
+        }:
+            verification = self.manager.verify(item_id)
+            if not verification["valid"]:
+                raise BuilderError("Finalization đã tồn tại nhưng verify thất bại")
+            return {
+                "resource_id": item_id,
+                "preparation_id": preparation_id,
+                "mode": plan["mode"],
+                "idempotent": True,
+                "verification": verification,
+            }
+        if item["status"] != "raw":
+            raise BuilderError(f"Resource '{item_id}' không còn ở raw")
+        source = self.root / item["source"]
+        if not source.exists():
+            raise BuilderError(f"Raw source không tồn tại: {source}")
+        current_hash = inspect_resource(
+            source, load_resource_settings(self.root)
+        )["content_sha256"]
+        if current_hash != report.get("source_sha256"):
+            raise BuilderError("Raw source đã thay đổi sau prepare")
+
+        if plan["mode"] == "single":
+            destination = self.root / "resource" / "pool" / source.name
+            self._copy_resource(source, destination, current_hash)
+            item.update(
+                source=str(destination.relative_to(self.root)),
+                kind="directory" if destination.is_dir() else "file",
+                status="pool",
+                reviewed_at=self.manager.now(),
+                prepared_at=self.manager.now(),
+                preparation_id=preparation_id,
+                content_sha256=resource_sha256(destination),
+            )
+            self.manager._save(data)
+            self._remove_raw(source)
+        else:
+            self._finalize_split(
+                data, item_id, item, source, preparation, preparation_id, plan, report
+            )
+
+        verification = self.manager.verify(item_id)
+        if not verification["valid"]:
+            raise BuilderError("Post-finalize verification thất bại")
+        return {
+            "resource_id": item_id,
+            "preparation_id": preparation_id,
+            "mode": plan["mode"],
+            "idempotent": False,
+            "verification": verification,
+        }
+
+    def _finalize_split(
+        self,
+        data: dict[str, Any],
+        item_id: str,
+        item: dict[str, Any],
+        source: Path,
+        preparation: Path,
+        preparation_id: str,
+        plan: dict[str, Any],
+        report: dict[str, Any],
+    ) -> None:
+        output_by_id = {output["id"]: output for output in report["outputs"]}
+        archive = self.root / "resource" / "archive" / item_id
+        archive_source = archive / "source" / source.name
+        manifest = {
+            "version": 1,
+            "resource_id": item_id,
+            "preparation_id": preparation_id,
+            "source_path": f"source/{source.name}",
+            "source_sha256": report["source_sha256"],
+            "coverage": report["coverage"],
+            "archive_only": report.get("archive_only", []),
+            "plan": plan,
+            "children": [],
+        }
+        for part in plan["parts"]:
+            candidate = preparation / "candidates" / part["id"]
+            expected_tree = output_by_id[part["id"]]["tree_sha256"]
+            if not candidate.is_dir() or resource_sha256(candidate) != expected_tree:
+                raise BuilderError(f"Candidate bị thay đổi: {part['id']}")
+            destination = self.root / "resource" / "pool" / part["id"]
+            self._copy_resource(candidate, destination, expected_tree)
+            manifest["children"].append(
+                {"id": part["id"], "tree_sha256": expected_tree}
+            )
+
+        if archive.exists():
+            existing_manifest = _load_yaml(archive / "manifest.yml")
+            if existing_manifest.get("preparation_id") != preparation_id:
+                raise BuilderError(f"Archive collision có nội dung khác: {archive}")
+            if not archive_source.exists() or resource_sha256(archive_source) != report["source_sha256"]:
+                raise BuilderError("Archive source collision hoặc bị thay đổi")
+        else:
+            temporary = archive.parent / f".{item_id}.{preparation_id}.tmp"
+            if temporary.exists():
+                shutil.rmtree(temporary)
+            (temporary / "source").mkdir(parents=True)
+            self._copy_resource(source, temporary / "source" / source.name, report["source_sha256"])
+            atomic_write(
+                temporary / "manifest.yml",
+                yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False),
+            )
+            temporary.rename(archive)
+
+        now = self.manager.now()
+        children: list[str] = []
+        for part in plan["parts"]:
+            child_id = part["id"]
+            destination = self.root / "resource" / "pool" / child_id
+            child = data["items"].get(child_id)
+            if child is not None and child.get("preparation_id") != preparation_id:
+                raise BuilderError(f"Index collision cho child: {child_id}")
+            data["items"][child_id] = {
+                "source": str(destination.relative_to(self.root)),
+                "kind": "directory",
+                "status": "pool",
+                "created_at": item.get("created_at"),
+                "reviewed_at": now,
+                "completed_at": None,
+                "cookbook": None,
+                "lesson_id": None,
+                "content_sha256": resource_sha256(destination),
+                "prepared_at": now,
+                "parent_id": item_id,
+                "children": [],
+                "manifest": None,
+                "preparation_id": preparation_id,
+            }
+            children.append(child_id)
+        item.update(
+            source=str(archive.relative_to(self.root)),
+            kind="directory",
+            status="archive",
+            reviewed_at=now,
+            prepared_at=now,
+            parent_id=None,
+            children=children,
+            manifest=str((archive / "manifest.yml").relative_to(self.root)),
+            preparation_id=preparation_id,
+            content_sha256=resource_sha256(archive),
+        )
+        self.manager._save(data)
+        self._remove_raw(source)
+
+    @staticmethod
+    def _copy_resource(source: Path, destination: Path, expected_hash: str) -> None:
+        if destination.exists():
+            if resource_sha256(destination) != expected_hash:
+                raise BuilderError(f"Target collision có nội dung khác: {destination}")
+            return
+        temporary = destination.parent / f".{destination.name}.copying"
+        if temporary.exists():
+            if temporary.is_dir():
+                shutil.rmtree(temporary)
+            else:
+                temporary.unlink()
+        if source.is_dir():
+            shutil.copytree(source, temporary)
+        else:
+            shutil.copy2(source, temporary)
+        copied_ok = (
+            resource_sha256(temporary) == expected_hash
+            if source.is_dir()
+            else file_sha256(temporary) == file_sha256(source)
+        )
+        if not copied_ok:
+            raise BuilderError(f"Copy verification thất bại: {destination}")
+        temporary.rename(destination)
+        if resource_sha256(destination) != expected_hash:
+            raise BuilderError(f"Target hash không khớp sau copy: {destination}")
+
+    @staticmethod
+    def _remove_raw(source: Path) -> None:
+        if not source.exists():
+            return
+        if source.is_dir():
+            shutil.rmtree(source)
+        else:
+            source.unlink()
 
     def _validate_plan(
         self,

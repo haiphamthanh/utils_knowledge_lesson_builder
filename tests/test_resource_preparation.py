@@ -2,6 +2,7 @@ from copy import deepcopy
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import yaml
 
@@ -157,6 +158,87 @@ class ResourcePreparationTests(unittest.TestCase):
         self.manager.prepare("large", plan_path, allow_large_single=True)
         with self.assertRaisesRegex(BuilderError, "không được bypass"):
             self.manager.review("large", allow_large_single=True)
+
+    def test_finalize_split_archives_original_and_creates_verified_children(self) -> None:
+        preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
+        original_hash = self.hash
+
+        result = self.manager.finalize(
+            "system-notes", preparation["preparation_id"]
+        )
+
+        self.assertTrue(result["verification"]["valid"])
+        self.assertFalse(self.source.exists())
+        parent = self.manager._load()["items"]["system-notes"]
+        self.assertEqual(parent["status"], "archive")
+        self.assertEqual(parent["children"], ["topic-a", "topic-b"])
+        manifest = yaml.safe_load(
+            (self.root / parent["manifest"]).read_text(encoding="utf-8")
+        )
+        self.assertEqual(manifest["source_sha256"], original_hash)
+        for child_id in parent["children"]:
+            child = self.manager._load()["items"][child_id]
+            self.assertEqual(child["parent_id"], "system-notes")
+            self.assertEqual(child["status"], "pool")
+            self.assertTrue(self.manager.verify(child_id)["valid"])
+
+        retry = self.manager.finalize(
+            "system-notes", preparation["preparation_id"]
+        )
+        self.assertTrue(retry["idempotent"])
+
+    def test_finalize_single_moves_verified_original_to_pool(self) -> None:
+        single_source = self.root / "resource" / "raw" / "single.md"
+        single_source.write_text("one topic\n", encoding="utf-8")
+        self.manager.sync()
+        source_hash = self.manager.inspect("single")["content_sha256"]
+        plan = {
+            "version": 1,
+            "resource_id": "single",
+            "source_sha256": source_hash,
+            "mode": "single",
+            "reason": "Một chủ đề nhỏ",
+            "parts": [],
+        }
+        preparation = self.manager.prepare("single", self.write_plan(plan, "small.yml"))
+
+        result = self.manager.finalize("single", preparation["preparation_id"])
+
+        self.assertTrue(result["verification"]["valid"])
+        self.assertFalse(single_source.exists())
+        self.assertEqual(self.manager._load()["items"]["single"]["status"], "pool")
+
+    def test_finalize_collision_never_removes_raw(self) -> None:
+        preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
+        collision = self.root / "resource" / "pool" / "topic-a"
+        collision.mkdir()
+        (collision / "content.md").write_text("different", encoding="utf-8")
+
+        with self.assertRaisesRegex(BuilderError, "collision"):
+            self.manager.finalize("system-notes", preparation["preparation_id"])
+        self.assertTrue(self.source.exists())
+
+    def test_finalize_index_failure_keeps_raw_and_retry_is_safe(self) -> None:
+        preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
+        real_save = self.manager._save
+        with patch.object(self.manager, "_save", side_effect=OSError("disk full")):
+            with self.assertRaisesRegex(OSError, "disk full"):
+                self.manager.finalize("system-notes", preparation["preparation_id"])
+        self.assertTrue(self.source.exists())
+
+        self.manager._save = real_save
+        result = self.manager.finalize("system-notes", preparation["preparation_id"])
+        self.assertTrue(result["verification"]["valid"])
+        self.assertFalse(self.source.exists())
+
+    def test_verify_detects_tampering_after_split(self) -> None:
+        preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
+        self.manager.finalize("system-notes", preparation["preparation_id"])
+        content = self.root / "resource" / "pool" / "topic-a" / "content.md"
+        content.write_text("tampered", encoding="utf-8")
+        report = self.manager.verify("topic-a")
+        self.assertFalse(report["valid"])
+        self.assertTrue(any("checksum" in error for error in report["errors"]))
 
 
 if __name__ == "__main__":
