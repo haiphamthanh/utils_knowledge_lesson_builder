@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Raw Resource"
+  short_description: "Plan, verify, and finalize raw resources safely"
+  default_prompt: "Inspect a raw resource, propose a lossless single/split plan, and wait for both required confirmations before finalizing."

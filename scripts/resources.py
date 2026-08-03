@@ -254,7 +254,12 @@ class ResourceManager:
     ) -> list[str]:
         errors: list[str] = []
         archive = self.root / parent["source"]
-        if not archive.exists() or resource_sha256(archive) != parent.get("content_sha256"):
+        try:
+            archive_hash = resource_sha256(archive) if archive.exists() else None
+        except BuilderError as error:
+            errors.append(str(error))
+            archive_hash = None
+        if archive_hash != parent.get("content_sha256"):
             errors.append("Archive tree checksum không khớp index")
         manifest_path = self.root / parent.get("manifest", "")
         if not manifest_path.is_file():
@@ -366,7 +371,12 @@ class ResourceManager:
 
         return ResourcePreparationEngine(self).finalize(item_id, preparation_id)
 
-    def review(self, item_id: str, allow_large_single: bool = False) -> Path:
+    def review(
+        self,
+        item_id: str,
+        allow_large_single: bool = False,
+        override_reason: str | None = None,
+    ) -> Path:
         item_id = require_slug(item_id, "Resource id")
         data = self.sync()
         item = self._get_item(data, item_id)
@@ -379,15 +389,21 @@ class ResourceManager:
         )
         if not report["valid"]:
             raise BuilderError("Resource không hợp lệ: " + "; ".join(report["errors"]))
+        preparation_root = self.root / "build" / "resource-preparation" / item_id
+        if preparation_root.is_dir() and any(preparation_root.iterdir()):
+            raise BuilderError(
+                "Resource đã có preparation; không được bypass bằng resource review"
+            )
         if report["split_review_required"] and not allow_large_single:
             raise BuilderError(
                 "Resource vượt soft_max_words; dùng resource prepare hoặc "
                 "--allow-large-single sau khi đã review ngữ nghĩa"
             )
-        preparation_root = self.root / "build" / "resource-preparation" / item_id
-        if preparation_root.is_dir() and any(preparation_root.iterdir()):
+        if report["hard_split_required"] and not (
+            isinstance(override_reason, str) and override_reason.strip()
+        ):
             raise BuilderError(
-                "Resource đã có preparation; không được bypass bằng resource review"
+                "Resource vượt hard_max_words; --allow-large-single cần --reason"
             )
         destination = self.resource_dir / "pool" / Path(item["source"]).name
         return self._move(data, item_id, item, destination, reviewed_at=_now())

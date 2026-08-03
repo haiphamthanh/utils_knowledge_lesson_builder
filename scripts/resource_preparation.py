@@ -171,6 +171,12 @@ class ResourcePreparationEngine:
             verification = self.manager.verify(item_id)
             if not verification["valid"]:
                 raise BuilderError("Finalization đã tồn tại nhưng verify thất bại")
+            if item["status"] == "archive":
+                manifest = _load_yaml(self.root / item["manifest"])
+                raw_name = Path(manifest["source_path"]).name
+            else:
+                raw_name = Path(item["source"]).name
+            self._remove_raw(self.root / "resource" / "raw" / raw_name)
             return {
                 "resource_id": item_id,
                 "preparation_id": preparation_id,
@@ -202,6 +208,8 @@ class ResourcePreparationEngine:
                 content_sha256=resource_sha256(destination),
             )
             self.manager._save(data)
+            if not self.manager.verify(item_id)["valid"]:
+                raise BuilderError("Index/copy verification thất bại; raw được giữ nguyên")
             self._remove_raw(source)
         else:
             self._finalize_split(
@@ -257,7 +265,7 @@ class ResourcePreparationEngine:
 
         if archive.exists():
             existing_manifest = _load_yaml(archive / "manifest.yml")
-            if existing_manifest.get("preparation_id") != preparation_id:
+            if existing_manifest != manifest:
                 raise BuilderError(f"Archive collision có nội dung khác: {archive}")
             if not archive_source.exists() or resource_sha256(archive_source) != report["source_sha256"]:
                 raise BuilderError("Archive source collision hoặc bị thay đổi")
@@ -311,6 +319,8 @@ class ResourcePreparationEngine:
             content_sha256=resource_sha256(archive),
         )
         self.manager._save(data)
+        if not self.manager.verify(item_id)["valid"]:
+            raise BuilderError("Archive/index verification thất bại; raw được giữ nguyên")
         self._remove_raw(source)
 
     @staticmethod

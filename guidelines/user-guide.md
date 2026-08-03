@@ -4,7 +4,7 @@ Tài liệu này đi theo một vòng đời hoàn chỉnh:
 
 ```text
 resource/raw
-    → review
+    → inspect → review (nhỏ) hoặc $prepare-raw-resource (lớn/nhiều chủ đề)
 resource/pool
     → $promote-pool-lesson
 knowledge/<cookbook>/lessons + graph + path
@@ -19,7 +19,8 @@ Chạy các lệnh từ thư mục gốc của project.
 | Tác vụ | Cách phù hợp | Lý do |
 |---|---|---|
 | Copy nguồn vào `raw` | Filesystem + `resource sync` | Deterministic, không cần agent suy luận |
-| Chuyển `raw → pool` | Người dùng review + `resource review` | Quyết định tin cậy nguồn cần người dùng xác nhận; command đã move và ghi timestamp chính xác |
+| Chuyển `raw → pool` nhỏ | Người dùng review + `resource review` | Deterministic, ít hơn 3.000 từ và chỉ một chủ đề |
+| Chuẩn hóa/split nguồn lớn | `$prepare-raw-resource` | AI chọn biên ngữ nghĩa; CLI bảo đảm checksum, coverage và copy-on-write |
 | Chuyển `pool → lesson → done` | `$promote-pool-lesson` | Phải đọc nội dung, chọn cookbook/relation/path và phối hợp nhiều file |
 | Validate/build cookbook | `build.sh` | CLI cho kết quả lặp lại được và báo lỗi trực tiếp |
 | Review lesson nằm đúng sách/vị trí | `$review-lesson-placement` | Cần kết hợp validation với đánh giá objective, depth và Progressive Disclosure |
@@ -45,11 +46,12 @@ Hoặc thêm một thư mục gồm nhiều file liên quan:
 cp -R /duong-dan/toi/cache-notes resource/raw/cache-notes
 ```
 
-Đồng bộ filesystem vào `resource/index.yml`, rồi kiểm tra kết quả:
+Đồng bộ filesystem vào `resource/index.yml`, rồi inspect kết quả:
 
 ```bash
 ./build.sh resource sync
 ./build.sh resource list --status raw
+./build.sh resource inspect cache-notes --json
 ```
 
 Lệnh `sync` tự ghi `created_at`. Không sửa timestamp thủ công và không dùng
@@ -66,12 +68,34 @@ nó đủ rõ để phát triển thành lesson. Sau đó dùng resource ID hi�
 ./build.sh resource list --status pool
 ```
 
-Lệnh `review` thực hiện hai việc cùng nhau:
+Lệnh `review` dành cho nguồn nhỏ, một chủ đề, và thực hiện hai việc cùng nhau:
 
 1. Move item từ `resource/raw/` sang `resource/pool/`.
 2. Cập nhật `status: pool` và `reviewed_at` trong `resource/index.yml`.
 
 Không move bằng tay khi command có thể thực hiện transition.
+
+Nếu nguồn vượt 3.000 từ, gồm nhiều file hoặc nhiều chủ đề, gọi:
+
+```text
+Sử dụng $prepare-raw-resource để xử lý resource cache-notes.
+```
+
+Skill đọc outline trước, đề xuất giữ nguyên hoặc bảng các part theo file/line,
+rồi chờ xác nhận lần một. Sau `resource prepare`, skill trình bày checksum,
+coverage, gap/overlap, attachment và output hash; chỉ sau xác nhận lần hai mới
+chạy `resource finalize`. Với split, original đi vào
+`resource/archive/<parent-id>/source/`, mỗi part vào
+`resource/pool/<part-id>/`, và có thể kiểm lại bất kỳ lúc nào:
+
+```bash
+./build.sh resource verify cache-notes
+./build.sh resource verify <part-id>
+```
+
+Trên 8.000 từ phải split trừ khi người dùng xác nhận rõ một lý do giữ nguyên.
+Trên 50.000 từ mà không có heading/cấu trúc file đủ rõ, skill dừng và yêu cầu
+outline. AI không tóm tắt hay viết lại nội dung tại bước này.
 
 ## 3. Dùng skill để đưa pool thành lesson
 
@@ -265,7 +289,10 @@ thêm vào cuối path và không dùng graph để tự sinh thứ tự đọc.
 |---|---|
 | Đồng bộ resource mới | `./build.sh resource sync` |
 | Liệt kê raw | `./build.sh resource list --status raw` |
-| Review raw → pool | `./build.sh resource review <resource-id>` |
+| Inspect raw | `./build.sh resource inspect <resource-id> --json` |
+| Review raw nhỏ → pool | `./build.sh resource review <resource-id>` |
+| Chuẩn hóa/split raw | Gọi `$prepare-raw-resource` trong Codex |
+| Verify resource | `./build.sh resource verify <resource-id>` |
 | Liệt kê pool | `./build.sh resource list --status pool` |
 | Tạo lesson từ pool | Gọi `$promote-pool-lesson` trong Codex |
 | Review vị trí lesson | Gọi `$review-lesson-placement` trong Codex |

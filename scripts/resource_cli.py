@@ -52,6 +52,7 @@ def add_resource_parser(subparsers: argparse._SubParsersAction) -> None:
         "--allow-large-single", action="store_true",
         help="Giữ nguyên resource vượt soft limit sau review ngữ nghĩa",
     )
+    review_parser.add_argument("--reason", help="Lý do giữ nguyên trên hard limit")
 
     complete_parser = commands.add_parser(
         "complete", help="Chuyển pool sang done sau khi lesson đã review"
@@ -92,7 +93,9 @@ def handle_resource_command(args: argparse.Namespace, root: Path) -> None:
         print(report_as_json(report))
         return
     if args.resource_command == "review":
-        destination = manager.review(args.item_id, args.allow_large_single)
+        destination = manager.review(
+            args.item_id, args.allow_large_single, args.reason
+        )
         print(f"[knowledge-builder] Reviewed and moved: {destination.relative_to(root)}")
         return
     if args.resource_command == "complete":

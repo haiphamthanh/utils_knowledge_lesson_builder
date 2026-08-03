@@ -31,7 +31,8 @@ lesson và không tự sửa learning path.
 flowchart LR
     Author[Người viết / Agent]
     CLI[build.sh + Python CLI]
-    Resource[(resource/raw, pool, done)]
+    Resource[(resource/raw, archive, pool, done)]
+    AI[Codex skill: semantic plan only]
     Knowledge[(lessons, graph, paths)]
     Template[(templates/name)]
     Validator[Loader + Validator]
@@ -41,6 +42,8 @@ flowchart LR
 
     Author --> CLI
     Author -->|thêm nguồn ban đầu| Resource
+    Author <--> AI
+    AI -->|plan YAML; không move/rewrite| CLI
     CLI <--> Resource
     CLI <--> Knowledge
     CLI --> Validator
@@ -89,7 +92,9 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 | `scripts.validation`   | Kiểm tra graph, dependency cycle, path, core/optional/draft     | Tự sinh thứ tự path                    |
 | `scripts.builder`      | Ghép Markdown, dựng lệnh Pandoc, tạo output                     | Chọn lesson hoặc thay đổi source       |
 | `scripts.authoring`    | Tạo lesson draft và đăng ký graph node                          | Đoán relation hoặc vị trí path         |
-| `scripts.resources`    | Đồng bộ index và transition `raw → pool → done`                 | Viết nội dung lesson                   |
+| `scripts.resources`    | Schema v2, lifecycle, migration và integrity verification       | Chọn biên chủ đề hoặc viết lesson      |
+| `scripts.resource_integrity` | Inventory UTF-8/binary, threshold và checksum cây          | Quyết định split theo ngữ nghĩa         |
+| `scripts.resource_preparation` | Validate plan, materialize và finalize copy-on-write     | Paraphrase hay tự xác nhận AI plan      |
 | `scripts.resource_cli` | Khai báo và dispatch nhóm lệnh `resource`                       | Thực thi quy tắc lifecycle             |
 | `scripts.models`       | Model bất biến, enum và `BuilderError`                          | I/O                                    |
 | `scripts.io_utils`     | Ghi file nguyên tử bằng temporary file + replace                | Quy tắc nghiệp vụ                      |
@@ -105,6 +110,8 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 | `knowledge/<cookbook>/paths/*.yml`  | Chapter, core/optional và thứ tự đọc              | Có                                  |
 | `templates/<name>/`           | Cấu hình format và asset Pandoc                   | Có                                  |
 | `resource/index.yml`          | Trạng thái, timestamp và lesson đích của resource | Có                                  |
+| `resource/archive/<parent>/`  | Original, manifest và lineage của split parent    | Có, bất biến và commit vào Git       |
+| `build/resource-preparation/` | Candidate + verification report trước finalize    | Generated, được `.gitignore` bỏ qua  |
 | `build/.work/`                | Markdown trung gian                               | Generated, được `.gitignore` bỏ qua |
 | `build/<cookbook>/<path>/`    | Tài liệu kết quả                                  | Generated, được `.gitignore` bỏ qua |
 
@@ -185,7 +192,7 @@ sequenceDiagram
 Lệnh này không thêm relation và không thay đổi path vì hai quyết định đó cần
 ngữ cảnh nội dung và xác nhận của người viết.
 
-### 5.3 Resource từ raw đến lesson hoàn thành
+### 5.3 Resource nhỏ từ raw đến lesson hoàn thành
 
 ```mermaid
 sequenceDiagram
@@ -200,7 +207,7 @@ sequenceDiagram
     User->>FS: Copy file/thư mục vào resource/raw
     User->>CLI: resource sync
     CLI->>RM: sync()
-    RM->>FS: Quét raw, pool, done
+    RM->>FS: Quét raw, archive, pool, done + checksum
     RM->>Index: Đăng ký item + created_at
 
     User->>CLI: resource review resource-id
@@ -211,6 +218,8 @@ sequenceDiagram
     User->>Skill: Chọn resource để tạo lesson
     Skill->>CLI: resource list --status pool --json
     CLI-->>Skill: Danh sách candidate
+    Skill->>CLI: resource verify resource-id --json
+    CLI-->>Skill: Child + parent archive integrity PASS
     Skill->>User: Đề xuất cookbook, lesson, graph và path
     alt Người dùng xác nhận
         Skill->>Core: Tạo draft, viết nội dung, cập nhật graph/path đã duyệt
@@ -226,6 +235,53 @@ sequenceDiagram
         Skill-->>User: Dừng; resource vẫn ở pool
     end
 ```
+
+### 5.4 Resource lớn: inspect, AI plan, prepare và finalize
+
+```mermaid
+sequenceDiagram
+    actor User as Người dùng
+    participant Skill as prepare-raw-resource
+    participant CLI
+    participant Engine as Preparation engine
+    participant Build as build/resource-preparation
+    participant Raw as resource/raw
+    participant Archive as resource/archive
+    participant Pool as resource/pool
+    participant Index as resource/index.yml
+
+    User->>Skill: Chuẩn hóa raw resource
+    Skill->>CLI: resource inspect id --json
+    CLI-->>Skill: Tree hash, outline, line/word/attachment inventory
+    Skill->>Skill: Đọc batch ~2.000 từ, overlap ~200
+    Skill->>User: Đề xuất single/split + exact line ranges
+    alt Xác nhận lần 1
+        Skill->>CLI: resource prepare id --plan plan.yml
+        CLI->>Engine: Validate checksum, ranges, IDs, attachment decisions
+        Engine->>Build: Materialize content nguyên văn + provenance + report
+        Engine-->>Skill: 100% coverage, 0 gap/overlap, output hashes
+        Skill->>User: Verification report
+        alt Xác nhận lần 2
+            Skill->>CLI: resource finalize id --preparation pid
+            CLI->>Engine: Recheck source/candidate checksum
+            Engine->>Archive: Copy original + manifest (split)
+            Engine->>Pool: Copy one or many verified items
+            Engine->>Index: Atomic replace schema v2 + lineage
+            Engine->>Raw: Xóa raw sau cùng
+            Skill->>CLI: resource verify id --json
+            CLI-->>Skill: Post-finalize PASS
+            Skill-->>User: Hoàn tất
+        else Chưa xác nhận
+            Skill-->>User: Dừng; raw giữ nguyên, pool không đổi
+        end
+    else Chưa xác nhận
+        Skill-->>User: Dừng; chưa materialize
+    end
+```
+
+AI chỉ tạo đề xuất ngữ nghĩa. Checksum, exact line coverage, manifest và
+filesystem là bằng chứng integrity. Nếu finalize dừng giữa chừng, raw hoặc
+archive vẫn còn; chạy lại cùng preparation ID để tiếp tục idempotently.
 
 ## 6. Đánh giá kiến trúc hiện tại
 
@@ -252,14 +308,14 @@ transaction tự động hoàn toàn.
 - Tạo lesson và chuyển resource đều có kiểm tra trước; các file YAML quan trọng
   được ghi theo cơ chế atomic replace.
 - Dependency ngoài ít: core Python chỉ cần PyYAML; Pandoc chỉ cần lúc build.
-- Test hiện tại bao phủ các invariant quan trọng nhất của path, authoring và
-  resource transition.
+- Test bao phủ các invariant quan trọng của path, authoring, inventory,
+  preparation, copy-on-write retry, lineage và resource tampering.
 
 ### Vấn đề và rủi ro
 
 | Ưu tiên    | Quan sát                                                                                                                              | Ảnh hưởng                                                                                           | Hướng xử lý nhỏ nhất                                                                                                                          |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cao        | `resource sync` chấp nhận item đã được move thủ công vào `done`, tự đặt `completed_at` nhưng không bắt buộc `cookbook` và `lesson_id` | `index.yml` có thể nói item đã hoàn thành nhưng không truy ngược được lesson                        | Khi sync thấy `done`, yêu cầu liên kết lesson hợp lệ; hoặc đánh dấu trạng thái riêng như `needs-link` thay vì coi là hoàn tất                 |
+| Cao        | `resource sync` vẫn chấp nhận item mới được đặt thủ công vào `done`, tự đặt `completed_at` nhưng không bắt buộc liên kết lesson | Item legacy/manual có thể thiếu khả năng truy ngược lesson | Không move thủ công; bước nhỏ tiếp theo là từ chối đăng ký `done` mới thiếu `cookbook/lesson_id` |
 | Trung bình | `graph.yml` lưu lại `title` vốn đã có trong front matter của lesson, nhưng validation chỉ so ID                                       | Hai title có thể lệch nhau và không rõ file nào là nguồn sự thật                                    | Chỉ lưu node ID, hoặc validate title graph luôn khớp lesson; phương án đầu sạch hơn nhưng cần migration                                       |
 | Trung bình | `specs/example-cookbook` chứa một pipeline build cũ và cả output HTML/PDF đã commit                                                   | Người mới có thể chạy nhầm script hoặc tưởng có hai kiến trúc được hỗ trợ                           | Gắn nhãn `legacy prototype` rõ trong README của specs; sau khi không còn cần đối chiếu, archive hoặc bỏ generated output bằng commit riêng    |
 | Trung bình | `template.yml` chỉ cấu hình được tập option Pandoc mà `builder.py` đã hard-code hỗ trợ                                                | Thêm format có option mới vẫn phải sửa Python, chưa hoàn toàn “copy template rồi build”             | Xác định contract option được hỗ trợ; sau đó thêm danh sách `pandoc_args` có kiểm soát hoặc adapter theo format nếu thực sự phát sinh nhu cầu |
@@ -275,7 +331,8 @@ transaction tự động hoàn toàn.
 | Validate/build cookbook có sẵn | Dễ         | Một lệnh, default rõ, lỗi có ngữ cảnh                                       |
 | Chọn template/format           | Khá dễ     | Chọn bằng tên; chưa có lệnh liệt kê capability                              |
 | Tạo lesson draft               | Khá dễ     | Scaffold và graph node tự sinh; relation/path cố ý để người viết quyết định |
-| Đưa raw sang pool              | Dễ         | Hai lệnh `sync`, `review` và index tự cập nhật                              |
+| Đưa raw nhỏ sang pool          | Dễ         | `inspect`, `review` và index tự cập nhật                                    |
+| Split raw lớn sang pool        | Trung bình | Hai xác nhận có chủ đích; skill che phần đọc batch và lập plan              |
 | Đưa pool thành lesson          | Trung bình | Có skill hướng dẫn nhưng vẫn cần quyết định nội dung và xác nhận nhiều file |
 | Mở rộng format hoàn toàn mới   | Trung bình | Dễ nếu dùng các option đã hỗ trợ, cần sửa core nếu Pandoc option khác       |
 

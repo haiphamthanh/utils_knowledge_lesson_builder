@@ -231,6 +231,23 @@ class ResourcePreparationTests(unittest.TestCase):
         self.assertTrue(result["verification"]["valid"])
         self.assertFalse(self.source.exists())
 
+    def test_finalize_interruption_after_index_removes_raw_on_retry(self) -> None:
+        preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
+        with patch(
+            "scripts.resource_preparation.ResourcePreparationEngine._remove_raw",
+            side_effect=OSError("interrupted"),
+        ):
+            with self.assertRaisesRegex(OSError, "interrupted"):
+                self.manager.finalize("system-notes", preparation["preparation_id"])
+        self.assertTrue(self.source.exists())
+        self.assertEqual(
+            self.manager._load()["items"]["system-notes"]["status"], "archive"
+        )
+
+        retry = self.manager.finalize("system-notes", preparation["preparation_id"])
+        self.assertTrue(retry["idempotent"])
+        self.assertFalse(self.source.exists())
+
     def test_verify_detects_tampering_after_split(self) -> None:
         preparation = self.manager.prepare("system-notes", self.write_plan(self.plan()))
         self.manager.finalize("system-notes", preparation["preparation_id"])

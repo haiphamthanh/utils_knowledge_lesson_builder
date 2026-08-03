@@ -213,6 +213,21 @@ tags: []
         destination = self.manager.review("large", allow_large_single=True)
         self.assertEqual(destination.parent.name, "pool")
 
+    def test_inspect_flags_ai_limit_and_hard_review_requires_reason(self) -> None:
+        source = self.root / "resource" / "raw" / "huge.md"
+        source.write_text("word " * 50001, encoding="utf-8")
+        self.manager.sync()
+        report = self.manager.inspect("huge")
+        self.assertTrue(report["ai_limit_exceeded"])
+        with self.assertRaisesRegex(BuilderError, "cần --reason"):
+            self.manager.review("huge", allow_large_single=True)
+        destination = self.manager.review(
+            "huge",
+            allow_large_single=True,
+            override_reason="Một chủ đề đồng nhất",
+        )
+        self.assertEqual(destination.parent.name, "pool")
+
 
 if __name__ == "__main__":
     unittest.main()

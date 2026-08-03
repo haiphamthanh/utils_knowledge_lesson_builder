@@ -104,28 +104,38 @@ Guideline đầy đủ nằm trong [`guidelines/`](guidelines/README.md).
 
 ## Resource lifecycle
 
-Nội dung đầu vào đi qua ba trạng thái:
+Nguồn nhỏ đi thẳng qua pool; nguồn lớn được split nhưng vẫn giữ original:
 
 ```text
-resource/raw → resource/pool → resource/done
+resource nhỏ: raw → inspect → pool → done
+resource lớn: raw → inspect/prepare → archive + nhiều pool children → done
 ```
 
 ```bash
 ./build.sh resource sync
-./build.sh resource list --status pool
+./build.sh resource inspect <resource-id> --json
 ./build.sh resource review <resource-id>
+./build.sh resource prepare <resource-id> --plan <plan.yml>
+./build.sh resource finalize <resource-id> --preparation <preparation-id>
+./build.sh resource verify <resource-id>
 ./build.sh resource complete <resource-id> \
   --cookbook web-system-foundations \
   --lesson request-response
 ```
 
-`resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
+`resource/index.yml` schema v2 lưu checksum, lineage, thời điểm và lesson đích.
+Split giữ byte gốc trong `resource/archive/`; candidate chỉ nằm trong `build/`
+cho tới xác nhận finalize. Xem
 [`guidelines/resources.md`](guidelines/resources.md) để biết quy tắc transition.
 
 Skill `$promote-pool-lesson` nằm trong
 `.codex/skills/promote-pool-lesson` của chính repo này. Khi gọi skill, agent sẽ
 liệt kê pool, đề xuất lesson/graph/path và yêu cầu xác nhận trước khi tạo nội
 dung hoặc move resource.
+
+Skill `$prepare-raw-resource` dùng AI duy nhất cho quyết định ngữ nghĩa
+single/split. CLI deterministic kiểm coverage/checksum; skill chờ xác nhận hai
+lần và không được viết lại nội dung nguồn.
 
 Skill `$review-lesson-placement` nằm trong
 `.codex/skills/review-lesson-placement` và chỉ audit cookbook, chapter,

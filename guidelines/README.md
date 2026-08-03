@@ -10,5 +10,5 @@ chiếu, không phải hướng dẫn vận hành hiện tại.
 | [`../docs/architecture.md`](../docs/architecture.md) | Kiến trúc, sequence diagram và đánh giá hệ thống |
 | [`knowledge-model.md`](knowledge-model.md) | Ranh giới lesson, graph và learning path |
 | [`authoring.md`](authoring.md) | Quy trình phân loại, viết và xuất bản lesson |
-| [`resources.md`](resources.md) | Lifecycle `raw → pool → done` |
+| [`resources.md`](resources.md) | Lifecycle `raw → archive/pool → done`, checksum và split an toàn |
 | [`agent-instructions.md`](agent-instructions.md) | Quy tắc bắt buộc dành cho agent |
