@@ -61,8 +61,12 @@
 \addtokomafont{section}{\color{BookNavy}\sffamily}
 \addtokomafont{subsection}{\color{BookNavy}\sffamily}
 \RedeclareSectionCommand[beforeskip=0pt,afterskip=1.4\baselineskip]{chapter}
+$if(numbersections)$
 \setcounter{secnumdepth}{2}
-\setcounter{tocdepth}{2}
+$else$
+\setcounter{secnumdepth}{-\maxdimen}
+$endif$
+\setcounter{tocdepth}{$toc-depth$}
 \newcommand{\passthrough}[1]{#1}
 \newcommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \newcommand{\pandocbounded}[1]{\begin{center}\includegraphics[width=\linewidth,height=.8\textheight,keepaspectratio]{#1}\end{center}}
@@ -115,4 +119,3 @@ $endif$
 \mainmatter
 $body$
 \end{document}
-

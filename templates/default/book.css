@@ -59,8 +59,15 @@ a { color: #0969a8; text-underline-offset: 3px; }
   font: .88rem/1.45 Arial, sans-serif;
 }
 .toc h2 { margin-top: 0; color: var(--navy); }
-.toc ul { padding-left: 1.15rem; }
+.toc ul { margin: .4rem 0; padding-left: 0; list-style: none; }
+.toc ul ul {
+  margin: .35rem 0 .75rem .35rem;
+  padding-left: .9rem;
+  border-left: 1px solid var(--line);
+}
+.toc li { margin: .28rem 0; }
 .toc a { color: #3d4b5e; text-decoration: none; }
+.toc a:hover { color: var(--teal); }
 .book-content { min-width: 0; }
 h1, h2, h3, h4 {
   color: var(--navy);
@@ -77,6 +84,25 @@ h1 {
 h1:first-child { margin-top: 0; }
 h2 { margin-top: 2.7rem; font-size: 1.65rem; }
 h3 { margin-top: 2rem; font-size: 1.25rem; }
+.chapter-index {
+  color: var(--teal);
+  font-size: .42em;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.lesson-index {
+  color: var(--teal);
+  font-size: .72em;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.toc .chapter-index,
+.toc .lesson-index {
+  color: inherit;
+  font-size: 1em;
+  letter-spacing: 0;
+}
 p, li { max-width: 75ch; }
 code {
   padding: .1em .3em;
@@ -121,4 +147,3 @@ pre {
   .book-layout { display: block; max-width: none; padding: 0; }
   .toc { position: static; max-height: none; }
 }
-

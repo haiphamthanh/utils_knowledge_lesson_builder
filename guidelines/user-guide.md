@@ -249,7 +249,7 @@ Chọn cụ thể path, template và format:
 ```bash
 ./build.sh build web-system-foundations \
   --path foundation \
-  --template default \
+  --template chapter-lesson \
   --format html
 ```
 
@@ -270,8 +270,16 @@ Ví dụ:
 
 ```text
 build/web-system-foundations/foundation/
-└── web-system-foundations-foundation-default.html
+└── web-system-foundations-foundation-chapter-lesson.html
 ```
+
+Các lựa chọn sẵn có:
+
+| Template | Cách hiển thị chỉ mục |
+|---|---|
+| `chapter-lesson` | `CHƯƠNG 01`, `Bài 01`; heading nhỏ không có số |
+| `clean` | Không đánh số |
+| `academic` | Đánh số đầy đủ `1`, `1.1`, `1.1.1` |
 
 Muốn đổi tiêu đề hiển thị trong sách, sửa `title` trong `cookbook.yml`. Không
 đổi cookbook ID chỉ để đổi tiêu đề. Nếu thật sự tạo một cookbook khác, tạo một

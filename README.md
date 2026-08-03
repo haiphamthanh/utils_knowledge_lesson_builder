@@ -49,23 +49,30 @@ Mỗi định dạng workbook nằm trong một thư mục có tên ổn định
 ```text
 templates/
 ├── lesson.md
-└── default/
-    ├── template.yml
-    ├── html-template.html
-    ├── pdf-template.tex
-    ├── book.css
-    └── admonitions.lua
+├── chapter-lesson/    # Chương 01 / Bài 01, khuyến nghị
+├── clean/             # Không đánh số
+├── academic/          # Đánh số 1 / 1.1 / 1.1.1
+└── default/           # Asset dùng chung và tương thích cũ
 ```
 
-Build bằng tên:
+Chọn phong cách bằng tên:
 
 ```bash
-./build.sh build web-system-foundations --template default --format html
+./build.sh build web-system-foundations --template chapter-lesson
+./build.sh build web-system-foundations --template clean
+./build.sh build web-system-foundations --template academic
 ```
 
-Muốn thêm style mới, copy `templates/default/` sang `templates/<ten-moi>/`, đổi
-`id` trong `template.yml`, rồi chỉnh các asset bên trong. Core builder không cần
-thay đổi.
+| Template | Chapter | Lesson | Heading bên trong |
+|---|---|---|---|
+| `chapter-lesson` | `CHƯƠNG 01` | `Bài 01` | Không số |
+| `clean` | Không số | Không số | Không số |
+| `academic` | `1` | `1.1` | `1.1.1` |
+
+Template có thể dùng lại asset trong `templates/default/` bằng relative path,
+nhưng không thể tham chiếu file nằm ngoài `templates/`. Hai field
+`number_sections` và `toc_depth` trong `template.yml` điều khiển độ sâu mục lục
+và đánh số; không thêm số vào lesson ID hoặc tên file.
 
 ## Cấu trúc cookbook
 

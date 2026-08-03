@@ -20,6 +20,32 @@ def _format_config(plan: BuildPlan) -> dict[str, Any]:
     return config
 
 
+def _document_options(plan: BuildPlan) -> list[str]:
+    toc_depth = plan.template.get("toc_depth", 2)
+    if (
+        not isinstance(toc_depth, int)
+        or isinstance(toc_depth, bool)
+        or not 1 <= toc_depth <= 6
+    ):
+        raise BuilderError("'toc_depth' trong template.yml phải là số từ 1 đến 6")
+    number_sections = plan.template.get("number_sections", True)
+    if not isinstance(number_sections, bool):
+        raise BuilderError("'number_sections' trong template.yml phải là boolean")
+    options = ["--table-of-contents", f"--toc-depth={toc_depth}"]
+    if number_sections:
+        options.append("--number-sections")
+    return options
+
+
+def _resolve_template_asset(plan: BuildPlan, value: str, label: str) -> Path:
+    templates_dir = (plan.root / "templates").resolve()
+    template_dir = templates_dir / plan.template_id
+    resolved = (template_dir / value).resolve()
+    if templates_dir not in resolved.parents or not resolved.is_file():
+        raise BuilderError(f"{label} không hợp lệ: {resolved}")
+    return resolved
+
+
 def _chapter_markdown(plan: BuildPlan) -> str:
     selected = set(plan.ordered_lesson_ids)
     blocks: list[str] = []
@@ -70,7 +96,6 @@ def build(plan: BuildPlan) -> Path:
     if shutil.which("pandoc") is None:
         raise BuilderError("Không tìm thấy pandoc trong PATH")
 
-    template_dir = plan.root / "templates" / plan.template_id
     format_config = _format_config(plan)
     extension = format_config.get("extension", plan.format_id)
     if not isinstance(extension, str) or not extension:
@@ -89,9 +114,7 @@ def build(plan: BuildPlan) -> Path:
         "pandoc",
         str(source_path),
         "--standalone",
-        "--table-of-contents",
-        "--toc-depth=2",
-        "--number-sections",
+        *_document_options(plan),
         "--top-level-division=chapter",
         f"--resource-path={plan.root}:{plan.root / 'knowledge' / plan.cookbook_id}",
         f"--output={output_path}",
@@ -102,16 +125,12 @@ def build(plan: BuildPlan) -> Path:
 
     template_file = format_config.get("template")
     if isinstance(template_file, str) and template_file:
-        resolved = (template_dir / template_file).resolve()
-        if template_dir.resolve() not in resolved.parents or not resolved.is_file():
-            raise BuilderError(f"Template file không hợp lệ: {resolved}")
+        resolved = _resolve_template_asset(plan, template_file, "Template file")
         command.append(f"--template={resolved}")
 
     stylesheet = format_config.get("stylesheet")
     if isinstance(stylesheet, str) and stylesheet:
-        resolved = (template_dir / stylesheet).resolve()
-        if template_dir.resolve() not in resolved.parents or not resolved.is_file():
-            raise BuilderError(f"Stylesheet không hợp lệ: {resolved}")
+        resolved = _resolve_template_asset(plan, stylesheet, "Stylesheet")
         command.append(f"--css={resolved}")
 
     filters = plan.template.get("filters", [])
@@ -120,9 +139,7 @@ def build(plan: BuildPlan) -> Path:
     for filter_name in filters:
         if not isinstance(filter_name, str):
             raise BuilderError("Tên filter phải là chuỗi")
-        resolved = (template_dir / filter_name).resolve()
-        if template_dir.resolve() not in resolved.parents or not resolved.is_file():
-            raise BuilderError(f"Filter không hợp lệ: {resolved}")
+        resolved = _resolve_template_asset(plan, filter_name, "Filter")
         command.append(f"--lua-filter={resolved}")
 
     if format_config.get("embed_resources") is True:

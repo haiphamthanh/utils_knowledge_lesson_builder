@@ -2,6 +2,7 @@ from pathlib import Path
 import unittest
 
 from scripts.core import create_plan
+from scripts.builder import _document_options, _resolve_template_asset
 from scripts.models import BuilderError, Chapter, Lesson
 from scripts.validation import validate_path
 
@@ -62,6 +63,45 @@ class CorePlanTests(unittest.TestCase):
                 include_optional=False,
                 include_draft=False,
             )
+
+    def test_numbering_is_controlled_by_template(self) -> None:
+        expected = {
+            "default": (True, "--toc-depth=2"),
+            "chapter-lesson": (False, "--toc-depth=2"),
+            "clean": (False, "--toc-depth=2"),
+            "academic": (True, "--toc-depth=3"),
+        }
+        for template_id, (numbered, toc_option) in expected.items():
+            with self.subTest(template=template_id):
+                plan = create_plan(
+                    root=ROOT,
+                    cookbook_id="web-system-foundations",
+                    path_id=None,
+                    template_id=template_id,
+                    format_id="html",
+                    include_optional=False,
+                    include_draft=False,
+                )
+                options = _document_options(plan)
+                self.assertEqual("--number-sections" in options, numbered)
+                self.assertIn(toc_option, options)
+
+    def test_template_can_reuse_assets_only_inside_templates_root(self) -> None:
+        plan = create_plan(
+            root=ROOT,
+            cookbook_id="web-system-foundations",
+            path_id=None,
+            template_id="clean",
+            format_id="html",
+            include_optional=False,
+            include_draft=False,
+        )
+        resolved = _resolve_template_asset(
+            plan, "../default/book.css", "Stylesheet"
+        )
+        self.assertEqual(resolved, (ROOT / "templates/default/book.css").resolve())
+        with self.assertRaisesRegex(BuilderError, "không hợp lệ"):
+            _resolve_template_asset(plan, "../../README.md", "Stylesheet")
 
 
 if __name__ == "__main__":

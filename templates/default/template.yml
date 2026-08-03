@@ -1,4 +1,6 @@
 id: default
+number_sections: true
+toc_depth: 2
 filters:
   - admonitions.lua
 formats:
@@ -13,4 +15,3 @@ formats:
     extension: pdf
     template: pdf-template.tex
     pdf_engine: xelatex
-
