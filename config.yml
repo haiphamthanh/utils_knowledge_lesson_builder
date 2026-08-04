@@ -1,6 +1,6 @@
 # Cấu hình mặc định ở cấp dự án. Cookbook hoặc CLI có thể ghi đè khi cần.
 build_dir: build
-default_template: chapter-lesson
+default_template: editorial
 default_format: html
 
 resource_preparation:

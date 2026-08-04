@@ -38,8 +38,8 @@ Output:
 
 ```text
 build/web-system-foundations/foundation/
-├── web-system-foundations-foundation-chapter-lesson.html
-└── web-system-foundations-foundation-chapter-lesson.pdf
+├── web-system-foundations-foundation-editorial.html
+└── web-system-foundations-foundation-editorial.pdf
 ```
 
 ## Chọn template
@@ -49,10 +49,10 @@ Mỗi định dạng workbook nằm trong một thư mục có tên ổn định
 ```text
 templates/
 ├── lesson.md
-├── chapter-lesson/    # Chương 01 / Bài 01, khuyến nghị
+├── chapter-lesson/    # Chương 01 / Bài 01, tối giản
 ├── clean/             # Không đánh số
 ├── academic/          # Đánh số 1 / 1.1 / 1.1.1
-├── editorial/         # Handbook với semantic content cards
+├── editorial/         # Handbook với semantic content cards, khuyến nghị
 ├── editorial-banner/  # Theme banner xanh–vàng
 ├── editorial-study/   # Theme study book cyan–orange
 └── default/           # Asset dùng chung và tương thích cũ
