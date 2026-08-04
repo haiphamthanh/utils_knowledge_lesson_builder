@@ -52,6 +52,9 @@ templates/
 ├── chapter-lesson/    # Chương 01 / Bài 01, khuyến nghị
 ├── clean/             # Không đánh số
 ├── academic/          # Đánh số 1 / 1.1 / 1.1.1
+├── editorial/         # Handbook với semantic content cards
+├── editorial-banner/  # Theme banner xanh–vàng
+├── editorial-study/   # Theme study book cyan–orange
 └── default/           # Asset dùng chung và tương thích cũ
 ```
 
@@ -63,16 +66,30 @@ Chọn phong cách bằng tên:
 ./build.sh build web-system-foundations --template academic
 ```
 
+Khám phá toàn bộ template trước khi chọn:
+
+```bash
+./build.sh template list
+./build.sh template list --json
+```
+
 | Template | Chapter | Lesson | Heading bên trong |
 |---|---|---|---|
 | `chapter-lesson` | `CHƯƠNG 01` | `Bài 01` | Không số |
 | `clean` | Không số | Không số | Không số |
 | `academic` | `1` | `1.1` | `1.1.1` |
+| `editorial` | `CHƯƠNG 01` | `Bài 01` | Content cards theo vai trò |
+| `editorial-banner` | `CHƯƠNG 01` | `Bài 01` | Banner xanh và dải màu đậm |
+| `editorial-study` | `CHƯƠNG 01` | `Bài 01` | Cyan–orange dạng study book |
 
 Template có thể dùng lại asset trong `templates/default/` bằng relative path,
 nhưng không thể tham chiếu file nằm ngoài `templates/`. Hai field
 `number_sections` và `toc_depth` trong `template.yml` điều khiển độ sâu mục lục
 và đánh số; không thêm số vào lesson ID hoặc tên file.
+
+`editorial-banner` và `editorial-study` được thiết kế lại từ đầu dựa trên ngôn
+ngữ thị giác của hai bài tham khảo VniTeach; URL nguồn cảm hứng được lưu trong
+`template.yml`. Project không sao chép nguyên source template bên ngoài.
 
 ## Cấu trúc cookbook
 

@@ -1,0 +1,21 @@
+id: editorial
+name: Editorial Handbook
+description: Nhịp đọc dạng handbook với problem, concept, example, decision và summary cards.
+number_sections: false
+toc_depth: 2
+filters:
+  - editorial.lua
+  - ../default/admonitions.lua
+  - ../chapter-lesson/chapter-lesson.lua
+formats:
+  html:
+    to: html5
+    extension: html
+    template: ../default/html-template.html
+    stylesheet: ../default/book.css
+    embed_resources: true
+  pdf:
+    to: latex
+    extension: pdf
+    template: ../default/pdf-template.tex
+    pdf_engine: xelatex

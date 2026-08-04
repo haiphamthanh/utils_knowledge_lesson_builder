@@ -130,6 +130,53 @@ pre {
   border-left-color: #c87718;
   background: #fff8e9;
 }
+.admonition.need {
+  border-color: #e7c46c;
+  border-left-color: var(--gold);
+  background: #fff9e8;
+}
+.admonition.context {
+  border-color: #d9dee8;
+  border-left-color: #7a8799;
+  background: #f6f7f9;
+}
+.admonition.concept {
+  border-color: #9bcfca;
+  border-left-color: var(--teal);
+  background: #edf9f7;
+}
+.admonition.example {
+  border-color: #aac9e4;
+  border-left-color: #3978aa;
+  background: #f1f7fc;
+}
+.admonition.tradeoff {
+  border-color: #e9bd91;
+  border-left-color: #c96d24;
+  background: #fff6ed;
+}
+.admonition.connections {
+  border-color: #d8dce4;
+  border-left-color: #69758a;
+  background: #f7f8fa;
+}
+.admonition.summary {
+  border-color: #91b4c2;
+  border-left-color: var(--navy);
+  background: #edf4f7;
+}
+.admonition.references {
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.editorial-section {
+  padding-bottom: .35rem;
+  border-bottom: 2px solid var(--line);
+}
 .book-footer {
   padding: 2rem;
   color: #d8e3e8;

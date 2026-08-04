@@ -280,6 +280,23 @@ Các lựa chọn sẵn có:
 | `chapter-lesson` | `CHƯƠNG 01`, `Bài 01`; heading nhỏ không có số |
 | `clean` | Không đánh số |
 | `academic` | Đánh số đầy đủ `1`, `1.1`, `1.1.1` |
+| `editorial` | Handbook cân bằng với các card theo vai trò nội dung |
+| `editorial-banner` | Chapter banner và dải màu xanh–vàng |
+| `editorial-study` | Cyan–orange theo phong cách study book |
+
+Xem template trước khi build:
+
+```bash
+./build.sh template list
+```
+
+Ví dụ chọn theme:
+
+```bash
+./build.sh build web-system-foundations --template editorial
+./build.sh build web-system-foundations --template editorial-banner
+./build.sh build web-system-foundations --template editorial-study
+```
 
 Muốn đổi tiêu đề hiển thị trong sách, sửa `title` trong `cookbook.yml`. Không
 đổi cookbook ID chỉ để đổi tiêu đề. Nếu thật sự tạo một cookbook khác, tạo một

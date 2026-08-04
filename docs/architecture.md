@@ -96,6 +96,7 @@ và Git là lớp lưu trữ; Pandoc là dependency bên ngoài để render tà
 | `scripts.resource_integrity` | Inventory UTF-8/binary, threshold và checksum cây          | Quyết định split theo ngữ nghĩa         |
 | `scripts.resource_preparation` | Validate plan, materialize và finalize copy-on-write     | Paraphrase hay tự xác nhận AI plan      |
 | `scripts.resource_cli` | Khai báo và dispatch nhóm lệnh `resource`                       | Thực thi quy tắc lifecycle             |
+| `scripts.template_cli` | Liệt kê template, format, numbering và nguồn cảm hứng           | Render hoặc thay đổi lesson            |
 | `scripts.models`       | Model bất biến, enum và `BuilderError`                          | I/O                                    |
 | `scripts.io_utils`     | Ghi file nguyên tử bằng temporary file + replace                | Quy tắc nghiệp vụ                      |
 

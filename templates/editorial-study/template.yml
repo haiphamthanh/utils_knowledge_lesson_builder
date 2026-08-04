@@ -1,0 +1,27 @@
+id: editorial-study
+name: Editorial Study
+description: Cyan–orange dạng study book, khung bài học rõ và thân thiện.
+inspired_by:
+  - https://www.vniteach.com/2022/08/03/latex-templates-noi-dung-sach-tuyet-dep-1/
+number_sections: false
+toc_depth: 2
+filters:
+  - ../editorial/editorial.lua
+  - ../default/admonitions.lua
+  - ../chapter-lesson/chapter-lesson.lua
+formats:
+  html:
+    to: html5
+    extension: html
+    template: ../default/html-template.html
+    stylesheet:
+      - ../default/book.css
+      - study.css
+    embed_resources: true
+  pdf:
+    to: latex
+    extension: pdf
+    template: ../default/pdf-template.tex
+    header_includes:
+      - study.tex
+    pdf_engine: xelatex

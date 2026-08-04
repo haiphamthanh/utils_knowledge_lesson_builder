@@ -1,0 +1,27 @@
+\definecolor{BannerNavy}{HTML}{123F58}
+\definecolor{BannerTeal}{HTML}{00A6C8}
+\definecolor{BannerGold}{HTML}{F2B705}
+\colorlet{BookNavy}{BannerNavy}
+\colorlet{BookTeal}{BannerTeal}
+\colorlet{BookGold}{BannerGold}
+\usepackage{eso-pic}
+\renewcommand*{\chapterlinesformat}[3]{%
+  \begin{tcolorbox}[
+    enhanced,
+    boxrule=0pt,
+    arc=1mm,
+    colback=BookNavy,
+    borderline west={3mm}{0pt}{BookGold},
+    left=5mm,right=5mm,top=4mm,bottom=4mm
+  ]
+    \color{white}#3
+  \end{tcolorbox}%
+}
+\AddToShipoutPictureBG{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[BookTeal] (current page.north west) rectangle
+      ([xshift=2.2mm]current page.south west);
+    \fill[BookGold] (current page.south west) rectangle
+      ([yshift=1.6mm]current page.south east);
+  \end{tikzpicture}%
+}

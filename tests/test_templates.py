@@ -14,7 +14,18 @@ class TemplateTests(unittest.TestCase):
     def test_registry_lists_available_templates(self) -> None:
         templates = list_templates(ROOT)
         ids = {template["id"] for template in templates}
-        self.assertTrue({"default", "chapter-lesson", "clean", "academic"} <= ids)
+        self.assertTrue(
+            {
+                "default",
+                "chapter-lesson",
+                "clean",
+                "academic",
+                "editorial",
+                "editorial-banner",
+                "editorial-study",
+            }
+            <= ids
+        )
         self.assertIn("chapter-lesson", templates_as_table(templates))
 
     def test_stylesheet_and_header_include_accept_string_or_list(self) -> None:
