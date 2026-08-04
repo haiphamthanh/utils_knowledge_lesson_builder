@@ -9,6 +9,7 @@ from scripts.builder import build
 from scripts.core import create_plan
 from scripts.models import BuilderError
 from scripts.resource_cli import add_resource_parser, handle_resource_command
+from scripts.template_cli import add_template_parser, handle_template_command
 
 
 def project_root() -> Path:
@@ -56,6 +57,7 @@ def parser() -> argparse.ArgumentParser:
         help="Độ sâu nội dung; mặc định standard",
     )
     add_resource_parser(subparsers)
+    add_template_parser(subparsers)
     return root
 
 
@@ -64,6 +66,9 @@ def main(argv: list[str] | None = None) -> None:
     try:
         if args.command == "resource":
             handle_resource_command(args, project_root())
+            return
+        if args.command == "template":
+            handle_template_command(args, project_root())
             return
         if args.command == "create-lesson":
             target = create_lesson(

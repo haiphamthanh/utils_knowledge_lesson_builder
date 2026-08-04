@@ -1,4 +1,6 @@
 id: chapter-lesson
+name: Chapter Lesson
+description: Chỉ đánh nhãn chương và bài, không đánh số heading nhỏ.
 number_sections: false
 toc_depth: 2
 filters:

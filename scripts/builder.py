@@ -46,6 +46,18 @@ def _resolve_template_asset(plan: BuildPlan, value: str, label: str) -> Path:
     return resolved
 
 
+def _asset_values(value: object, label: str) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str) and value:
+        return [value]
+    if isinstance(value, list) and all(
+        isinstance(item, str) and item for item in value
+    ):
+        return value
+    raise BuilderError(f"'{label}' trong template.yml phải là string hoặc list string")
+
+
 def _chapter_markdown(plan: BuildPlan) -> str:
     selected = set(plan.ordered_lesson_ids)
     blocks: list[str] = []
@@ -128,10 +140,17 @@ def build(plan: BuildPlan) -> Path:
         resolved = _resolve_template_asset(plan, template_file, "Template file")
         command.append(f"--template={resolved}")
 
-    stylesheet = format_config.get("stylesheet")
-    if isinstance(stylesheet, str) and stylesheet:
+    for stylesheet in _asset_values(
+        format_config.get("stylesheet"), "stylesheet"
+    ):
         resolved = _resolve_template_asset(plan, stylesheet, "Stylesheet")
         command.append(f"--css={resolved}")
+
+    for header_include in _asset_values(
+        format_config.get("header_includes"), "header_includes"
+    ):
+        resolved = _resolve_template_asset(plan, header_include, "Header include")
+        command.append(f"--include-in-header={resolved}")
 
     filters = plan.template.get("filters", [])
     if not isinstance(filters, list):

@@ -1,4 +1,6 @@
 id: clean
+name: Clean
+description: Trình bày tối giản, không đánh số heading.
 number_sections: false
 toc_depth: 2
 filters:

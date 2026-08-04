@@ -1,4 +1,6 @@
 id: academic
+name: Academic
+description: Trình bày học thuật với chỉ mục 1, 1.1 và 1.1.1.
 number_sections: true
 toc_depth: 3
 filters:

@@ -1,4 +1,6 @@
 id: default
+name: Default Academic
+description: Template tương thích cũ với đánh số phân cấp đầy đủ.
 number_sections: true
 toc_depth: 2
 filters:
