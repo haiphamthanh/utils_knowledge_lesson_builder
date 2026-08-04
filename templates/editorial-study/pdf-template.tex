@@ -1,0 +1,321 @@
+\documentclass[11pt,a4paper,openany]{book}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{vietnamese}
+\setmainfont{texgyrepagella}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setsansfont{texgyreheros}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setmonofont{texgyrecursor}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic,
+  Scale=0.86
+]
+\usepackage[a4paper,inner=22mm,outer=19mm,top=21mm,bottom=20mm,headheight=17pt]{geometry}
+\usepackage{xcolor,graphicx,longtable,booktabs,array,calc,multicol}
+\usepackage{amssymb}
+\usepackage{hyperref,bookmark}
+\usepackage{fancyhdr}
+\usepackage[explicit]{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shadows.blur,shapes}
+\usepackage{eso-pic}
+\usepackage{fvextra}
+\usepackage{upquote}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+
+\definecolor{StudyInk}{HTML}{243F4B}
+\definecolor{StudyCyan}{HTML}{00A9B7}
+\definecolor{StudyBlue}{HTML}{168FB0}
+\definecolor{StudyOrange}{HTML}{F28C28}
+\definecolor{StudyYellow}{HTML}{F7C948}
+\definecolor{StudyMist}{HTML}{EAF8F9}
+\definecolor{StudyWarm}{HTML}{FFF6EA}
+\definecolor{StudyLine}{HTML}{D6E7E8}
+\definecolor{StudyCode}{HTML}{F1F7F7}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=StudyBlue,
+  urlcolor=StudyInk,
+  citecolor=StudyBlue,
+  pdfauthor={$author$},
+  pdftitle={$title$}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlist{nosep,leftmargin=*}
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{$toc-depth$}
+
+% Viền cyan–orange đổi phía theo trang chẵn/lẻ như mẫu study book.
+\AddToShipoutPictureBG{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \ifodd\value{page}
+      \fill[StudyOrange] (current page.south west) rectangle
+        ([xshift=6mm]current page.north west);
+      \fill[StudyCyan] (current page.south west) rectangle
+        ([yshift=6mm]current page.south east);
+    \else
+      \fill[StudyCyan] ([xshift=-6mm]current page.north east) rectangle
+        (current page.south east);
+      \fill[StudyOrange] (current page.south west) rectangle
+        ([yshift=6mm]current page.south east);
+    \fi
+  \end{tikzpicture}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}{}}
+\fancyhead[LE]{\small\sffamily\bfseries\color{StudyInk}\leftmark}
+\fancyhead[RO]{\small\sffamily\bfseries\color{StudyInk}\rightmark}
+\fancyfoot[LE,RO]{%
+  \tikz[baseline=(page.base)]{
+    \node (page) [circle,fill=StudyCyan,text=white,font=\bfseries,minimum size=8mm] {\thepage};
+  }%
+}
+\fancyfoot[C]{\sffamily\footnotesize\color{white}$if(author)$$author$$else$KNOWLEDGE COOKBOOK$endif$}
+
+% Chapter opener với chữ C lớn, dải cyan và title nghiêng như mẫu gốc.
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\bfseries}
+  {}
+  {0pt}
+  {%
+    \begin{tikzpicture}
+      \node[
+        circle,
+        shade,
+        top color=StudyOrange,
+        bottom color=StudyCyan,
+        text=white,
+        minimum size=22mm,
+        font=\sffamily\bfseries\fontsize{34}{34}\selectfont
+      ] (letter) {C};
+      \node[
+        anchor=west,
+        font=\sffamily\bfseries\fontsize{22}{25}\selectfont,
+        text=StudyInk
+      ] (chaptername) at ([xshift=-1mm]letter.east) {HƯƠNG \thechapter};
+      \draw[line width=2.6mm,StudyCyan]
+        ([xshift=2mm,yshift=-2mm]letter.south west) --
+        ([xshift=4mm,yshift=-2mm]chaptername.south east);
+      \node[
+        anchor=north west,
+        align=left,
+        text width=.83\textwidth,
+        font=\sffamily\bfseries\fontsize{25}{31}\selectfont,
+        text=StudyInk,
+        xslant=.08
+      ] at ([xshift=8mm,yshift=-12mm]letter.south west) {#1};
+    \end{tikzpicture}%
+  }
+\titlespacing*{\chapter}{0pt}{-9mm}{28mm}
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\sffamily\bfseries\fontsize{27}{32}\selectfont\color{StudyInk}}
+  {}
+  {0pt}
+  {\begin{tcolorbox}[frame hidden,colback=StudyMist,borderline west={3mm}{0pt}{StudyOrange},left=6mm,right=5mm,top=4mm,bottom=4mm]#1\end{tcolorbox}}
+
+% Lesson title là một khung lớn với thanh gradient và huy hiệu tròn.
+\titleformat{\section}
+  {\normalfont\sffamily\bfseries\Large\color{StudyInk}}
+  {}
+  {0pt}
+  {%
+    \begin{tcolorbox}[
+      enhanced,
+      frame hidden,
+      colback=white,
+      left=9mm,right=4mm,top=3mm,bottom=3mm,
+      borderline west={3.5mm}{0pt}{StudyCyan},
+      overlay={%
+        \shade[top color=StudyOrange,bottom color=StudyCyan]
+          ([xshift=-3.5mm]frame.north west) rectangle (frame.south west);
+        \node[circle,fill=StudyOrange,text=white,font=\bfseries\sffamily,minimum size=8mm]
+          at ([xshift=-1.8mm]frame.north west) {\textbullet};
+      }
+    ]
+      #1
+    \end{tcolorbox}%
+  }
+\titlespacing*{\section}{0pt}{12mm}{3mm}
+
+\titleformat{\subsection}
+  {\normalfont\sffamily\bfseries\large\color{StudyBlue}}
+  {}
+  {0pt}
+  {%
+    \begin{tikzpicture}[baseline=(title.base)]
+      \node[fill=StudyCyan,text=white,rounded corners=1mm,inner xsep=4mm,inner ysep=1.5mm,font=\bfseries\sffamily] (tag) {\textbullet};
+      \node[anchor=west,text=StudyBlue,font=\bfseries\sffamily\large] (title) at ([xshift=3mm]tag.east) {#1};
+      \draw[StudyOrange,line width=.8mm] ([yshift=-1.4mm]title.south west) -- ([yshift=-1.4mm]title.south east);
+    \end{tikzpicture}%
+  }
+\titlespacing*{\subsection}{0pt}{9mm}{3mm}
+
+\newcommand{\passthrough}[1]{#1}
+\newcommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcommand{\pandocbounded}[1]{\begin{center}\includegraphics[width=\linewidth,height=.8\textheight,keepaspectratio]{#1}\end{center}}
+\newenvironment{CSLReferences}[2]{}{}
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\entryspacing}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\cslhangindent}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth-\cslhangindent}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+$for(header-includes)$
+$header-includes$
+$endfor$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\small}
+\BeforeBeginEnvironment{Shaded}{\begin{tcolorbox}[colback=StudyCode,colframe=StudyLine,boxrule=.4pt,arc=2pt,left=2mm,right=2mm,top=1mm,bottom=1mm]}
+\AfterEndEnvironment{Shaded}{\end{tcolorbox}}
+
+\newtcolorbox{chapterobjectivebox}{
+  enhanced,breakable,title=Mục tiêu chương,
+  frame hidden,colback=StudyMist,coltitle=StudyBlue,
+  fonttitle=\bfseries\sffamily,
+  borderline west={3mm}{0pt}{StudyCyan},
+  attach boxed title to top left={xshift=7mm,yshift=-2mm},
+  boxed title style={frame hidden,colback=white},top=5mm
+}
+\newtcolorbox{needbox}{
+  enhanced,breakable,title=Vấn đề cần giải quyết,
+  sharp corners,rounded corners=northwest,
+  colback=StudyWarm,colframe=StudyOrange,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left,
+  boxed title style={colback=StudyOrange,sharp corners},
+  borderline west={2mm}{0pt}{StudyOrange}
+}
+\newtcolorbox{contextbox}{
+  enhanced,breakable,title=Vì sao quan trọng?,
+  colback=white,colframe=StudyOrange,coltitle=StudyInk,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=5mm,yshift=-2mm},
+  boxed title style={frame hidden,colback=StudyWarm},top=5mm
+}
+\newtcolorbox{conceptbox}{
+  enhanced,breakable,title=Khái niệm cốt lõi,
+  frame hidden,colback=white,coltitle=StudyBlue,
+  fonttitle=\bfseries\sffamily,
+  borderline west={3mm}{0pt}{StudyCyan},
+  overlay unbroken={%
+    \shade[top color=StudyOrange,bottom color=StudyCyan]
+      ([xshift=-3mm]frame.north west) rectangle (frame.south west);
+  },
+  overlay first={%
+    \shade[top color=StudyOrange,bottom color=StudyCyan]
+      ([xshift=-3mm]frame.north west) rectangle (frame.south west);
+  },
+  attach boxed title to top left={xshift=7mm,yshift=-2mm},
+  boxed title style={frame hidden,colback=StudyMist},top=5mm
+}
+\newtcolorbox{examplebox}{
+  enhanced,breakable,title=Ví dụ,
+  colback=StudyMist,colframe=StudyCyan,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=5mm,yshift=-2mm},
+  boxed title style={colback=StudyCyan,sharp corners},top=5mm
+}
+\newtcolorbox{tradeoffbox}{
+  enhanced,breakable,title=Quyết định và giới hạn,
+  colback=StudyWarm,colframe=StudyOrange,coltitle=StudyInk,
+  fonttitle=\bfseries\sffamily,
+  borderline west={2mm}{0pt}{StudyOrange},arc=2mm
+}
+\newtcolorbox{connectionsbox}{
+  enhanced,breakable,title=Liên kết kiến thức,
+  colback=white,colframe=StudyLine,coltitle=StudyBlue,
+  fonttitle=\bfseries\sffamily,
+  borderline north={1mm}{0pt}{StudyCyan}
+}
+\newtcolorbox{summarybox}{
+  enhanced,breakable,title=Ghi nhớ,
+  colback=StudyInk,colframe=StudyInk,coltitle=StudyYellow,
+  colupper=white,fonttitle=\bfseries\sffamily,
+  borderline west={2.5mm}{0pt}{StudyOrange}
+}
+\newtcolorbox{referencesbox}{
+  breakable,title=Tài liệu tham khảo,colback=white,colframe=StudyLine,
+  coltitle=StudyInk,fonttitle=\bfseries\sffamily,
+  fontupper=\small\color{black!65}
+}
+\newtcolorbox{warningbox}{
+  breakable,title=Cảnh báo,colback=red!4,colframe=StudyOrange,
+  fonttitle=\bfseries\sffamily
+}
+\newtcolorbox{nextstepbox}{
+  enhanced,breakable,title=Nhu cầu tiếp theo,
+  colback=StudyMist,colframe=StudyCyan,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top right={xshift=-5mm,yshift=-2mm},
+  boxed title style={colback=StudyCyan,sharp corners},top=5mm
+}
+
+\begin{document}
+\frontmatter
+\begin{titlepage}
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[StudyWarm] (current page.south west) rectangle (current page.north east);
+    \fill[StudyCyan] (current page.south west) rectangle
+      ([xshift=20mm]current page.north west);
+    \fill[StudyOrange] ([xshift=20mm]current page.south west) rectangle
+      ([xshift=28mm]current page.north west);
+    \fill[StudyInk] ([yshift=-36mm]current page.north west) rectangle
+      ([xshift=.88\paperwidth,yshift=-31mm]current page.north west);
+    \node[anchor=north west,text width=.72\paperwidth,align=left]
+      at ([xshift=42mm,yshift=-58mm]current page.north west) {%
+        \sffamily\bfseries\fontsize{30}{36}\selectfont\color{StudyInk}$title$
+      };
+$if(subtitle)$
+    \node[anchor=north west,text width=.68\paperwidth,align=left]
+      at ([xshift=42mm,yshift=-115mm]current page.north west) {%
+        \sffamily\fontsize{15}{20}\selectfont\color{StudyBlue}$subtitle$
+      };
+$endif$
+    \node[circle,shade,top color=StudyOrange,bottom color=StudyCyan,text=white,minimum size=34mm,font=\sffamily\bfseries\fontsize{24}{25}\selectfont]
+      at ([xshift=-38mm,yshift=46mm]current page.south east) {KB};
+    \node[anchor=south west,text width=.62\paperwidth,align=left]
+      at ([xshift=42mm,yshift=25mm]current page.south west) {%
+        \sffamily\small\color{StudyInk}
+$if(path-title)$$path-title$\\[2mm]$endif$
+$if(author)$$author$\\[2mm]$endif$
+$if(date)$Phiên bản $date$$endif$
+      };
+  \end{tikzpicture}
+\end{titlepage}
+$if(toc)$
+\tableofcontents
+\clearpage
+$endif$
+\let\cleardoublepage\clearpage
+\mainmatter
+$body$
+\end{document}

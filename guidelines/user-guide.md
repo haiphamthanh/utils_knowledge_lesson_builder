@@ -281,8 +281,8 @@ Các lựa chọn sẵn có:
 | `clean` | Không đánh số |
 | `academic` | Đánh số đầy đủ `1`, `1.1`, `1.1.1` |
 | `editorial` | Handbook cân bằng với các card theo vai trò nội dung |
-| `editorial-banner` | Chapter banner và dải màu xanh–vàng |
-| `editorial-study` | Cyan–orange theo phong cách study book |
+| `editorial-banner` | PDF A4 với chapter banner, tab số dựng đứng và dải mép xanh–vàng |
+| `editorial-study` | PDF A4 với chapter `C–HƯƠNG`, viền chẵn/lẻ cyan–orange và khung giáo trình |
 
 Xem template trước khi build:
 
@@ -297,6 +297,10 @@ Ví dụ chọn theme:
 ./build.sh build web-system-foundations --template editorial-banner
 ./build.sh build web-system-foundations --template editorial-study
 ```
+
+Hai theme trên dùng LaTeX template độc lập cho PDF; thay đổi một theme không
+làm đổi bố cục PDF của theme còn lại. Bản HTML vẫn giữ cùng semantic content
+cards để nội dung có cấu trúc nhất quán giữa các format.
 
 Muốn đổi tiêu đề hiển thị trong sách, sửa `title` trong `cookbook.yml`. Không
 đổi cookbook ID chỉ để đổi tiêu đề. Nếu thật sự tạo một cookbook khác, tạo một

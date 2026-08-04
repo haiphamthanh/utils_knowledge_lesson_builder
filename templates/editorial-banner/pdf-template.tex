@@ -1,0 +1,326 @@
+\documentclass[11pt,a4paper,openany]{book}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{vietnamese}
+\setmainfont{texgyrepagella}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setsansfont{texgyreheros}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic
+]
+\setmonofont{texgyrecursor}[
+  Extension=.otf,
+  UprightFont=*-regular,
+  BoldFont=*-bold,
+  ItalicFont=*-italic,
+  BoldItalicFont=*-bolditalic,
+  Scale=0.86
+]
+\usepackage[a4paper,inner=27mm,outer=24mm,top=25mm,bottom=24mm,headheight=22pt]{geometry}
+\usepackage{xcolor,graphicx,longtable,booktabs,array,calc,multicol}
+\usepackage{amssymb}
+\usepackage{hyperref,bookmark}
+\usepackage{fancyhdr}
+\usepackage[explicit]{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{calc,fit,positioning,shadows.blur,shapes.symbols}
+\usepackage{eso-pic}
+\usepackage{fvextra}
+\usepackage{upquote}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+
+\definecolor{BannerBlue}{HTML}{087E98}
+\definecolor{BannerNavy}{HTML}{123F58}
+\definecolor{BannerCyan}{HTML}{00A6C8}
+\definecolor{BannerGold}{HTML}{F2B705}
+\definecolor{BannerOrange}{HTML}{E96B2C}
+\definecolor{BannerCream}{HTML}{FFF8E8}
+\definecolor{BannerMist}{HTML}{EEF7F9}
+\definecolor{BannerLine}{HTML}{D4E4E8}
+\definecolor{BannerCode}{HTML}{F2F6F7}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=BannerBlue,
+  urlcolor=BannerNavy,
+  citecolor=BannerBlue,
+  pdfauthor={$author$},
+  pdftitle={$title$}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlist{nosep,leftmargin=*}
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{$toc-depth$}
+
+% Dải trang và nhịp trang được dựng lại từ ngôn ngữ thị giác của mẫu banner.
+\AddToShipoutPictureBG{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[BannerNavy] (current page.south west) rectangle
+      ([yshift=7mm]current page.south east);
+    \fill[BannerGold] (current page.south west) rectangle
+      ([xshift=7mm,yshift=7mm]current page.south west);
+    \ifodd\value{page}
+      \fill[BannerCyan] ([xshift=-7mm]current page.north east) rectangle
+        (current page.south east);
+      \foreach \offset/\height in {12/24,40/13,62/9,79/6,91/4}{
+        \fill[BannerGold] ([xshift=-7mm,yshift=-\offset mm]current page.north east)
+          rectangle ++(7mm,-\height mm);
+      }
+    \else
+      \fill[BannerCyan] (current page.north west) rectangle
+        ([xshift=7mm]current page.south west);
+      \foreach \offset/\height in {12/24,40/13,62/9,79/6,91/4}{
+        \fill[BannerGold] ([yshift=-\offset mm]current page.north west)
+          rectangle ++(7mm,-\height mm);
+      }
+    \fi
+  \end{tikzpicture}%
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}{}}
+\fancyhead[LO]{\small\sffamily\bfseries\color{BannerBlue}\rightmark}
+\fancyhead[RE]{\small\sffamily\bfseries\color{BannerBlue}\leftmark}
+\fancyhead[RO]{%
+  \tikz[baseline=(page.base)]{
+    \node[circle,fill=BannerMist,minimum size=7mm] {};
+    \node[circle,fill=BannerCyan!55,minimum size=7mm,xshift=7mm] {};
+    \node (page) [circle,fill=BannerNavy,text=white,font=\bfseries,minimum size=8mm,xshift=14mm] {\thepage};
+  }%
+}
+\fancyhead[LE]{%
+  \tikz[baseline=(page.base)]{
+    \node (page) [circle,fill=BannerNavy,text=white,font=\bfseries,minimum size=8mm] {\thepage};
+    \node[circle,fill=BannerCyan!55,minimum size=7mm,xshift=7mm] {};
+    \node[circle,fill=BannerMist,minimum size=7mm,xshift=14mm] {};
+  }%
+}
+\fancyfoot[C]{\sffamily\footnotesize\color{white}$if(author)$$author$$else$KNOWLEDGE COOKBOOK$endif$}
+
+% Chapter banner: mảng màu toàn chiều ngang và tab số chương dựng đứng.
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\bfseries}
+  {}
+  {0pt}
+  {%
+    \begin{tikzpicture}
+      \node[
+        fill=BannerBlue,
+        text=white,
+        align=left,
+        text width=.72\textwidth,
+        minimum height=34mm,
+        inner xsep=9mm,
+        inner ysep=7mm,
+        font=\fontsize{25}{30}\selectfont\bfseries
+      ] (chapterbar) {#1};
+      \path[fill=BannerNavy]
+        (chapterbar.north west) rectangle ([yshift=-7mm]chapterbar.north east);
+      \node[
+        signal,
+        signal from=north,
+        signal pointer angle=150,
+        fill=BannerCream,
+        drop shadow={shadow xshift=0pt,shadow yshift=-1.5pt},
+        rotate=-90,
+        minimum width=39mm,
+        minimum height=30mm,
+        anchor=north
+      ] (chaptertab) at ([xshift=18mm,yshift=9mm]chapterbar.north east) {};
+      \node[font=\sffamily\bfseries\footnotesize,color=BannerNavy,rotate=90]
+        at ([xshift=-8mm]chaptertab.center) {CHƯƠNG};
+      \node[font=\sffamily\bfseries\fontsize{35}{35}\selectfont,color=BannerBlue,rotate=90]
+        at ([xshift=7mm]chaptertab.center) {\thechapter};
+      \fill[BannerGold] (chapterbar.south west) rectangle
+        ([yshift=2.2mm]chapterbar.south east);
+    \end{tikzpicture}%
+  }
+\titlespacing*{\chapter}{-7mm}{-11mm}{17mm}
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\sffamily\bfseries\fontsize{27}{32}\selectfont\color{BannerNavy}}
+  {}
+  {0pt}
+  {\begin{tcolorbox}[boxrule=0pt,arc=0pt,colback=BannerMist,borderline west={3mm}{0pt}{BannerGold},left=6mm,right=5mm,top=4mm,bottom=4mm]#1\end{tcolorbox}}
+
+% Lesson title dạng signal, lấy cảm hứng từ dải section của mẫu gốc.
+\titleformat{\section}
+  {\normalfont\sffamily\bfseries\Large\color{BannerNavy}}
+  {}
+  {0pt}
+  {%
+    \begin{tikzpicture}
+      \node[
+        signal,
+        signal to=east,
+        left color=BannerMist,
+        right color=white,
+        text=BannerNavy,
+        align=left,
+        text width=.86\textwidth,
+        minimum height=13mm,
+        inner xsep=7mm,
+        font=\sffamily\bfseries\Large
+      ] (lesson) {#1};
+      \fill[BannerGold] (lesson.south west) rectangle ++(34mm,1.3mm);
+    \end{tikzpicture}%
+  }
+\titlespacing*{\section}{-5mm}{14mm}{5mm}
+
+\titleformat{\subsection}
+  {\normalfont\sffamily\bfseries\large\color{BannerBlue}}
+  {}
+  {0pt}
+  {\tikz[baseline=(title.base)]{%
+    \node[fill=BannerCyan,rounded corners=1.2mm,text=white,font=\bfseries\sffamily,inner xsep=4mm,inner ysep=1.5mm] (title) {#1};
+  }}
+\titlespacing*{\subsection}{0pt}{10mm}{3mm}
+
+\newcommand{\passthrough}[1]{#1}
+\newcommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\newcommand{\pandocbounded}[1]{\begin{center}\includegraphics[width=\linewidth,height=.8\textheight,keepaspectratio]{#1}\end{center}}
+\newenvironment{CSLReferences}[2]{}{}
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\entryspacing}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\cslhangindent}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth-\cslhangindent}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+$for(header-includes)$
+$header-includes$
+$endfor$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\small}
+\BeforeBeginEnvironment{Shaded}{\begin{tcolorbox}[colback=BannerCode,colframe=BannerLine,boxrule=.4pt,arc=2pt,left=2mm,right=2mm,top=1mm,bottom=1mm]}
+\AfterEndEnvironment{Shaded}{\end{tcolorbox}}
+
+\newtcolorbox{chapterobjectivebox}{
+  enhanced,breakable,title=Mục tiêu chương,
+  colback=BannerMist,colframe=BannerCyan,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=5mm,yshift=-2mm},
+  boxed title style={colback=BannerCyan,sharp corners},
+  borderline west={2.5mm}{0pt}{BannerGold},top=5mm
+}
+\newtcolorbox{needbox}{
+  enhanced,breakable,title=Vấn đề cần giải quyết,
+  colback=BannerCream,colframe=BannerOrange,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=4mm,yshift=-2mm},
+  boxed title style={colback=BannerOrange,sharp corners},
+  borderline west={2mm}{0pt}{BannerGold},top=5mm
+}
+\newtcolorbox{contextbox}{
+  enhanced,breakable,title=Vì sao quan trọng?,
+  colback=white,colframe=BannerLine,coltitle=BannerNavy,
+  fonttitle=\bfseries\sffamily,arc=0mm,
+  borderline north={.8mm}{0pt}{BannerNavy}
+}
+\newtcolorbox{conceptbox}{
+  enhanced,breakable,title=Khái niệm cốt lõi,
+  colback=BannerMist,colframe=BannerBlue,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=4mm,yshift=-2mm},
+  boxed title style={colback=BannerBlue,sharp corners},top=5mm
+}
+\newtcolorbox{examplebox}{
+  enhanced,breakable,title=Ví dụ,
+  colback=white,colframe=BannerCyan,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top left={xshift=4mm,yshift=-2mm},
+  boxed title style={colback=BannerCyan,sharp corners},top=5mm
+}
+\newtcolorbox{tradeoffbox}{
+  enhanced,breakable,title=Quyết định và giới hạn,
+  colback=BannerCream,colframe=BannerGold!85!black,coltitle=BannerNavy,
+  fonttitle=\bfseries\sffamily,arc=1mm,
+  borderline west={2mm}{0pt}{BannerGold}
+}
+\newtcolorbox{connectionsbox}{
+  enhanced,breakable,title=Liên kết kiến thức,
+  colback=white,colframe=BannerLine,coltitle=BannerBlue,
+  fonttitle=\bfseries\sffamily,arc=0mm,
+  borderline west={1mm}{0pt}{BannerCyan}
+}
+\newtcolorbox{summarybox}{
+  enhanced,breakable,title=Ghi nhớ,
+  colback=BannerNavy,colframe=BannerNavy,coltitle=BannerGold,
+  colupper=white,fonttitle=\bfseries\sffamily,arc=1mm
+}
+\newtcolorbox{referencesbox}{
+  breakable,title=Tài liệu tham khảo,colback=white,colframe=BannerLine,
+  coltitle=BannerNavy,fonttitle=\bfseries\sffamily,
+  fontupper=\small\color{black!65}
+}
+\newtcolorbox{warningbox}{
+  breakable,title=Cảnh báo,colback=red!4,colframe=BannerOrange,
+  fonttitle=\bfseries\sffamily
+}
+\newtcolorbox{nextstepbox}{
+  enhanced,breakable,title=Nhu cầu tiếp theo,
+  colback=BannerMist,colframe=BannerCyan,coltitle=white,
+  fonttitle=\bfseries\sffamily,
+  attach boxed title to top right={xshift=-4mm,yshift=-2mm},
+  boxed title style={colback=BannerCyan,sharp corners},top=5mm
+}
+
+\begin{document}
+\frontmatter
+\begin{titlepage}
+  \thispagestyle{empty}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[BannerNavy] (current page.south west) rectangle (current page.north east);
+    \fill[BannerBlue] (current page.south west) rectangle
+      ([xshift=.68\paperwidth]current page.north west);
+    \fill[BannerCyan] ([xshift=.68\paperwidth]current page.south west) rectangle
+      ([xshift=.76\paperwidth]current page.north west);
+    \fill[BannerGold] ([yshift=-38mm]current page.north west) rectangle
+      ([xshift=.82\paperwidth,yshift=-34mm]current page.north west);
+    \node[anchor=north west,text width=.58\paperwidth,align=left]
+      at ([xshift=20mm,yshift=-52mm]current page.north west) {%
+        \sffamily\bfseries\fontsize{29}{35}\selectfont\color{white}$title$
+      };
+$if(subtitle)$
+    \node[anchor=north west,text width=.55\paperwidth,align=left]
+      at ([xshift=20mm,yshift=-104mm]current page.north west) {%
+        \sffamily\fontsize{15}{20}\selectfont\color{white!82}$subtitle$
+      };
+$endif$
+    \node[anchor=south west,text width=.55\paperwidth,align=left]
+      at ([xshift=20mm,yshift=24mm]current page.south west) {%
+        \sffamily\small\color{white!80}
+$if(path-title)$$path-title$\\[2mm]$endif$
+$if(author)$$author$\\[2mm]$endif$
+$if(date)$Phiên bản $date$$endif$
+      };
+    \node[rotate=90,anchor=south,font=\sffamily\bfseries\fontsize{12}{14}\selectfont,text=BannerGold]
+      at ([xshift=-25mm]current page.east) {KNOWLEDGE COOKBOOK};
+  \end{tikzpicture}
+\end{titlepage}
+$if(toc)$
+\tableofcontents
+\clearpage
+$endif$
+\let\cleardoublepage\clearpage
+\mainmatter
+$body$
+\end{document}

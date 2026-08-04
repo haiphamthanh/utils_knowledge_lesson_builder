@@ -2,6 +2,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
+import yaml
+
 from scripts.builder import _asset_values
 from scripts.models import BuilderError
 from scripts.template_cli import list_templates, templates_as_table
@@ -36,6 +38,17 @@ class TemplateTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(BuilderError, "string hoặc list string"):
             _asset_values(["theme.css", 1], "stylesheet")
+
+    def test_ornate_themes_use_standalone_pdf_templates(self) -> None:
+        for template_id in ("editorial-banner", "editorial-study"):
+            template_dir = ROOT / "templates" / template_id
+            manifest = yaml.safe_load(
+                (template_dir / "template.yml").read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                manifest["formats"]["pdf"]["template"], "pdf-template.tex"
+            )
+            self.assertTrue((template_dir / "pdf-template.tex").is_file())
 
     def test_registry_ignores_manifest_with_mismatched_directory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

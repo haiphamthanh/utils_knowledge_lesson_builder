@@ -53,8 +53,8 @@ templates/
 ├── clean/             # Không đánh số
 ├── academic/          # Đánh số 1 / 1.1 / 1.1.1
 ├── editorial/         # Handbook với semantic content cards, khuyến nghị
-├── editorial-banner/  # Theme banner xanh–vàng
-├── editorial-study/   # Theme study book cyan–orange
+├── editorial-banner/  # PDF A4: banner xanh–vàng và tab số chương
+├── editorial-study/   # PDF A4: study book cyan–orange
 └── default/           # Asset dùng chung và tương thích cũ
 ```
 
@@ -79,17 +79,18 @@ Khám phá toàn bộ template trước khi chọn:
 | `clean` | Không số | Không số | Không số |
 | `academic` | `1` | `1.1` | `1.1.1` |
 | `editorial` | `CHƯƠNG 01` | `Bài 01` | Content cards theo vai trò |
-| `editorial-banner` | `CHƯƠNG 01` | `Bài 01` | Banner xanh và dải màu đậm |
-| `editorial-study` | `CHƯƠNG 01` | `Bài 01` | Cyan–orange dạng study book |
+| `editorial-banner` | Tab số chương dựng đứng | `Bài 01` | Banner, dải mép và page marker riêng |
+| `editorial-study` | Chữ `C–HƯƠNG 01` | `Bài 01` | Viền cyan–orange và khung giáo trình |
 
 Template có thể dùng lại asset trong `templates/default/` bằng relative path,
 nhưng không thể tham chiếu file nằm ngoài `templates/`. Hai field
 `number_sections` và `toc_depth` trong `template.yml` điều khiển độ sâu mục lục
 và đánh số; không thêm số vào lesson ID hoặc tên file.
 
-`editorial-banner` và `editorial-study` được thiết kế lại từ đầu dựa trên ngôn
-ngữ thị giác của hai bài tham khảo VniTeach; URL nguồn cảm hứng được lưu trong
-`template.yml`. Project không sao chép nguyên source template bên ngoài.
+`editorial-banner` và `editorial-study` có `pdf-template.tex` A4 độc lập, không
+còn chỉ đổi màu trên `templates/default/pdf-template.tex`. Hai mã nguồn LaTeX
+tham khảo được dùng làm đặc tả trực quan rồi thích nghi cho dữ liệu Pandoc và
+semantic cards của project; URL nguồn được lưu trong `template.yml`.
 
 ## Cấu trúc cookbook
 
