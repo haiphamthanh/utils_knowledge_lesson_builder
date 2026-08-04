@@ -1,0 +1,19 @@
+id: academic
+name: Academic
+description: Trình bày học thuật với chỉ mục 1, 1.1 và 1.1.1.
+number_sections: true
+toc_depth: 3
+filters:
+  - ../default/admonitions.lua
+formats:
+  html:
+    to: html5
+    extension: html
+    template: ../default/html-template.html
+    stylesheet: ../default/book.css
+    embed_resources: true
+  pdf:
+    to: latex
+    extension: pdf
+    template: ../default/pdf-template.tex
+    pdf_engine: xelatex

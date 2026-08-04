@@ -1,4 +1,8 @@
 id: default
+name: Default Academic
+description: Template tương thích cũ với đánh số phân cấp đầy đủ.
+number_sections: true
+toc_depth: 2
 filters:
   - admonitions.lua
 formats:
@@ -13,4 +17,3 @@ formats:
     extension: pdf
     template: pdf-template.tex
     pdf_engine: xelatex
-

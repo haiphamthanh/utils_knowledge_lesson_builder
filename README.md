@@ -38,8 +38,8 @@ Output:
 
 ```text
 build/web-system-foundations/foundation/
-├── web-system-foundations-foundation-default.html
-└── web-system-foundations-foundation-default.pdf
+├── web-system-foundations-foundation-editorial.html
+└── web-system-foundations-foundation-editorial.pdf
 ```
 
 ## Chọn template
@@ -49,23 +49,48 @@ Mỗi định dạng workbook nằm trong một thư mục có tên ổn định
 ```text
 templates/
 ├── lesson.md
-└── default/
-    ├── template.yml
-    ├── html-template.html
-    ├── pdf-template.tex
-    ├── book.css
-    └── admonitions.lua
+├── chapter-lesson/    # Chương 01 / Bài 01, tối giản
+├── clean/             # Không đánh số
+├── academic/          # Đánh số 1 / 1.1 / 1.1.1
+├── editorial/         # Handbook với semantic content cards, khuyến nghị
+├── editorial-banner/  # PDF A4: banner xanh–vàng và tab số chương
+├── editorial-study/   # PDF A4: study book cyan–orange
+└── default/           # Asset dùng chung và tương thích cũ
 ```
 
-Build bằng tên:
+Chọn phong cách bằng tên:
 
 ```bash
-./build.sh build web-system-foundations --template default --format html
+./build.sh build web-system-foundations --template chapter-lesson
+./build.sh build web-system-foundations --template clean
+./build.sh build web-system-foundations --template academic
 ```
 
-Muốn thêm style mới, copy `templates/default/` sang `templates/<ten-moi>/`, đổi
-`id` trong `template.yml`, rồi chỉnh các asset bên trong. Core builder không cần
-thay đổi.
+Khám phá toàn bộ template trước khi chọn:
+
+```bash
+./build.sh template list
+./build.sh template list --json
+```
+
+| Template | Chapter | Lesson | Heading bên trong |
+|---|---|---|---|
+| `chapter-lesson` | `CHƯƠNG 01` | `Bài 01` | Không số |
+| `clean` | Không số | Không số | Không số |
+| `academic` | `1` | `1.1` | `1.1.1` |
+| `editorial` | `CHƯƠNG 01` | `Bài 01` | Content cards theo vai trò |
+| `editorial-banner` | Tab số chương dựng đứng | `Bài 01` | Banner, dải mép và page marker riêng |
+| `editorial-study` | Chữ `C–HƯƠNG 01` | `Bài 01` | Viền cyan–orange và khung giáo trình |
+
+Template có thể dùng lại asset trong `templates/default/` bằng relative path,
+nhưng không thể tham chiếu file nằm ngoài `templates/`. Hai field
+`number_sections` và `toc_depth` trong `template.yml` điều khiển độ sâu mục lục
+và đánh số; không thêm số vào lesson ID hoặc tên file.
+
+`editorial-banner` và `editorial-study` có `pdf-template.tex` A4 độc lập, không
+còn chỉ đổi màu trên `templates/default/pdf-template.tex`. Hai mã nguồn LaTeX
+tham khảo được dùng làm đặc tả trực quan rồi thích nghi cho dữ liệu Pandoc và
+semantic cards của project; URL nguồn được lưu trong `template.yml`.
 
 ## Cấu trúc cookbook
 
@@ -104,28 +129,38 @@ Guideline đầy đủ nằm trong [`guidelines/`](guidelines/README.md).
 
 ## Resource lifecycle
 
-Nội dung đầu vào đi qua ba trạng thái:
+Nguồn nhỏ đi thẳng qua pool; nguồn lớn được split nhưng vẫn giữ original:
 
 ```text
-resource/raw → resource/pool → resource/done
+resource nhỏ: raw → inspect → pool → done
+resource lớn: raw → inspect/prepare → archive + nhiều pool children → done
 ```
 
 ```bash
 ./build.sh resource sync
-./build.sh resource list --status pool
+./build.sh resource inspect <resource-id> --json
 ./build.sh resource review <resource-id>
+./build.sh resource prepare <resource-id> --plan <plan.yml>
+./build.sh resource finalize <resource-id> --preparation <preparation-id>
+./build.sh resource verify <resource-id>
 ./build.sh resource complete <resource-id> \
   --cookbook web-system-foundations \
   --lesson request-response
 ```
 
-`resource/index.yml` lưu thời điểm tạo, review, hoàn thành và lesson đích. Xem
+`resource/index.yml` schema v2 lưu checksum, lineage, thời điểm và lesson đích.
+Split giữ byte gốc trong `resource/archive/`; candidate chỉ nằm trong `build/`
+cho tới xác nhận finalize. Xem
 [`guidelines/resources.md`](guidelines/resources.md) để biết quy tắc transition.
 
 Skill `$promote-pool-lesson` nằm trong
 `.codex/skills/promote-pool-lesson` của chính repo này. Khi gọi skill, agent sẽ
 liệt kê pool, đề xuất lesson/graph/path và yêu cầu xác nhận trước khi tạo nội
 dung hoặc move resource.
+
+Skill `$prepare-raw-resource` dùng AI duy nhất cho quyết định ngữ nghĩa
+single/split. CLI deterministic kiểm coverage/checksum; skill chờ xác nhận hai
+lần và không được viết lại nội dung nguồn.
 
 Skill `$review-lesson-placement` nằm trong
 `.codex/skills/review-lesson-placement` và chỉ audit cookbook, chapter,

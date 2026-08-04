@@ -1,0 +1,25 @@
+id: editorial-banner
+name: Editorial Banner
+description: PDF A4 với banner xanh đậm, tab số chương và dải màu trang.
+inspired_by:
+  - https://www.vniteach.com/2023/08/20/latex-templates-mau-bia-va-noi-dung-tuyet-dep/
+number_sections: false
+toc_depth: 2
+filters:
+  - ../editorial/editorial.lua
+  - ../default/admonitions.lua
+  - ../editorial/ornate-numbering.lua
+formats:
+  html:
+    to: html5
+    extension: html
+    template: ../default/html-template.html
+    stylesheet:
+      - ../default/book.css
+      - banner.css
+    embed_resources: true
+  pdf:
+    to: latex
+    extension: pdf
+    template: pdf-template.tex
+    pdf_engine: xelatex

@@ -1,5 +1,13 @@
 # Cấu hình mặc định ở cấp dự án. Cookbook hoặc CLI có thể ghi đè khi cần.
 build_dir: build
-default_template: default
+default_template: editorial
 default_format: html
 
+resource_preparation:
+  text_extensions:
+    - .md
+    - .markdown
+    - .txt
+  soft_max_words: 3000
+  hard_max_words: 8000
+  max_ai_words: 50000

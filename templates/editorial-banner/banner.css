@@ -1,0 +1,19 @@
+:root {
+  --navy: #123f58;
+  --teal: #00a6c8;
+  --gold: #f2b705;
+  --paper: #fbfdfe;
+}
+.book-cover {
+  background: linear-gradient(145deg, #0b3349 0%, #006f89 68%, #00a6c8 100%);
+}
+.book-content > h1 {
+  padding: 1.2rem 1.35rem;
+  border: 0;
+  border-left: .45rem solid var(--gold);
+  border-radius: .25rem;
+  color: white;
+  background: linear-gradient(90deg, var(--navy), #087e98);
+}
+.book-content > h1 .chapter-index { color: #ffe38a; }
+.admonition { box-shadow: 0 8px 22px rgb(18 63 88 / 8%); }

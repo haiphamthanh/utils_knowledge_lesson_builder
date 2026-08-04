@@ -11,7 +11,12 @@ description: Convert a reviewed resource item from resource/pool into a structur
 3. Run `python <skill-dir>/scripts/list_pool.py --project <root>`.
 4. Present the returned candidates and ask the user to choose one. Stop if the
    pool is empty.
-5. Read the selected file or the relevant files inside the selected directory.
+5. Run `./build.sh resource verify <resource-id> --json` and stop unless it
+   passes. For a split child, this also verifies its parent archive, coverage,
+   provenance, and original checksum. Read `content.md` first when present;
+   consult `provenance.yml` only to trace source fragments and attachments.
+   Never copy technical provenance metadata into the lesson. Otherwise read
+   the selected file or relevant files inside the selected directory.
    Inspect `knowledge/<cookbook>/cookbook.yml`, its graph, paths, lesson
    template, and nearby lessons.
 6. Propose one concrete change set: title, stable lesson ID, depth, target

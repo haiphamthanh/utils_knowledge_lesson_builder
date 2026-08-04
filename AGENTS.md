@@ -2,7 +2,7 @@
 
 Đọc `guidelines/agent-instructions.md`, `guidelines/knowledge-model.md` và
 `guidelines/authoring.md` trước khi thay đổi lesson, graph hoặc learning path.
-Đọc `guidelines/resources.md` trước khi chuyển item giữa raw, pool và done.
+Đọc `guidelines/resources.md` trước khi chuyển item giữa raw, archive, pool và done.
 
 Giữ ba nguồn sự thật tách biệt:
 

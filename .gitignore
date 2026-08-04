@@ -3,4 +3,7 @@
 __pycache__/
 *.py[cod]
 build/
-
+*.aux
+*.fdb_latexmk
+*.fls
+*.log

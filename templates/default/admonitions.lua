@@ -1,7 +1,13 @@
 local labels = {
   ["chapter-objective"] = "Mục tiêu chương",
-  ["need"] = "Nhu cầu",
+  ["need"] = "Vấn đề cần giải quyết",
+  ["context"] = "Vì sao quan trọng?",
+  ["concept"] = "Khái niệm cốt lõi",
   ["example"] = "Ví dụ",
+  ["tradeoff"] = "Quyết định và giới hạn",
+  ["connections"] = "Liên kết kiến thức",
+  ["summary"] = "Ghi nhớ",
+  ["references"] = "Tài liệu tham khảo",
   ["warning"] = "Cảnh báo",
   ["next-step"] = "Nhu cầu tiếp theo",
 }
@@ -9,7 +15,13 @@ local labels = {
 local latex_environments = {
   ["chapter-objective"] = "chapterobjectivebox",
   ["need"] = "needbox",
+  ["context"] = "contextbox",
+  ["concept"] = "conceptbox",
   ["example"] = "examplebox",
+  ["tradeoff"] = "tradeoffbox",
+  ["connections"] = "connectionsbox",
+  ["summary"] = "summarybox",
+  ["references"] = "referencesbox",
   ["warning"] = "warningbox",
   ["next-step"] = "nextstepbox",
 }
@@ -43,4 +55,3 @@ function Div(element)
 
   return element
 end
-
