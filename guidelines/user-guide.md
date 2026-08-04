@@ -54,9 +54,26 @@ Xác nhận cookbook, graph relation và vị trí learning path được đề 
 
 ## Step 5: Validate và build cookbook
 
+### Validate cookbook
+
 ```bash
 ./build.sh validate web-system-foundations
-./build.sh build web-system-foundations
+```
+
+### Build cookbook
+
+Xem template trước khi build:
+
+```bash
+./build.sh template list
+```
+
+Ví dụ chọn theme:
+
+```bash
+./build.sh build web-system-foundations --template editorial
+./build.sh build web-system-foundations --template editorial-banner
+./build.sh build web-system-foundations --template editorial-study
 ```
 
 Output nằm trong:
@@ -95,14 +112,14 @@ Chạy các lệnh từ thư mục gốc của project.
 
 ## Automation nào nên dùng?
 
-| Tác vụ | Cách phù hợp | Lý do |
-|---|---|---|
-| Copy nguồn vào `raw` | Filesystem + `resource sync` | Deterministic, không cần agent suy luận |
-| Chuyển `raw → pool` nhỏ | Người dùng review + `resource review` | Deterministic, ít hơn 3.000 từ và chỉ một chủ đề |
-| Chuẩn hóa/split nguồn lớn | `$prepare-raw-resource` | AI chọn biên ngữ nghĩa; CLI bảo đảm checksum, coverage và copy-on-write |
-| Chuyển `pool → lesson → done` | `$promote-pool-lesson` | Phải đọc nội dung, chọn cookbook/relation/path và phối hợp nhiều file |
-| Validate/build cookbook | `build.sh` | CLI cho kết quả lặp lại được và báo lỗi trực tiếp |
-| Review lesson nằm đúng sách/vị trí | `$review-lesson-placement` | Cần kết hợp validation với đánh giá objective, depth và Progressive Disclosure |
+| Tác vụ                             | Cách phù hợp                          | Lý do                                                                          |
+| ---------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| Copy nguồn vào `raw`               | Filesystem + `resource sync`          | Deterministic, không cần agent suy luận                                        |
+| Chuyển `raw → pool` nhỏ            | Người dùng review + `resource review` | Deterministic, ít hơn 3.000 từ và chỉ một chủ đề                               |
+| Chuẩn hóa/split nguồn lớn          | `$prepare-raw-resource`               | AI chọn biên ngữ nghĩa; CLI bảo đảm checksum, coverage và copy-on-write        |
+| Chuyển `pool → lesson → done`      | `$promote-pool-lesson`                | Phải đọc nội dung, chọn cookbook/relation/path và phối hợp nhiều file          |
+| Validate/build cookbook            | `build.sh`                            | CLI cho kết quả lặp lại được và báo lỗi trực tiếp                              |
+| Review lesson nằm đúng sách/vị trí | `$review-lesson-placement`            | Cần kết hợp validation với đánh giá objective, depth và Progressive Disclosure |
 
 Không tạo skill chỉ để bọc một command có sẵn. Skill được dành cho bước cần
 đọc nhiều nguồn sự thật hoặc cần đánh giá ngữ nghĩa.
@@ -201,11 +218,11 @@ Skill sẽ đọc source và đề xuất:
 Skill phải chờ xác nhận trước khi ghi file. Hãy kiểm tra đề xuất theo ba nguồn sự
 thật:
 
-| Nguồn | Trách nhiệm |
-|---|---|
-| `knowledge/<cookbook>/lessons/<lesson-id>.md` | Nội dung của lesson |
-| `knowledge/<cookbook>/graph.yml` | Quan hệ với các lesson khác |
-| `knowledge/<cookbook>/paths/<path-id>.yml` | Chapter, vai trò và thứ tự đọc |
+| Nguồn                                         | Trách nhiệm                    |
+| --------------------------------------------- | ------------------------------ |
+| `knowledge/<cookbook>/lessons/<lesson-id>.md` | Nội dung của lesson            |
+| `knowledge/<cookbook>/graph.yml`              | Quan hệ với các lesson khác    |
+| `knowledge/<cookbook>/paths/<path-id>.yml`    | Chapter, vai trò và thứ tự đọc |
 
 `cookbook.yml` chỉ chứa metadata và default của cookbook. Không thêm danh sách
 lesson hoặc thứ tự lesson vào file này. Skill chỉ sửa `cookbook.yml` khi title,
@@ -275,14 +292,14 @@ build/web-system-foundations/foundation/
 
 Các lựa chọn sẵn có:
 
-| Template | Cách hiển thị chỉ mục |
-|---|---|
-| `chapter-lesson` | `CHƯƠNG 01`, `Bài 01`; heading nhỏ không có số |
-| `clean` | Không đánh số |
-| `academic` | Đánh số đầy đủ `1`, `1.1`, `1.1.1` |
-| `editorial` | Handbook cân bằng với các card theo vai trò nội dung |
-| `editorial-banner` | PDF A4 với chapter banner, tab số dựng đứng và dải mép xanh–vàng |
-| `editorial-study` | PDF A4 với chapter `C–HƯƠNG`, viền chẵn/lẻ cyan–orange và khung giáo trình |
+| Template           | Cách hiển thị chỉ mục                                                      |
+| ------------------ | -------------------------------------------------------------------------- |
+| `chapter-lesson`   | `CHƯƠNG 01`, `Bài 01`; heading nhỏ không có số                             |
+| `clean`            | Không đánh số                                                              |
+| `academic`         | Đánh số đầy đủ `1`, `1.1`, `1.1.1`                                         |
+| `editorial`        | Handbook cân bằng với các card theo vai trò nội dung                       |
+| `editorial-banner` | PDF A4 với chapter banner, tab số dựng đứng và dải mép xanh–vàng           |
+| `editorial-study`  | PDF A4 với chapter `C–HƯƠNG`, viền chẵn/lẻ cyan–orange và khung giáo trình |
 
 Xem template trước khi build:
 
@@ -393,21 +410,21 @@ thêm vào cuối path và không dùng graph để tự sinh thứ tự đọc.
 
 ## Lệnh tham khảo nhanh
 
-| Mục đích | Lệnh |
-|---|---|
-| Đồng bộ resource mới | `./build.sh resource sync` |
-| Liệt kê raw | `./build.sh resource list --status raw` |
-| Inspect raw | `./build.sh resource inspect <resource-id> --json` |
-| Review raw nhỏ → pool | `./build.sh resource review <resource-id>` |
-| Chuẩn hóa/split raw | Gọi `$prepare-raw-resource` trong Codex |
-| Verify resource | `./build.sh resource verify <resource-id>` |
-| Liệt kê pool | `./build.sh resource list --status pool` |
-| Tạo lesson từ pool | Gọi `$promote-pool-lesson` trong Codex |
-| Review vị trí lesson | Gọi `$review-lesson-placement` trong Codex |
-| Kiểm tra cookbook/path | `./build.sh validate <cookbook> --path <path>` |
-| Build HTML mặc định | `./build.sh build <cookbook>` |
-| Build cả optional | `./build.sh build <cookbook> --include-optional` |
-| Kiểm tra done | `./build.sh resource list --status done` |
+| Mục đích               | Lệnh                                               |
+| ---------------------- | -------------------------------------------------- |
+| Đồng bộ resource mới   | `./build.sh resource sync`                         |
+| Liệt kê raw            | `./build.sh resource list --status raw`            |
+| Inspect raw            | `./build.sh resource inspect <resource-id> --json` |
+| Review raw nhỏ → pool  | `./build.sh resource review <resource-id>`         |
+| Chuẩn hóa/split raw    | Gọi `$prepare-raw-resource` trong Codex            |
+| Verify resource        | `./build.sh resource verify <resource-id>`         |
+| Liệt kê pool           | `./build.sh resource list --status pool`           |
+| Tạo lesson từ pool     | Gọi `$promote-pool-lesson` trong Codex             |
+| Review vị trí lesson   | Gọi `$review-lesson-placement` trong Codex         |
+| Kiểm tra cookbook/path | `./build.sh validate <cookbook> --path <path>`     |
+| Build HTML mặc định    | `./build.sh build <cookbook>`                      |
+| Build cả optional      | `./build.sh build <cookbook> --include-optional`   |
+| Kiểm tra done          | `./build.sh resource list --status done`           |
 
 Đọc thêm [`knowledge-model.md`](knowledge-model.md),
 [`authoring.md`](authoring.md) và [`resources.md`](resources.md) khi cần thay đổi
